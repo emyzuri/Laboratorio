@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />    <PackageReference Include="Microsoft.AspNetCore" Version="2.3.0" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Funciones\Ejecución\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core.DataAccess\Core.DataAccess.csproj" />
+    <ProjectReference Include="..\Core.Infraestructura\Core.Infraestructura.csproj" />
+    <ProjectReference Include="..\Core.Util\Core.Util.csproj" />
+  </ItemGroup>
+
+</Project>
