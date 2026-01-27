@@ -1,0 +1,10 @@
+<div
+  [ngClass]="{
+    'shadow-box': variant === 'shadow',
+    'border': variant === 'bordered',
+    'text-center': align === 'center',
+  }"
+  [class]="'full-width bg-white rounded-sm  p-' + spacing"
+>
+  <ng-content></ng-content>
+</div>

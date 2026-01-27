@@ -1,0 +1,11 @@
+<button
+  [type]="type"
+  [disabled]="disabled"
+  [ngClass]="{
+    'full-width': fullWidth,
+    'm-b-xs': !withoutMargin
+  }"
+  [class]="variant + ' rounded-xs no-border p-y-sm p-x-md pointer ' + (disabled ? 'disabled-state' : '')"
+>
+  <ng-content></ng-content>
+</button>
