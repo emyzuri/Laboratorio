@@ -1,1 +1,164 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary-color: #F2C94C;
+  --secondary-color: #1F1F1F;
+
+  --bg-app: #F4F6F8;
+  --bg-card: #FFFFFF;
+
+  --text-main: #333333;
+  --text-light: #FFFFFF;
+  --text-muted: #6B7280;
+  --placeholder-color: #9CA3AF;
+  --border-color: #E5E7EB;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  --space-xs: 4px;
+  --space-sm: 12px;
+  --space-md: 24px;
+  --space-lg: 32px;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body, html {
+  height: 100%;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+h1, h2, h3 { font-weight: 700; color: var(--secondary-color); }
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.1rem; font-weight: 400; color: var(--text-muted); }
+
+.full-width { width: 100% !important; display: block; }
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.pointer { cursor: pointer; }
+
+.screen-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+}
+
+.m-t-md { margin-top: var(--space-md); }
+.m-b-xs { margin-bottom: var(--space-xs); }
+.m-b-md { margin-bottom: var(--space-md); }
+.m-x-md {
+  margin-left: var(--space-md);
+  margin-right: var(--space-md);
+  width: 100%;
+  max-width: 400px;
+}
+
+.p-y-sm { padding-top: var(--space-sm); padding-bottom: var(--space-sm); }
+.p-x-md { padding-left: var(--space-md); padding-right: var(--space-md); }
+.p-lg   { padding: var(--space-lg); }
+
+.no-border { border: none; }
+.rounded-xs { border-radius: var(--radius-xs); }
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+
+.bg-white { background-color: var(--bg-card); }
+.shadow-box { box-shadow: var(--shadow-md); }
+.border { border: 1px solid var(--border-color); }
+
+
+button {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button.primary {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+button.primary:hover { filter: brightness(0.95); }
+
+button.secondary {
+  background-color: var(--secondary-color);
+  color: var(--text-light);
+}
+button.secondary:hover { opacity: 0.9; }
+
+button.default {
+  background-color: transparent;
+  color: var(--text-main);
+}
+button.default:hover { background-color: rgba(0,0,0,0.05); }
+
+.disabled-state {
+  opacity: 0.5;
+  pointer-events: none;
+  background-color: #ccc !important;
+}
+
+sgc-card {
+  display: block;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+}
+
+sgc-card sgc-logo img,
+sgc-card app-logo img {
+  max-width: 150px !important;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text-main);
+  background-color: var(--bg-card);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input::placeholder {
+  color: var(--placeholder-color);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(242, 201, 76, 0.2);
+}
