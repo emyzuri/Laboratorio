@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { GlobalLayoutComponent } from './core/layout/global-layout/global-layout';
 
 export const routes: Routes = [
   {
@@ -6,18 +7,20 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule)
   },
   {
-    path: '',
-    redirectTo: 'auth/login',
-    pathMatch: 'full'
+    path: 'principal',
+    component: GlobalLayoutComponent,
+    children: [ //pagina principal marco
+      { path: '', redirectTo: 'clientes', pathMatch: 'full' },
+      {
+        path: 'clientes',
+        loadChildren: () => import('./pages/pantalla-inicial/pantalla-inicial-module').then(m => m.PantallaInicialRoutingModule)
+      },
+      {
+        path: 'administrador',
+        loadChildren: () => import('./pages/administrador/administrador-module').then(m => m.AdministradorModule)
+      },
+    ]
   },
-// {
-//   path: 'principal',
-//   loadChildren: () =>
-//     // Fíjate si tu archivo es .module o -module
-//     // import('./pages/pantalla-inicial/pantalla-inicial-module').then((m) => m.PantallaInicialModule),
-// },
-  {
-    path: '**',
-    redirectTo: 'auth/login'
-  }
+  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: '**', redirectTo: 'auth/login' }
 ];

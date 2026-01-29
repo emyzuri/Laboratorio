@@ -162,3 +162,10 @@ sgc-card app-logo img {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(242, 201, 76, 0.2);
 }
+
+.active-nav {
+  background-color: var(--bg-app);
+  color: var(--secondary-color) !important;
+  font-weight: 700;
+  border-right: 4px solid var(--primary-color);
+}

@@ -8,26 +8,26 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.html',
 })
 export class LoginComponent {
-  private readonly authService: AuthService = inject(AuthService);
-  private readonly router: Router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  usuarioEncontrado: any = null;
+  async login(usuario: string) {
+  if (!usuario) return alert('Ingresa un usuario');
 
-  async login() {
-    try {
-      console.log('Iniciando sesión...');
+  try {
+    const datos = await this.authService.loginAPI(usuario);
 
-      const datos = await this.authService.loginAPI('emily');
+    if (datos && datos.idUsuario) {
+      localStorage.setItem('IdSesion', datos.idSesion);
 
-      console.log('¡DATO RECIBIDO DE LA API!', datos);
-
-      this.usuarioEncontrado = datos;
-
-      alert(`Bienvenida: ${datos.name} \nEmail: ${datos.email}`);
-
-    } catch (error) {
-      console.error('Error al entrar', error);
-      alert('Hubo un error al conectar con el servidor');
+      this.router.navigateByUrl('/principal');
+    } else {
+      alert('Usuario no encontrado en la base de datos');
     }
+
+  } catch (error: any) {
+    console.error('Error de base de datos:', error);
+    alert('Error al validar: ' + (error.message || 'Servidor desconectado'));
   }
+}
 }

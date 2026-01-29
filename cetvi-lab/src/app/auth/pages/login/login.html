@@ -1,28 +1,16 @@
 <div class="screen-center">
   <sgc-card class="m-x-md" align="center">
     <sgc-logo></sgc-logo>
-
     <h1 class="m-t-md">Inicio de Sesión</h1>
 
     <div class="form-group text-left m-b-md">
-      <input
-        type="text"
-        id="username"
-        class="form-input full-width"
-        placeholder="ej. usuario@cetvi.com"
-      >
-      <input
-        type="text"
-        id="password"
-        class="form-input full-width"
-        placeholder="ej. 123"
-      >
+      <input #u type="text" class="form-input full-width" placeholder="ej. bory">
+      <input type="password" class="form-input full-width" placeholder="123">
     </div>
 
-    <sgc-button [fullWidth]="true" variant="primary" (click)="login()">
+    <sgc-button [fullWidth]="true" variant="primary" (click)="login(u.value)">
       <sgc-icon icon="house"></sgc-icon>
       Iniciar sesión
     </sgc-button>
-
   </sgc-card>
 </div>

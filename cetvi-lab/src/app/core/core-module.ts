@@ -7,17 +7,21 @@ import { CardComponent } from './components/card/card';
 import { LogoComponent } from './components/logo/logo';
 import { IconComponent } from './components/icon/icon';
 import { LoadingView } from './components/loading-view/loading-view';
+import { GlobalLayoutComponent } from './layout/global-layout/global-layout';
+import { RouterModule } from '@angular/router';
 @NgModule({
   declarations: [
     ButtonComponent,
     CardComponent,
     LogoComponent,
     IconComponent,
-    LoadingView
+    LoadingView,
+    GlobalLayoutComponent
   ],
   imports: [
     CommonModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    RouterModule
   ],
   exports: [
     ButtonComponent,
@@ -25,7 +29,8 @@ import { LoadingView } from './components/loading-view/loading-view';
     LogoComponent,
     IconComponent,
     FontAwesomeModule,
-    LoadingView
+    LoadingView,
+    GlobalLayoutComponent
   ]
 })
 export class CoreModule { }

@@ -1,38 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link rel="stylesheet" href="./pantalla-inicial.css">
-    <title>Generación de orden de Trabajo</title>
-</head>
-<body>
-    <header class="header">
-        <div class="header__logo__title">
-            <img src="/cetvi.jpeg" alt="Logotipo cetvi" class="header__logo">
-            <h1 class="header__title">Generación de Orden de Trabajo</h1>
-        </div>
-        <nav class="nav">
-            <ul class="nav__link nav--menu container">
-                <li class="nav__items">
-                    <span class="material-symbols-outlined">data_table</span>
-                    <a href="#" class="nav__links">Datos del proyecto</a>
-                </li>
-                <li class="nav__items">
-                    <span class="material-symbols-outlined">format_list_bulleted</span>
-                    <a href="#" class="nav__links">Contratista</a>
-                </li>
-                <li class="nav__items">
-                    <span class="material-symbols-outlined">interactive_space</span>
-                    <a href="#" class="nav__links">Fiscalizador</a>
-                </li>
-                <li class="nav__items">
-                    <span class="material-symbols-outlined">person</span>
-                    <a href="#" class="nav__links">Preomoliantos</a>
-                </li>
-            </ul>
-        </nav>
-    </header>
-</body>
-</html>
+<main class="p-lg">
+  <div class="bg-white rounded-md shadow-box border overflow-hidden">
+    <table class="full-width" style="border-collapse: collapse;">
+      <thead>
+        <tr style="background-color: #f8f9fa;">
+          <th class="p-sm text-left border-b">Razón Social</th>
+          <th class="p-sm text-left border-b">RUC / ID</th>
+          <th class="p-sm text-center border-b">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of clientes" class="border-b">
+          <td class="p-sm" style="font-weight: 600;">{{ c.nombre }}</td>
+          <td class="p-sm">{{ c.ruc || c.identificacion }}</td>
+          <td class="p-sm text-center">
+            <span style="padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: #e6fffa; color: #2c7a7b;">
+              {{ c.estado || 'ACTIVO' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>

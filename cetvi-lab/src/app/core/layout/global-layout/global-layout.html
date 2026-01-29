@@ -1,0 +1,40 @@
+<div style="display: flex; height: 100vh; overflow: hidden;">
+
+  <aside class="bg-white border" style="width: 260px; display: flex; flex-direction: column; z-index: 10;">
+    <div class="p-lg text-center border-b">
+      <img src="/cetvi.jpeg" alt="Logo" style="width: 80px; margin-bottom: 10px;">
+      <h3 style="font-size: 0.8rem; letter-spacing: 1px; color: var(--text-muted);">CETVILAB</h3>
+    </div>
+
+    <nav style="flex-grow: 1; padding: var(--space-sm) 0;">
+      <ul style="list-style: none;">
+        <li class="pointer p-x-md p-y-sm" routerLink="/principal/clientes" routerLinkActive="active-nav"
+            style="display: flex; align-items: center; gap: 12px; color: var(--text-main); font-size: 0.9rem;">
+          <span class="material-symbols-outlined"></span> Resumen Clientes
+        </li>
+
+        <li class="pointer p-x-md p-y-sm" routerLink="/principal/administrador" routerLinkActive="active-nav"
+            style="display: flex; align-items: center; gap: 12px; color: var(--text-main); font-size: 0.9rem;">
+          <span class="material-symbols-outlined"></span> Perfil Administrador
+        </li>
+      </ul>
+    </nav>
+
+    <div class="p-md border-t">
+      <button class="default full-width rounded-sm border p-y-sm" (click)="cerrarSesion()" style="font-size: 0.8rem; color: #c53030;">
+        <span class="material-symbols-outlined" style="font-size: 18px;"></span> Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto;">
+    <header class="bg-white border-b p-x-lg" style="min-height: 65px; display: flex; align-items: center; justify-content: flex-end;">
+      <div class="text-left">
+      </div>
+    </header>
+
+    <main class="p-lg">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
