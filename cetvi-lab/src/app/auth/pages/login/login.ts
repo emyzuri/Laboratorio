@@ -26,7 +26,7 @@ export class LoginComponent {
     }
 
   } catch (error: any) {
-    console.error('Error de base de datos:', error);
+    console.error('Error en la base de datos:', error);
     alert('Error al validar: ' + (error.message || 'Servidor desconectado'));
   }
 }
