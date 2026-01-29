@@ -10,6 +10,12 @@ export const routes: Routes = [
     redirectTo: 'auth/login',
     pathMatch: 'full'
   },
+// {
+//   path: 'principal',
+//   loadChildren: () =>
+//     // Fíjate si tu archivo es .module o -module
+//     // import('./pages/pantalla-inicial/pantalla-inicial-module').then((m) => m.PantallaInicialModule),
+// },
   {
     path: '**',
     redirectTo: 'auth/login'
