@@ -19,15 +19,15 @@ export class LoginComponent {
 
     if (datos && datos.idUsuario) {
       localStorage.setItem('IdSesion', datos.idSesion);
+      localStorage.setItem('UsuarioNombre', datos.nombre || 'Ingeniero');
 
       this.router.navigateByUrl('/principal');
     } else {
-      alert('Usuario no encontrado en la base de datos');
+      alert('Usuario no encontrado');
     }
-
   } catch (error: any) {
-    console.error('Error en la base de datos:', error);
     alert('Error al validar: ' + (error.message || 'Servidor desconectado'));
   }
 }
 }
+
