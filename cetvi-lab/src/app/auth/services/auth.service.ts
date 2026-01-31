@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, firstValueFrom, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -16,6 +16,7 @@ export class AuthService {
       .set('usuario', usuario)
       .set('password', '123')
       .set('IdSesion', '83b5a7e2-eac8-4c8c-b74d-cb0be7e8b496');
+
     return await lastValueFrom(this.http.get(`${this.URL_BASE}/Usuario`, { headers }));
   }
 
