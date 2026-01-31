@@ -7,9 +7,8 @@ export class AuthService {
   private http = inject(HttpClient);
   private readonly URL_BASE = 'http://localhost:5243/api/v1';
 
-  private obtenerHeaders() {
-    return new HttpHeaders()
-      .set('IdSesion', localStorage.getItem('IdSesion') || '');
+  private obtenerHeaders(): HttpHeaders {
+    return new HttpHeaders().set('IdSesion', localStorage.getItem('IdSesion') || '');
   }
 
   async loginAPI(usuario: string): Promise<any> {
@@ -23,7 +22,13 @@ export class AuthService {
 
   async getClientes(): Promise<any[]> {
     return await lastValueFrom(
-      this.http.get<any[]>(`${this.URL_BASE}/Cliente/Clientes`, { headers: this.obtenerHeaders() })
+      this.http.get<any[]>(`${this.URL_BASE}/Cliente`, { headers: this.obtenerHeaders() })
+    );
+  }
+
+  async getMenu(): Promise<any[]> {
+    return await lastValueFrom(
+      this.http.get<any[]>(`${this.URL_BASE}/Menu`, { headers: this.obtenerHeaders() })
     );
   }
 

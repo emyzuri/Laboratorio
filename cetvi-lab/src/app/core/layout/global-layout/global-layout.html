@@ -1,40 +1,47 @@
-<div style="display: flex; height: 100vh; overflow: hidden;">
-
-  <aside class="bg-white border" style="width: 260px; display: flex; flex-direction: column; z-index: 10;">
-    <div class="p-lg text-center border-b">
-      <img src="/cetvi.jpeg" alt="Logo" style="width: 80px; margin-bottom: 10px;">
-      <h3 style="font-size: 0.8rem; letter-spacing: 1px; color: var(--text-muted);">CETVILAB</h3>
+<div class="cl-dashboard">
+  <aside class="cl-sidebar">
+    <div class="cl-header">
+      <img src="/cetvi.jpeg" alt="Logo" class="cl-logo">
     </div>
 
-    <nav style="flex-grow: 1; padding: var(--space-sm) 0;">
-      <ul style="list-style: none;">
-        <li class="pointer p-x-md p-y-sm" routerLink="/principal/clientes" routerLinkActive="active-nav"
-            style="display: flex; align-items: center; gap: 12px; color: var(--text-main); font-size: 0.9rem;">
-          <span class="material-symbols-outlined"></span> Resumen Clientes
-        </li>
+    <nav class="cl-nav">
+      <ul>
+        <li *ngFor="let m of listaMenu">
+          <div class="cl-nav-item" (click)="toggleMenu(m.idMenu)" [class.active]="menusAbiertos[m.idMenu]">
+            <div class="cl-nav-label">
+              <span class="material-symbols-outlined">
+                {{ m.nombre.toLowerCase().includes('trans') ? 'payments' :
+                   m.nombre.toLowerCase().includes('segur') ? 'shield' : 'grid_view' }}
+              </span>
+              <span>{{ m.nombre | titlecase }}</span>
+            </div>
 
-        <li class="pointer p-x-md p-y-sm" routerLink="/principal/administrador" routerLinkActive="active-nav"
-            style="display: flex; align-items: center; gap: 12px; color: var(--text-main); font-size: 0.9rem;">
-          <span class="material-symbols-outlined"></span> Perfil Administrador
+            <span class="material-symbols-outlined" *ngIf="m.subMenus && m.subMenus.length > 0">
+              {{ menusAbiertos[m.idMenu] ? 'expand_less' : 'expand_more' }}
+            </span>
+          </div>
+
+          <ul class="cl-submenu" *ngIf="menusAbiertos[m.idMenu] && m.subMenus?.length > 0">
+            <li *ngFor="let sm of m.subMenus" [routerLink]="sm.url">
+              {{ sm.nombre | titlecase }}
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>
 
-    <div class="p-md border-t">
-      <button class="default full-width rounded-sm border p-y-sm" (click)="cerrarSesion()" style="font-size: 0.8rem; color: #c53030;">
-        <span class="material-symbols-outlined" style="font-size: 18px;"></span> Cerrar Sesión
+    <div class="cl-footer">
+      <button type="button" class="cl-btn-logout" (click)="cerrarSesion()">
+        <span class="material-symbols-outlined">logout</span>
+        <span>Cerrar Sesión</span>
       </button>
     </div>
   </aside>
 
-  <div style="flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto;">
-    <header class="bg-white border-b p-x-lg" style="min-height: 65px; display: flex; align-items: center; justify-content: flex-end;">
-      <div class="text-left">
-      </div>
-    </header>
-
-    <main class="p-lg">
+  <main class="cl-main">
+    <header style="height: 60px; background: white; border-bottom: 1px solid var(--border-color);"></header>
+    <div class="cl-content">
       <router-outlet></router-outlet>
-    </main>
-  </div>
+    </div>
+  </main>
 </div>
