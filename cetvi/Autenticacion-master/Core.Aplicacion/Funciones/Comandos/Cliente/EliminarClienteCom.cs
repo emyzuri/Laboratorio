@@ -2,7 +2,7 @@
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class EliminarClienteCom : IRequest<bool>
+    public class EliminarClienteCom : IRequest<Unit>
     {
         public int IdCliente { get; set; }
 

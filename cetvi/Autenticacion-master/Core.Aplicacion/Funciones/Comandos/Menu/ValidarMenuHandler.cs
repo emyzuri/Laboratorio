@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace Core.Aplicacion.Funciones.Comandos.Menu
 {
-    public class ValidarMenuHandler : IRequestHandler<ValidarMenuCom, List<MenuModel>>
+    public class ValidarMenuHandler : IRequestHandler<ValidarMenuCom, IEnumerable<MenuModel>>
     {
         private readonly IMenu iMenu;
         private readonly ICacheServicio cacheServicio;
@@ -16,9 +16,9 @@ namespace Core.Aplicacion.Funciones.Comandos.Menu
             this.cacheServicio = cacheServicio ?? throw new ArgumentException(nameof(cacheServicio));
         }
 
-        public async Task<List<MenuModel>> Handle(ValidarMenuCom request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MenuModel>> Handle(ValidarMenuCom request, CancellationToken cancellationToken)
         {
-            List<MenuModel> menu = await iMenu.ObtenerMenu();
+            IEnumerable<MenuModel> menu = await iMenu.ObtenerMenu();
             foreach (var item in menu)
             {
                 var hijos = menu.Where(x => x.IdPadre == item.IdMenu).ToList();

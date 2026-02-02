@@ -28,18 +28,17 @@ namespace Core.DataAccess.Clientes.Servicio
             return await dbConnection.QueryFirstOrDefaultAsync<ClienteModel>("sps_clientes", parametros, commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<bool> DesactivarCliente(int idCliente)
+        public async Task DesactivarCliente(int idCliente)
         {
             using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
             DynamicParameters parametros = new();
             parametros.Add("@i_cl_id", idCliente);
             parametros.Add("@i_cl_estado", 0);
 
-            var filas = await dbConnection.ExecuteScalarAsync<int>("spu_clientes_estado", parametros, commandType: CommandType.StoredProcedure);
-            return filas > 0;
+            await dbConnection.ExecuteScalarAsync<int>("spu_clientes_estado", parametros, commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<bool> ActualizarCliente(ClienteModel cliente)
+        public async Task ActualizarCliente(ClienteModel cliente)
         {
             using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
             DynamicParameters parametros = new();
@@ -51,18 +50,17 @@ namespace Core.DataAccess.Clientes.Servicio
             parametros.Add("@i_cl_ciudad", dbType: DbType.String, value: cliente.Ciudad);
             parametros.Add("@i_cl_titulo", dbType: DbType.String, value: cliente.Titulo);
 
-            var filas = await dbConnection.ExecuteAsync("spu_clientes", parametros, commandType: CommandType.StoredProcedure);
-            return filas > 0;
+            await dbConnection.ExecuteAsync("spu_clientes", parametros, commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<List<ClienteModel>> ConsultarClientes()
+        public async Task<IEnumerable<ClienteModel>> ConsultarClientes()
         {
             using IDbConnection db = sqlConfiguracion.CrearConexion();
-            var resultado = await db.QueryAsync<ClienteModel>("sps_clientes", commandType: CommandType.StoredProcedure);
+            IEnumerable<ClienteModel> resultado = await db.QueryAsync<ClienteModel>("sps_clientes", commandType: CommandType.StoredProcedure);
 
-            return resultado.ToList();
+            return resultado;
         }
-        public async Task<int> InsertarCliente(ClienteModel cliente)
+        public async Task InsertarCliente(ClienteModel cliente)
         {
             using IDbConnection db = sqlConfiguracion.CrearConexion();
             var p = new DynamicParameters();
@@ -74,7 +72,7 @@ namespace Core.DataAccess.Clientes.Servicio
             p.Add("@i_cl_ciudad", cliente.Ciudad);
             p.Add("@i_cl_titulo", cliente.Titulo);
 
-            return await db.ExecuteScalarAsync<int>("spi_clientes", p, commandType: CommandType.StoredProcedure);
+            await db.ExecuteScalarAsync<int>("spi_clientes", p, commandType: CommandType.StoredProcedure);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Core.DataAccess.Menu.Interfaz
 {
     public interface IMenu
     {
-        Task<List<MenuModel>> ObtenerMenu();
-        Task<List<MenuModel>> ObtenerMenus();
+        Task<IEnumerable<MenuModel>> ObtenerMenu();
+        Task<IEnumerable<MenuModel>> ObtenerMenus();
     }
 }

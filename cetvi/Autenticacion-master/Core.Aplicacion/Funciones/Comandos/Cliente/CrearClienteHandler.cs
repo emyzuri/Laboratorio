@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class CrearClienteHandler : IRequestHandler<CrearClienteCom, Respuesta<int>>
+    public class CrearClienteHandler : IRequestHandler<CrearClienteCom, Unit>
     {
         private readonly ICliente _clienteServicio;
         private readonly ICacheServicio _cacheServicio;
@@ -20,7 +20,7 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
             _cacheServicio = cacheServicio;
         }
 
-        public async Task<Respuesta<int>> Handle(CrearClienteCom request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CrearClienteCom request, CancellationToken cancellationToken)
         {
             var nuevoCliente = new ClienteModel
             {
@@ -32,11 +32,11 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
                 Titulo = request.Titulo
             };
 
-            int idGenerado = await _clienteServicio.InsertarCliente(nuevoCliente);
+             await _clienteServicio.InsertarCliente(nuevoCliente);
 
-            await _cacheServicio.Agregar("UltimoClienteId", idGenerado.ToString(), new TimeSpan(0, 5, 0));
+            //await _cacheServicio.Agregar("UltimoClienteId", idGenerado.ToString(), new TimeSpan(0, 5, 0));
 
-            return new Respuesta<int>(idGenerado);
+            return Unit.Value;
         }
     }
 }

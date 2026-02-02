@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class ValidarMenuCom : IRequest<List<MenuModel>>
+    public class ValidarMenuCom : IRequest<IEnumerable<MenuModel>>
     {
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class EliminarClienteHandler : IRequestHandler<EliminarClienteCom, bool>
+    public class EliminarClienteHandler : IRequestHandler<EliminarClienteCom, Unit>
     {
         private readonly ICliente _clienteServicio;
 
@@ -14,9 +14,10 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
             _clienteServicio = clienteServicio;
         }
 
-        public async Task<bool> Handle(EliminarClienteCom request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(EliminarClienteCom request, CancellationToken cancellationToken)
         {
-            return await _clienteServicio.DesactivarCliente(request.IdCliente);
+            await _clienteServicio.DesactivarCliente(request.IdCliente);
+            return Unit.Value;
         }
     }
 }

@@ -6,7 +6,7 @@ using Core.DataAccess.Menu.Interfaz;
 
 namespace Core.Aplicacion.Funciones.Comandos.Menu
 {
-    public class CrearMenuHandler : IRequestHandler<CrearMenuCom, Respuesta<int>>
+    public class CrearMenuHandler : IRequestHandler<CrearMenuCom, int>
     {
         private readonly IMenu iMenu;
         private readonly ICacheServicio cacheServicio;
@@ -17,10 +17,10 @@ namespace Core.Aplicacion.Funciones.Comandos.Menu
             this.cacheServicio = cacheServicio;
         }
 
-        public async Task<Respuesta<int>> Handle(CrearMenuCom request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CrearMenuCom request, CancellationToken cancellationToken)
         {
             await cacheServicio.Agregar("menu_temp", request.Nombre, new TimeSpan(0, 2, 0));
-            return new Respuesta<int>(10);
+            return 10;
         }
     }
 }

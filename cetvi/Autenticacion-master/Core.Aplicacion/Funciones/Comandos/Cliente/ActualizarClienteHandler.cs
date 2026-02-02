@@ -1,14 +1,10 @@
 ﻿using Core.DataAccess.Clientes.Interfaz;
 using Core.Dominio.Model;
-using Core.Aplicacion.RespuestaUtilitario;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class ActualizarClienteHandler : IRequestHandler<ActualizarClienteCom, Respuesta<bool>>
+    public class ActualizarClienteHandler : IRequestHandler<ActualizarClienteCom, Unit>
     {
         private readonly ICliente iCliente;
 
@@ -17,7 +13,7 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
             this.iCliente = iCliente ?? throw new ArgumentException(nameof(iCliente));
         }
 
-        public async Task<Respuesta<bool>> Handle(ActualizarClienteCom request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ActualizarClienteCom request, CancellationToken cancellationToken)
         {
             ClienteModel clienteParaActualizar = new()
             {
@@ -30,9 +26,9 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
                 Titulo = request.Titulo
             };
 
-            bool resultado = await iCliente.ActualizarCliente(clienteParaActualizar);
+            await iCliente.ActualizarCliente(clienteParaActualizar);
 
-            return new Respuesta<bool>(resultado);
+            return Unit.Value;
         }
     }
 }

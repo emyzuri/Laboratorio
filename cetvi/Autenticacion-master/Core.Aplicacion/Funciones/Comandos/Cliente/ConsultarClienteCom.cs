@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Aplicacion.Funciones.Comandos.Usuarios
 {
-    public class ConsultarClienteCom : IRequest<List<ClienteModel>>
+    public class ConsultarClienteCom : IRequest<IEnumerable<ClienteModel>>
     {
     }
 }

@@ -14,13 +14,19 @@ namespace Core.Aplicacion.RespuestaUtilitario
         public static async Task<Respuesta> CrearRespuestaExito<TResult>(ILogger bitacora, Func<Task<TResult>> metodo)
         {
             Respuesta respuesta = new Respuesta();
-            return new Respuesta
+            try
             {
-                EsExitoso = true,
-                Datos = datos,
-                Codigo = 0,
-                Mensaje = "Operación exitosa"
-            };
+                Respuesta respuesta1 = respuesta;
+                respuesta1.Datos = await metodo();
+            }
+            catch (Exception ex)
+            {
+                bitacora.LogError(ex, ex.Message);
+                respuesta.Codigo = ex.HResult;
+                respuesta.Mensaje = ex.Message;
+                respuesta.Errores = new List<string> { ex.ToString() };
+            }
+            return respuesta;
         }
     }
 }

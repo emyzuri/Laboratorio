@@ -4,6 +4,8 @@ using Core.Aplicacion.Funciones.Comandos.Usuarios;
 using Core.Aplicacion.RespuestaUtilitario;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace Web.PalicacionAPI.Controllers
@@ -12,17 +14,19 @@ namespace Web.PalicacionAPI.Controllers
     {
         readonly IMediator mediador;
         protected Respuesta respuesta;
+        private ILogger<MenuController> logger;
 
-        public MenuController(IMediator mediador)
+        public MenuController(ILogger<MenuController> logger, IMediator mediador)
         {
             this.mediador = mediador;
             this.respuesta = new Respuesta();
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
         public async Task<IActionResult> ObtenerMenu()
         {
-            respuesta = await mediador.Send(new ValidarMenuCom());
+            respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () =>  await mediador.Send(new ValidarMenuCom()));
             return Ok(respuesta);
         }
 
@@ -30,8 +34,9 @@ namespace Web.PalicacionAPI.Controllers
         [Route("Menus")]
         public async Task<IActionResult> ConsultarMenus()
         {
-            var menus = await mediador.Send(new ConsultarMenuCom());
-            return Ok(menus);
+            respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () => await mediador.Send(new ValidarMenuCom()));
+
+            return Ok(respuesta);
         }
     }
 }

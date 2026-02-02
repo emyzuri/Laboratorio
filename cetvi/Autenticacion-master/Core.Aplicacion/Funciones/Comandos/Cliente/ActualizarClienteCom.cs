@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class ActualizarClienteCom : IRequest<Respuesta<bool>>
+    public class ActualizarClienteCom : IRequest<Unit>
     {
         public int IdCliente { get; set; }
         public string Nombre { get; set; }

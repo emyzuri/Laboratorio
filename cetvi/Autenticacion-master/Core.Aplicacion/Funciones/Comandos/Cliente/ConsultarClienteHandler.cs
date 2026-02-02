@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Core.Aplicacion.Funciones.Comandos.Usuarios
 {
-    public class ConsultarClienteHandler : IRequestHandler<ConsultarClienteCom, List<ClienteModel>>
+    public class ConsultarClienteHandler : IRequestHandler<ConsultarClienteCom, IEnumerable<ClienteModel>>
     {
         private readonly ICliente iCliente;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -21,7 +21,7 @@ namespace Core.Aplicacion.Funciones.Comandos.Usuarios
             this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentException(nameof(httpContextAccessor));
         }
 
-        public async Task<List<ClienteModel>> Handle(ConsultarClienteCom request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<ClienteModel>> Handle(ConsultarClienteCom request, CancellationToken cancellationToken)
         {
             var idSesion = httpContextAccessor.HttpContext.Request.Headers["IdSesion"].ToString();
             return await iCliente.ConsultarClientes();

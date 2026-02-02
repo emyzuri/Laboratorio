@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Aplicacion.Funciones.Comandos.Usuarios
 {
-    public class CrearUsuarioCom : IRequest<Respuesta<int>>
+    public class CrearUsuarioCom : IRequest<int>
     {
         public string Nombre { get; set; }
         public string Apellido { get; set; }

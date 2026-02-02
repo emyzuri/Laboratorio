@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class CrearMenuCom : IRequest<Respuesta<int>>
+    public class CrearMenuCom : IRequest<int>
     {
 
         public int IdMenu { get; set; }
