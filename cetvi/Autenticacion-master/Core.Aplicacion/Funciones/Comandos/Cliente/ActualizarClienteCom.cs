@@ -1,8 +1,9 @@
-﻿using Core.Dominio.Comunes;
+﻿using Core.Aplicacion.RespuestaUtilitario;
+using MediatR;
 
-namespace Core.Dominio.Model
+namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class ClienteModel : EntidadAuditoriaBase
+    public class ActualizarClienteCom : IRequest<Respuesta<bool>>
     {
         public int IdCliente { get; set; }
         public string Nombre { get; set; }
@@ -11,9 +12,5 @@ namespace Core.Dominio.Model
         public string Direccion { get; set; }
         public string Ciudad { get; set; }
         public string Titulo { get; set; }
-        public int Estado { get; set; }
-        public DateTime FechaRegistro { get; set; }
-        public DateTime? FechaIngreso { get; set; }
-
     }
 }

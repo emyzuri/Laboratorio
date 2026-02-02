@@ -1,7 +1,7 @@
 ﻿using Core.Aplicacion.RespuestaUtilitario;
 using MediatR;
 
-namespace Core.Aplicacion.Funciones.Comandos.Cliente
+namespace Core.Aplicacion.Funciones.Comandos.Usuarios
 {
     public class CrearUsuarioCom : IRequest<Respuesta<int>>
     {

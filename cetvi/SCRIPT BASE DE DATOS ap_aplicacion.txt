@@ -1,0 +1,455 @@
+SCRIPT BASE DE DATOS ap_aplicacion
+
+
+--script ap_usuario
+USE [ap_aplicacion]
+GO
+
+/****** Object:  Table [dbo].[ap_usuario]    Script Date: 28/1/2026 13:28:00 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[ap_usuario](
+	[us_id] [int] NOT NULL,
+	[us_nombre] [varchar](300) NOT NULL,
+	[us_apellido] [varchar](500) NOT NULL,
+	[us_login] [varchar](20) NOT NULL,
+	[us_password] [varchar](50) NOT NULL,
+	[us_telefono] [varchar](10) NOT NULL,
+	[us_cedula] [varchar](10) NOT NULL,
+	[us_fecha_nacimiento] [date] NOT NULL,
+	[us_fecha_registro] [date] NOT NULL,
+	[us_fecha_actualizacion] [date] NOT NULL,
+	[us_numero_login] [int] NOT NULL,
+	[us_activo] [bit] NOT NULL,
+	[us_fecha_ultimo_ingreso] [datetime] NOT NULL,
+ CONSTRAINT [PK_dbo.ap_usuario] PRIMARY KEY CLUSTERED 
+(
+	[us_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+-- script sps_login_usuario
+USE ap_aplicacion
+GO
+
+ --1. Limpieza previa: Borrar el SP si ya existe para evitar conflictos
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='sps_login_usuario' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.sps_login_usuario
+    PRINT 'SP sps_login_usuario eliminado correctamente.'
+END 
+GO
+
+-- 2. Creación del Procedimiento
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE sps_login_usuario
+(
+    @i_us_login VARCHAR(20)='bory', 
+    @i_us_password VARCHAR(50) ='123'
+)
+AS
+BEGIN
+    SET NOCOUNT ON; -- Buena práctica para evitar mensajes de "n filas afectadas" extra
+    
+    DECLARE @w_numero_login INT;
+
+    -- PASO 1: VERIFICAR SI EXISTE EL USUARIO
+    IF EXISTS (SELECT 1,1 FROM ap_usuario WHERE us_login = @i_us_login)
+    BEGIN 
+        -- PASO 2: VERIFICAR SI ESTÁ ACTIVO (NO BLOQUEADO)
+		IF EXISTS( SELECT 1, 1 FROM ap_usuario WHERE us_login = @i_us_login AND us_activo = 1 )
+        BEGIN 
+            -- PASO 3: VERIFICAR CONTRASEÑA
+            IF EXISTS (SELECT us_id  FROM ap_usuario WHERE us_login = @i_us_login AND us_password = @i_us_password)
+            BEGIN 
+                -- A) LOGIN EXITOSO
+				 -- Reiniciar contador de intentos a 0
+                UPDATE ap_usuario SET us_numero_login = 0, us_fecha_ultimo_ingreso = GETDATE()
+                WHERE us_login = @i_us_login
+                SELECT
+                    us_id AS 'IdUsuario', 
+                    us_nombre AS 'Nombre', 
+                    us_apellido AS 'Apellido', 
+                    us_login AS 'Usuario', 
+                    us_password AS 'Password', 
+                    us_telefono AS 'Telefono', 
+                    us_cedula AS 'Cedula', 
+                    us_fecha_nacimiento AS 'FechaNacimiento', 
+                    us_fecha_registro AS 'FechaRegistro', 
+                    us_fecha_actualizacion AS 'FechaActualizacion',
+                    us_numero_login AS 'NumeroLogin', 
+                    us_activo AS 'Activo'
+                FROM ap_usuario
+                WHERE us_login = @i_us_login AND us_password = @i_us_password
+
+               
+            END
+            ELSE
+            BEGIN 
+                -- B) CONTRASEÑA INCORRECTA
+                -- Aumentamos intentos
+                UPDATE ap_usuario SET us_numero_login = us_numero_login + 1
+                WHERE us_login = @i_us_login
+
+                -- Verificamos si llegamos al límite (3)
+                SELECT @w_numero_login = us_numero_login 
+                FROM ap_usuario
+                WHERE us_login = @i_us_login
+
+                IF(@w_numero_login >= 3) 
+                BEGIN
+                    -- Bloquear usuario
+                    UPDATE ap_usuario SET us_activo = 0
+                    WHERE us_login = @i_us_login
+                    
+                    PRINT 'RETURN 1002' -- CÓDIGO: Usuario bloqueado tras 3 intentos
+                END
+                ELSE
+                BEGIN
+                    PRINT 'RETURN 1001' -- CÓDIGO: Contraseña incorrecta
+                END
+            END 
+        END
+        ELSE
+        BEGIN
+             PRINT 'RETURN 1002' -- CÓDIGO: Usuario Bloqueado / Inactivo (Existe pero activo=0)
+        END
+    END
+    ELSE 
+    BEGIN
+        PRINT 'RETURN 1004' -- CÓDIGO: No existe usuario 
+    END
+END
+GO
+-- script sps_usuario
+USE ap_aplicacion
+GO
+
+ --1. Limpieza previa: Borrar el SP si ya existe para evitar conflictos
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='sps_usuarios' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.sps_usuarios
+    PRINT 'SP sps_usuarios eliminado correctamente.'
+END 
+GO
+
+-- 2. Creación del Procedimiento
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE sps_usuarios
+AS
+BEGIN
+    SELECT
+                    us_id AS 'IdUsuario', 
+                    us_nombre AS 'Nombre', 
+                    us_apellido AS 'Apellido', 
+                    us_login AS 'Usuario', 
+                    us_password AS 'Password', 
+                    us_telefono AS 'Telefono', 
+                    us_cedula AS 'Cedula', 
+                    us_fecha_nacimiento AS 'FechaNacimiento', 
+                    us_fecha_registro AS 'FechaRegistro', 
+                    us_fecha_actualizacion AS 'FechaActualizacion',
+                    us_numero_login AS 'NumeroLogin', 
+                    us_activo AS 'Activo'
+                FROM ap_usuario
+                WHERE us_activo = 1
+END
+GO
+
+//TABLA CLIENTE 
+USE ap_aplicacion
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ap_cliente]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[ap_cliente](
+	[cl_id] [int] IDENTITY(1,1) NOT NULL,
+	[cl_nombre] [varchar](300) NOT NULL,
+	[cl_apellido] [varchar](300) NOT NULL,
+	[cl_telefono] [varchar](20) NULL,
+	[cl_direccion] [varchar](500) NULL,
+	[cl_ciudad] [varchar](100) NULL,
+	[cl_titulo] [varchar](100) NULL,    
+	[cl_estado] [bit] NOT NULL DEFAULT 1, 
+	[cl_fecha_registro] [datetime] NOT NULL DEFAULT GETDATE(),
+	[cl_fecha_ingreso] [datetime] NULL, 
+ CONSTRAINT [PK_ap_cliente] PRIMARY KEY CLUSTERED 
+(
+	[cl_id] ASC
+)
+) ON [PRIMARY]
+END
+GO
+--scrip spu_cliente
+USE ap_aplicacion
+GO
+
+CREATE PROCEDURE [dbo].[spu_clientes_estado]
+    @i_cl_id INT,     
+    @i_cl_estado INT  
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE Clientes
+    SET cl_estado = @i_cl_estado
+    WHERE cl_id = @i_cl_id;
+
+    SELECT @@ROWCOUNT AS FilasAfectadas;
+END
+GO-- sps_clientes
+USE ap_aplicacion
+GO
+
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='sps_clientes' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.sps_clientes
+    PRINT 'SP sps_clientes eliminado correctamente.'
+END 
+GO
+
+--alter sps_clientes
+ALTER PROCEDURE sps_clientes
+(
+    @i_cl_id INT = NULL,
+    @i_cl_estado VARCHAR(1) = NULL -- Nuevo parámetro para el filtro
+)
+AS
+BEGIN
+    SELECT cl_id as IdCliente, cl_nombre as Nombre, cl_apellido as Apellido, 
+           cl_telefono as Telefono, cl_direccion as Direccion, cl_ciudad as Ciudad, 
+           cl_titulo as Titulo, cl_estado as Estado
+    FROM ap_cliente
+    WHERE (@i_cl_id IS NULL OR cl_id = @i_cl_id)
+      AND (@i_cl_estado IS NULL OR cl_estado = @i_cl_estado) -- Filtro dinámico
+END
+
+--spi_clientes
+USE [ap_aplicacion]
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[spi_clientes]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[spi_clientes]
+GO
+
+CREATE PROCEDURE [dbo].[spi_clientes]
+    @i_cl_nombre VARCHAR(300),
+    @i_cl_apellido VARCHAR(300),
+    @i_cl_telefono VARCHAR(20),
+    @i_cl_direccion VARCHAR(500),
+    @i_cl_ciudad VARCHAR(100),
+    @i_cl_titulo VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO dbo.ap_cliente (
+        cl_nombre, 
+        cl_apellido, 
+        cl_telefono, 
+        cl_direccion, 
+        cl_ciudad, 
+        cl_titulo, 
+        cl_estado, 
+        cl_fecha_registro,
+        cl_fecha_ingreso
+    )
+    VALUES (
+        @i_cl_nombre, 
+        @i_cl_apellido, 
+        @i_cl_telefono, 
+        @i_cl_direccion, 
+        @i_cl_ciudad, 
+        @i_cl_titulo, 
+        1, 
+        GETDATE(), 
+        GETDATE()
+    );
+
+    SELECT SCOPE_IDENTITY() AS IdGenerado;
+END
+GO
+
+//TABLA MENU
+
+USE ap_aplicacion
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ap_menu]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[ap_menu](
+    [mn_id] [int] IDENTITY(1,1) NOT NULL,
+    [mn_id_padre] [int] NOT NULL DEFAULT 0,
+    [mn_nombre] [varchar](100) NOT NULL,
+    [mn_descripcion] [varchar](300) NULL,
+    [mn_url] [varchar](300) NULL,
+    [mn_transaccion] [varchar](100) NULL, 
+    [mn_orden] [int] NOT NULL DEFAULT 0,  
+    [mn_visible] [bit] NOT NULL DEFAULT 1, 
+    [mn_estado] [bit] NOT NULL DEFAULT 1,  
+    [mn_icono] [varchar](100) NULL,     
+    [mn_fecha_registro] [datetime] NOT NULL DEFAULT GETDATE(),
+    [mn_fecha_ingreso] [datetime] NULL,
+ CONSTRAINT [PK_ap_menu] PRIMARY KEY CLUSTERED 
+(
+    [mn_id] ASC
+)
+) ON [PRIMARY]
+END
+GO
+ --script spi_menu
+USE ap_aplicacion
+GO
+
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='spi_menu' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.spi_menu
+    PRINT 'SP spi_menu eliminado correctamente.'
+END 
+GO
+
+CREATE PROCEDURE spi_menu
+(
+    @i_mn_id_padre INT,
+    @i_mn_nombre VARCHAR(100),
+    @i_mn_descripcion VARCHAR(300),
+    @i_mn_url VARCHAR(300),
+    @i_mn_transaccion VARCHAR(100),
+    @i_mn_orden INT,
+    @i_mn_visible BIT,
+    @i_mn_icono VARCHAR(100),
+    @i_mn_fecha_ingreso DATETIME
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO ap_menu
+    (
+        mn_id_padre,
+        mn_nombre,
+        mn_descripcion,
+        mn_url,
+        mn_transaccion,
+        mn_orden,
+        mn_visible,
+        mn_estado,     
+        mn_icono,
+        mn_fecha_registro,  
+        mn_fecha_actualizacion
+    )
+    VALUES
+    (
+        @i_mn_id_padre,     
+        @i_mn_nombre,
+        @i_mn_descripcion,
+        @i_mn_url,
+        @i_mn_transaccion,
+        @i_mn_orden,
+        @i_mn_visible,
+        1,                  
+        @i_mn_icono,
+        GETDATE(),
+        @i_mn_fecha_actualizacion
+    )
+    
+    SELECT SCOPE_IDENTITY() AS NewId;
+END
+GO
+-- sps_menu
+USE ap_aplicacion
+GO
+
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='sps_menus' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.sps_menus
+    PRINT 'SP sps_menus eliminado correctamente.'
+END 
+GO
+
+
+CREATE PROCEDURE sps_menus
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        mn_id AS 'IdMenu',
+        mn_id_padre AS 'IdPadre',
+        mn_nombre AS 'Nombre',
+        mn_descripcion AS 'Descripcion',
+        mn_url AS 'Url',
+        mn_transaccion AS 'Transaccion',
+        mn_orden AS 'Orden',
+        mn_visible AS 'Visible',
+        mn_estado AS 'Estado',
+        mn_icono AS 'Icono'
+    FROM ap_menu
+    WHERE mn_estado = 1
+    ORDER BY mn_id_padre ASC, mn_orden ASC
+END
+GO
+-- insertar los datos en menu
+USE ap_aplicacion
+GO 
+
+INSERT INTO ap_menu 
+VALUES 
+(
+    0,                      
+    'usuarios',         
+    'paso de datos',      
+    'http://vrv.com',    
+    '2004',              
+    4,                  
+    1,                    
+    1,                  
+    'hola',                
+    GETDATE(),           
+    GETDATE()              
+)
+GO
+
+--cambio de nombre de fecha_ingreso a fcha_actualizacion
+USE ap_aplicacion
+GO
+
+-- Renombrar la columna de mn_fecha_ingreso a mn_fecha_actualizacion
+-- El parámetro 'COLUMN' le dice a SQL que estamos renombrando una columna y no la tabla
+EXEC sp_rename 'dbo.ap_menu.mn_fecha_ingreso', 'mn_fecha_actualizacion', 'COLUMN';
+GO
+
+-- Verificar que el cambio se realizó correctamente
+SELECT  * FROM ap_menu;
+GO
+
+-- script estado en bit:
+ALTER PROCEDURE sps_clientes
+(
+    @i_cl_id INT = NULL,
+    @i_cl_estado BIT = NULL 
+)
+AS
+BEGIN
+    SELECT cl_id as IdCliente, cl_nombre as Nombre, cl_apellido as Apellido, 
+           cl_telefono as Telefono, cl_direccion as Direccion, cl_ciudad as Ciudad, 
+           cl_titulo as Titulo, cl_estado as Estado
+    FROM ap_cliente
+    WHERE (@i_cl_id IS NULL OR cl_id = @i_cl_id)
+      AND (@i_cl_estado IS NULL OR cl_estado = @i_cl_estado)
+END
+
+--script de verificación de Alteración cliente

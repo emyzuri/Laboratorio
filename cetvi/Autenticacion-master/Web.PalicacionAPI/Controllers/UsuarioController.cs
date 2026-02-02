@@ -1,5 +1,5 @@
 ﻿using Core.Aplicacion.Funciones.Comandos.Cliente;
-using Core.Aplicacion.Funciones.Comandos.Usuario;
+using Core.Aplicacion.Funciones.Comandos.Usuarios;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -31,7 +31,7 @@ namespace Web.PalicacionAPI.Controllers
 
         public async Task<IActionResult> ConsultarClientes()
         {
-            var cliente = await mediador.Send(new ConsultarClientesCom());
+            var cliente = await mediador.Send(new ConsultarUsuariosCom());
             return Ok(cliente);
         }
     }

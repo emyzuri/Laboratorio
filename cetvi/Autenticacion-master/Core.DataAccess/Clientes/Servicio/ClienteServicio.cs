@@ -2,68 +2,79 @@
 using Core.DataAccess.Configuracion;
 using Core.Dominio.Model;
 using Dapper;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Core.DataAccess.Clientes.Servicio
 {
     public class ClienteServicio : ICliente
     {
-        /// <summary>
-        /// Instancia de conexión
-        /// </summary>
-        readonly SqlConfiguracion sqlConfiguracion;
+        private readonly SqlConfiguracion sqlConfiguracion;
 
-        /// <summary>
-        /// Constructor de la clase
-        /// </summary>
-        /// <param name="sqlConfiguracion">Instancia de conexión</param>
-        /// <exception cref="ArgumentException">Control de excepciones</exception>
         public ClienteServicio(SqlConfiguracion sqlConfiguracion)
         {
             this.sqlConfiguracion = sqlConfiguracion ?? throw new ArgumentException(nameof(sqlConfiguracion));
         }
 
-        /// <summary>
-        /// Consulta usuario
-        /// </summary>
-        /// <param name="logguin">Logguin del usuario</param>
-        /// <param name="llave">Llave de cifrado</param>
-        /// <returns>Usuario</returns>
-        /// <exception cref="DataException">Control de errore</exception>
-        public async Task<ClienteModel> ObtenerCliente(string logguin, string llave)
+        public async Task<ClienteModel> ObtenerCliente(int idCliente)
         {
             using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
             DynamicParameters parametros = new();
-            parametros.Add("@i_al_loggin", dbType: DbType.String, value: logguin);
-            parametros.Add("@i_llave", dbType: DbType.String, value: llave);
-            parametros.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
-            var resultado = await dbConnection.QueryFirstOrDefaultAsync<ClienteModel>("sps_usuario", parametros, commandType: CommandType.StoredProcedure);
-            int respuesta = parametros.Get<int>("@ReturnValue");
-            if (respuesta != 0)
-            {
-                throw new DataException { HResult = respuesta };
-            }
+            parametros.Add("@i_cl_id", dbType: DbType.Int32, value: idCliente);
 
-            return resultado;
+            return await dbConnection.QueryFirstOrDefaultAsync<ClienteModel>("sps_clientes", parametros, commandType: CommandType.StoredProcedure);
         }
 
-        /// <summary>
-        /// Actualiza el numero de logguin del cliente
-        /// </summary>
-        /// <param name="idCliente">Id cliente</param>
-        /// <exception cref="DataException">Control de errores</exception>
-        public async Task ActualizarNumeroLogguin(int idCliente)
+        public async Task<bool> DesactivarCliente(int idCliente)
         {
             using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
             DynamicParameters parametros = new();
-            parametros.Add("@i_al_id", dbType: DbType.Int32, value: idCliente);
-            parametros.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
-            await dbConnection.ExecuteAsync("spu_numero_logguin", parametros, commandType: CommandType.StoredProcedure);
-            int respuesta = parametros.Get<int>("@ReturnValue");
-            if (respuesta != 0)
-            {
-                throw new DataException { HResult = respuesta };
-            }
+            parametros.Add("@i_cl_id", idCliente);
+            parametros.Add("@i_cl_estado", 0);
+
+            var filas = await dbConnection.ExecuteScalarAsync<int>("spu_clientes_estado", parametros, commandType: CommandType.StoredProcedure);
+            return filas > 0;
+        }
+
+        public async Task<bool> ActualizarCliente(ClienteModel cliente)
+        {
+            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
+            DynamicParameters parametros = new();
+            parametros.Add("@i_cl_id", dbType: DbType.Int32, value: cliente.IdCliente);
+            parametros.Add("@i_cl_nombre", dbType: DbType.String, value: cliente.Nombre);
+            parametros.Add("@i_cl_apellido", dbType: DbType.String, value: cliente.Apellido);
+            parametros.Add("@i_cl_telefono", dbType: DbType.String, value: cliente.Telefono);
+            parametros.Add("@i_cl_direccion", dbType: DbType.String, value: cliente.Direccion);
+            parametros.Add("@i_cl_ciudad", dbType: DbType.String, value: cliente.Ciudad);
+            parametros.Add("@i_cl_titulo", dbType: DbType.String, value: cliente.Titulo);
+
+            var filas = await dbConnection.ExecuteAsync("spu_clientes", parametros, commandType: CommandType.StoredProcedure);
+            return filas > 0;
+        }
+
+        public async Task<List<ClienteModel>> ConsultarClientes()
+        {
+            using IDbConnection db = sqlConfiguracion.CrearConexion();
+            var resultado = await db.QueryAsync<ClienteModel>("sps_clientes", commandType: CommandType.StoredProcedure);
+
+            return resultado.ToList();
+        }
+        public async Task<int> InsertarCliente(ClienteModel cliente)
+        {
+            using IDbConnection db = sqlConfiguracion.CrearConexion();
+            var p = new DynamicParameters();
+
+            p.Add("@i_cl_nombre", cliente.Nombre);
+            p.Add("@i_cl_apellido", cliente.Apellido);
+            p.Add("@i_cl_telefono", cliente.Telefono);
+            p.Add("@i_cl_direccion", cliente.Direccion);
+            p.Add("@i_cl_ciudad", cliente.Ciudad);
+            p.Add("@i_cl_titulo", cliente.Titulo);
+
+            return await db.ExecuteScalarAsync<int>("spi_clientes", p, commandType: CommandType.StoredProcedure);
         }
     }
 }

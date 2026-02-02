@@ -6,6 +6,8 @@ using Core.Util;
 using Core.DataAccess.Configuracion;
 using Core.DataAccess.Clientes.Servicio;
 using Core.DataAccess.Clientes.Interfaz;
+using Core.DataAccess.Menu.Servicio;
+using Core.DataAccess.Menu.Interfaz;
 
 namespace Core.Aplicacion
 {
@@ -21,6 +23,7 @@ namespace Core.Aplicacion
             servicios.AddSingleton(conexion);
             servicios.AddScoped<ICliente, ClienteServicio>();
             servicios.AddScoped<IUsuario, UsuarioServicio>();
+            servicios.AddScoped<IMenu, MenuServicio>();
             servicios.AddSingleton<ICacheServicio, CacheServicio>();
             servicios.AddAutoMapper(Assembly.GetExecutingAssembly());
             servicios.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

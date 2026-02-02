@@ -2,11 +2,11 @@
 using Core.Dominio.Model;
 using Core.Util;
 using MediatR;
-using Pipelines.Sockets.Unofficial.Arenas;
+using Microsoft.AspNetCore.Http;
 
-namespace Core.Aplicacion.Funciones.Comandos.Usuario
+namespace Core.Aplicacion.Funciones.Comandos.Usuarios
 {
-    public class ValidarUsuarioHandler : IRequestHandler<ValidarUsuarioCom, UsuarioModel>
+    internal class ConsultarUsuariosHandler : IRequestHandler<ConsultarUsuariosCom, List<UsuarioModel>>
     {
         /// <summary>
         /// Servicio de cliente
@@ -14,15 +14,18 @@ namespace Core.Aplicacion.Funciones.Comandos.Usuario
         readonly IUsuario iUsuario;
         readonly ICacheServicio cacheServicio;
 
+        readonly IHttpContextAccessor httpContextAccessor;
+
         /// <summary>
         /// Constructor de la clase
         /// </summary>
         /// <param name="iUsuario">Servicio de cliente</param>
         /// <exception cref="ArgumentException">Control de errores</exception>
-        public ValidarUsuarioHandler(IUsuario iUsuario, ICacheServicio cacheServicio)
+        public ConsultarUsuariosHandler(IUsuario iUsuario, ICacheServicio cacheServicio, IHttpContextAccessor httpContextAccessor)
         {
             this.iUsuario = iUsuario ?? throw new ArgumentException(nameof(iUsuario));
             this.cacheServicio = cacheServicio ?? throw new ArgumentException(nameof(cacheServicio));
+            this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentException(nameof(httpContextAccessor));
         }
 
         /// <summary>
@@ -32,11 +35,14 @@ namespace Core.Aplicacion.Funciones.Comandos.Usuario
         /// <param name="cancellationToken">Token de cancelacion</param>
         /// <returns>Cliente</returns>
         /// <exception cref="NotImplementedException">Control de errores</exception>
-        public async Task<UsuarioModel> Handle(ValidarUsuarioCom request, CancellationToken cancellationToken)
+        public async Task<List<UsuarioModel>> Handle(ConsultarUsuariosCom request, CancellationToken cancellationToken)
         {
-            UsuarioModel usuario = await iUsuario.ObtenerUsuario(request.usuario, request.password);
-            await cacheServicio.Agregar(usuario.IdSesion.ToString(), usuario, new TimeSpan(0,6,0));
-            return usuario;
+            UsuarioModel usuario = await cacheServicio.Obtener<UsuarioModel>(httpContextAccessor.HttpContext.Request.Headers["IdSesion"]);
+            if (usuario == null)
+            {
+                throw new ArgumentException("Sesión caducada");
+            }
+            return await iUsuario.ObtenerUsuarios();
         }
     }
 }

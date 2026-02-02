@@ -1,54 +1,34 @@
 ﻿using Core.DataAccess.Clientes.Interfaz;
 using Core.Dominio.Model;
+using Core.Util;
 using MediatR;
-using Pipelines.Sockets.Unofficial.Arenas;
+using System.Threading;
+using System.Threading.Tasks;
+using System;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
     public class ValidarClienteHandler : IRequestHandler<ValidarClienteCom, ClienteModel>
     {
-        /// <summary>
-        /// Servicio de cliente
-        /// </summary>
-        readonly ICliente iCLiente;
+        private readonly ICliente iCliente;
+        private readonly ICacheServicio cacheServicio;
 
-        /// <summary>
-        /// Constructor de la clase
-        /// </summary>
-        /// <param name="iCLiente">Servicio de cliente</param>
-        /// <exception cref="ArgumentException">Control de errores</exception>
-        public ValidarClienteHandler(ICliente iCLiente)
+        public ValidarClienteHandler(ICliente iCliente, ICacheServicio cacheServicio)
         {
-            this.iCLiente = iCLiente ?? throw new ArgumentException(nameof(iCLiente));
+            this.iCliente = iCliente ?? throw new ArgumentException(nameof(iCliente));
+            this.cacheServicio = cacheServicio ?? throw new ArgumentException(nameof(cacheServicio));
         }
 
-        /// <summary>
-        /// Logica de consula del cliente
-        /// </summary>
-        /// <param name="request">Objeto transaccional</param>
-        /// <param name="cancellationToken">Token de cancelacion</param>
-        /// <returns>Cliente</returns>
-        /// <exception cref="NotImplementedException">Control de errores</exception>
         public async Task<ClienteModel> Handle(ValidarClienteCom request, CancellationToken cancellationToken)
         {
-            ClienteModel cliente = await iCLiente.ObtenerCliente(request.Usuario, "prueba");
+            ClienteModel cliente = await iCliente.ObtenerCliente(request.IdCliente);
+
             if (cliente != null)
             {
-                if (cliente.Clave.Equals(request.Clave, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return cliente;
-                }
-                else
-                {
-                    await iCLiente.ActualizarNumeroLogguin(cliente.IdCliente);
-                    throw new Exception("message");
-                }
+                await cacheServicio.Agregar("cliente_" + cliente.IdCliente.ToString(), cliente, new TimeSpan(0, 6, 0));
             }
-            else
-            {
-                throw new Exception("message");
-            }
-           
+
+            return cliente;
         }
     }
 }
