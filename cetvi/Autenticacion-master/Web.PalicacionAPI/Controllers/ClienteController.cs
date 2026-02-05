@@ -2,6 +2,7 @@
 using Core.Aplicacion.Funciones.Comandos.Usuarios;
 using Core.Aplicacion.RespuestaUtilitario;
 using Core.DataAccess.Clientes.Interfaz;
+using Core.Dominio.Request.Clientes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -57,9 +58,17 @@ namespace Web.PalicacionAPI.Controllers
 
         [HttpPost]
         [Route("Insertar")]
-        public async Task<IActionResult> InsertarCliente([FromBody] CrearClienteCom comando)
+        public async Task<IActionResult> InsertarCliente([FromBody] CrearClienteRequest comando)
         {
-            respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () => mediador.Send(comando));
+            respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () => await mediador.Send( new CrearClienteCom(comando)));
+            return Ok(respuesta);
+        }
+
+        [HttpPost]
+        [Route("Activar")]
+        public async Task<IActionResult> ActivarCliente([FromBody] ActivarClienteRequest comando)
+        {
+            respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () => await mediador.Send(new ActivarClienteCom(comando)));
             return Ok(respuesta);
         }
     }

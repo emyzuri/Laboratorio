@@ -246,6 +246,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[spi_cl
 GO
 
 CREATE PROCEDURE [dbo].[spi_clientes]
+	@i_cl_cedula VARCHAR (10),
     @i_cl_nombre VARCHAR(300),
     @i_cl_apellido VARCHAR(300),
     @i_cl_telefono VARCHAR(20),
@@ -257,6 +258,7 @@ BEGIN
     SET NOCOUNT ON;
 
     INSERT INTO dbo.ap_cliente (
+		cl_cedula,
         cl_nombre, 
         cl_apellido, 
         cl_telefono, 
@@ -265,9 +267,10 @@ BEGIN
         cl_titulo, 
         cl_estado, 
         cl_fecha_registro,
-        cl_fecha_ingreso
+        cl_fecha_actualizacion
     )
     VALUES (
+		@i_cl_cedula,
         @i_cl_nombre, 
         @i_cl_apellido, 
         @i_cl_telefono, 
@@ -279,9 +282,75 @@ BEGIN
         GETDATE()
     );
 
-    SELECT SCOPE_IDENTITY() AS IdGenerado;
+	SELECT 
+		cl_id AS IdCliente,
+		cl_cedula AS Cedula,
+        cl_nombre AS Nombre, 
+        cl_apellido AS Apellido, 
+        cl_telefono AS Telefono, 
+        cl_direccion AS Direccion, 
+        cl_ciudad AS Ciudad, 
+        cl_titulo AS Titulo, 
+        cl_estado AS Estado, 
+        cl_fecha_registro AS FechaRegistro,
+        cl_fecha_actualizacion AS FechaActualizacion
+	FROM ap_cliente WHERE cl_cedula = @i_cl_cedula 
 END
 GO
+
+USE ap_aplicacion
+GO 
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='spu_cliente_activar' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.spu_cliente_activar
+    PRINT 'SP spu_cliente_activar eliminado correctamente.'
+END 
+GO
+CREATE PROCEDURE spu_cliente_activar
+(
+    @i_cl_cedula VARCHAR(10)
+)
+AS
+BEGIN
+	UPDATE ap_cliente SET cl_estado = 0 WHERE cl_cedula = @i_cl_cedula
+END
+GO
+
+--exec spu_cliente_activar @i_cl_cedula=N'0648961254'
+
+--sp_helptext spu_cliente_activar
+
+--CREATE PROCEDURE spu_cliente_activar  
+declare
+@i_cl_cedula VARCHAR (10)  = '0648961254'
+--AS  
+BEGIN  
+    UPDATE ap_cliente  
+    SET    cl_estado = 0  
+    WHERE  cl_cedula = @i_cl_cedula;  
+END  
+
+USE ap_aplicacion
+GO 
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='spu_cliente_activar' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.spu_cliente_activar
+    PRINT 'SP spu_cliente_activar eliminado correctamente.'
+END 
+GO
+CREATE PROCEDURE spu_cliente_activar
+(
+    @i_cl_cedula VARCHAR(10)
+)
+AS
+BEGIN
+	UPDATE ap_cliente SET cl_estado = 1
+	WHERE cl_cedula = @i_cl_cedula
+END
+GO
+
+
+
 
 //TABLA MENU
 
@@ -453,3 +522,127 @@ BEGIN
 END
 
 --script de verificación de Alteración cliente
+
+//catalogo
+USE ap_aplicacion
+GO 
+CREATE TABLE [dbo].[ap_catalogo](
+	[ct_id] [int] IDENTITY (1,1),
+	[ct_nombre] [varchar](300) NOT NULL,
+	[ct_descripcion] [varchar] (500) NOT NULL,
+	[ct_estado] [int] NOT NULL,
+	[ct_fecha_registro] [date] NOT NULL,
+	[ct_fecha_actualizacion] [date] NOT NULL,
+CONSTRAINT [PK_ap_catalogo] PRIMARY KEY CLUSTERED 
+(
+    [ct_id] ASC
+)
+) ON [PRIMARY]
+
+
+//ensayo
+USE ap_aplicacion
+GO 
+--DROP TABLE ap_ensayo
+CREATE TABLE [dbo].[ap_ensayo](
+	[en_id] [int] IDENTITY (1,1),
+	[en_idCliente] [int] NOT NULL,
+	[en_idCatalogo] [int] NOT NULL,
+	[en_idPrueba] [int] NOT NULL,
+	[en_nombreUsuario] [varchar](300) NOT NULL,
+	[en_fecha_registro] [date] NOT NULL,
+	[monto] [money] NOT NULL,
+CONSTRAINT [PK_ap_ensayo] PRIMARY KEY CLUSTERED ([en_id] ASC),
+CONSTRAINT [FK_ap_ensayo_ap_cliente] FOREIGN KEY([en_idCliente]) 
+        REFERENCES [dbo].[ap_cliente] ([cl_id]),
+CONSTRAINT [FK_ap_ensayo_ap_catalogo] FOREIGN KEY([en_idCatalogo]) 
+        REFERENCES [dbo].[ap_catalogo] ([ct_id])
+)
+
+--SPI_ENSAYO
+
+ --script spi_menu
+USE ap_aplicacion
+GO
+
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='spi_ensayo' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.spi_ensayo
+    PRINT 'SP spi_ensayo eliminado correctamente.'
+END 
+GO
+
+CREATE PROCEDURE spi_ensayo
+(
+	@i_en_idCliente INT,
+	@i_en_idCatalogo INT,
+	@i_en_idPrueba INT,
+	@i_en_nombreUsuario VARCHAR(300),
+	@i_en_monto MONEY
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO ap_ensayo
+    (
+		en_idCliente,
+		en_idCatalogo,
+		en_idPrueba,
+		en_nombreUsuario,
+		en_fecha_registro,
+		en_monto
+    )
+    VALUES
+    (
+        @i_en_idCliente,
+		@i_en_idCatalogo,
+		@i_en_idPrueba,
+		@i_en_nombreUsuario,
+		GETDATE(),
+		@i_en_monto
+    )
+    
+END
+GO
+
+--sps_prueba
+
+ --script spi_menu
+USE ap_aplicacion
+GO
+
+IF EXISTS(SELECT 1 FROM sysobjects WHERE NAME ='sps_id_prueba' AND type= 'P')
+BEGIN 
+    DROP PROCEDURE dbo.sps_id_prueba
+    PRINT 'SP sps_id_prueba  eliminado correctamente.'
+END
+GO
+
+CREATE PROCEDURE sps_id_prueba
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+	SELECT (MAX(en_idPrueba))
+	FROM ap_ensayo;
+END
+GO
+
+
+//pagos
+USE ap_aplicacion
+GO 
+CREATE TABLE [dbo].[ap_pagos](
+	[pg_id] [int] IDENTITY (1,1),
+	[pg_idEnsayo] [int] NOT NULL,
+	[pg_montoTotal] [money] NOT NULL,
+	[pg_abono] [money] NOT NULL,
+	[pg_nombreUsuario] [varchar](300) NOT NULL,
+	[pg_fecha_registro] [date] NOT NULL,
+CONSTRAINT [PK_ap_pagos] PRIMARY KEY CLUSTERED ([pg_id] ASC)
+)
+
+
+

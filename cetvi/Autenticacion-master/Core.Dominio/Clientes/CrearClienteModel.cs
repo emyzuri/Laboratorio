@@ -1,8 +1,7 @@
-﻿using Core.Dominio.Comunes;
-
-namespace Core.Dominio.Model
+﻿
+namespace Core.Dominio.Clientes
 {
-    public class ClienteModel : EntidadAuditoriaBase
+    public class CrearClienteModel
     {
         public int IdCliente { get; set; }
         public string Cedula { get; set; }
@@ -12,5 +11,8 @@ namespace Core.Dominio.Model
         public string Direccion { get; set; }
         public string Ciudad { get; set; }
         public string Titulo { get; set; }
+        public bool Estado { get; set; }
+        public DateTime FechaRegistro { get; set; }
+        public DateTime FechaActualizacion { get; set; }
     }
 }

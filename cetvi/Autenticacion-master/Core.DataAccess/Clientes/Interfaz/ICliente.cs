@@ -1,7 +1,5 @@
-﻿// ICliente.cs
+﻿using Core.Dominio.Clientes;
 using Core.Dominio.Model;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Core.DataAccess.Clientes.Interfaz
 {
@@ -11,6 +9,8 @@ namespace Core.DataAccess.Clientes.Interfaz
         Task DesactivarCliente(int idCliente);
         Task ActualizarCliente(ClienteModel cliente);
         Task<IEnumerable<ClienteModel>> ConsultarClientes();
-        Task InsertarCliente(ClienteModel cliente);
+        Task<CrearClienteModel> InsertarCliente(ClienteModel cliente);
+        Task<CrearClienteModel> ConsultarCliente(ConsultarClienteModel cliente);
+        Task ActivarCliente(string cedula);
     }
 }

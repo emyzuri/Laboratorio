@@ -1,10 +1,8 @@
-﻿using Core.Dominio.Comunes;
-
-namespace Core.Dominio.Model
+﻿
+namespace Core.Dominio.Request.Clientes
 {
-    public class ClienteModel : EntidadAuditoriaBase
+    public class CrearClienteRequest
     {
-        public int IdCliente { get; set; }
         public string Cedula { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get; set; }

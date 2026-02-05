@@ -1,5 +1,6 @@
 ﻿using Core.DataAccess.Clientes.Interfaz;
 using Core.DataAccess.Configuracion;
+using Core.Dominio.Clientes;
 using Core.Dominio.Model;
 using Dapper;
 using System;
@@ -60,11 +61,12 @@ namespace Core.DataAccess.Clientes.Servicio
 
             return resultado;
         }
-        public async Task InsertarCliente(ClienteModel cliente)
+        public async Task<CrearClienteModel> InsertarCliente(ClienteModel cliente)
         {
             using IDbConnection db = sqlConfiguracion.CrearConexion();
-            var p = new DynamicParameters();
+            DynamicParameters p = new();
 
+            p.Add("@i_cl_cedula", cliente.Cedula);
             p.Add("@i_cl_nombre", cliente.Nombre);
             p.Add("@i_cl_apellido", cliente.Apellido);
             p.Add("@i_cl_telefono", cliente.Telefono);
@@ -72,7 +74,30 @@ namespace Core.DataAccess.Clientes.Servicio
             p.Add("@i_cl_ciudad", cliente.Ciudad);
             p.Add("@i_cl_titulo", cliente.Titulo);
 
-            await db.ExecuteScalarAsync<int>("spi_clientes", p, commandType: CommandType.StoredProcedure);
+            var clienteResp = await db.QueryFirstOrDefaultAsync<CrearClienteModel>("spi_clientes", p, commandType: CommandType.StoredProcedure);
+            return clienteResp;
         }
+
+        public async Task<CrearClienteModel> ConsultarCliente(ConsultarClienteModel cliente)
+        {
+            using IDbConnection db = sqlConfiguracion.CrearConexion();
+            DynamicParameters p = new();
+
+            p.Add("@i_cl_cedula", cliente.Cedula);
+
+            var clienteResp = await db.QueryFirstOrDefaultAsync<CrearClienteModel>("sps_cliente_cedula", p, commandType: CommandType.StoredProcedure);
+            return clienteResp;
+        }
+
+        public async Task ActivarCliente(string cedula)
+        {
+            using IDbConnection db = sqlConfiguracion.CrearConexion();
+            DynamicParameters p = new();
+
+            p.Add("@i_cl_cedula", cedula);
+
+            await db.QueryFirstOrDefaultAsync<CrearClienteModel>("spu_cliente_activar", p, commandType: CommandType.StoredProcedure);
+        }
+
     }
 }
