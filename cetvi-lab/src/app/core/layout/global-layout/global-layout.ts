@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core'; // Agregamos OnInit
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 
@@ -8,13 +8,12 @@ import { AuthService } from '../../../auth/services/auth.service';
   templateUrl: './global-layout.html',
   styleUrls: ['./global-layout.scss']
 })
-export class GlobalLayoutComponent implements OnInit { // Implementamos OnInit
-
+export class GlobalLayoutComponent implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  listaMenu: any[] = []; // Aquí se guardará lo que venga del Back
-  menusAbiertos: { [key: number]: boolean } = {}; // Usaremos el ID del menú para controlar el despliegue
+  listaMenu: any[] = [];
+  menusAbiertos: { [key: number]: boolean } = {};
 
   ngOnInit() {
     this.cargarMenu();
@@ -22,11 +21,15 @@ export class GlobalLayoutComponent implements OnInit { // Implementamos OnInit
 
   async cargarMenu() {
     try {
-      // Consumimos el endpoint de Postman
-      this.listaMenu = await this.authService.getMenu();
-      console.log('Menú cargado dinámicamente:', this.listaMenu);
+      const respuesta: any = await this.authService.getMenu();
+
+      if (respuesta && respuesta.esExitoso === true) {
+        this.listaMenu = respuesta.datos || [];
+      } else {
+        console.error('Error en carga de menú:', respuesta?.mensaje);
+      }
     } catch (error) {
-      console.error('Error al cargar el menú:', error);
+      console.error('Error de comunicación con el servidor:', error);
     }
   }
 

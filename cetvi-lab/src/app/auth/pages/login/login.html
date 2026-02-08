@@ -5,10 +5,10 @@
 
     <div class="form-group text-left m-b-md">
       <input #u type="text" class="form-input full-width" placeholder="ej. bory">
-      <input type="password" class="form-input full-width" placeholder="123">
+      <input #p type="password" class="form-input full-width" placeholder="123" (keyup.enter)="login(u.value, p.value)">
     </div>
 
-    <sgc-button [fullWidth]="true" variant="primary" (click)="login(u.value)">
+    <sgc-button [fullWidth]="true" variant="primary" (click)="login(u.value, p.value)">
       <sgc-icon icon="house"></sgc-icon>
       Iniciar sesión
     </sgc-button>

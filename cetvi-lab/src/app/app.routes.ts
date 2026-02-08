@@ -9,7 +9,7 @@ export const routes: Routes = [
   {
     path: 'principal',
     component: GlobalLayoutComponent,
-    children: [ //pagina principal marco
+    children: [
       { path: '', redirectTo: 'clientes', pathMatch: 'full' },
       {
         path: 'clientes',

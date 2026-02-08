@@ -1,14 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { PantallaInicial } from './pantalla-inicial';
-
+import { PantallaInicialComponent } from './pantalla-inicial';
 const routes: Routes = [
-  { path: '', component: PantallaInicial }
+  { path: '', component: PantallaInicialComponent }
 ];
 
 @NgModule({
-  declarations: [PantallaInicial],
+  declarations: [],
   imports: [
     CommonModule,
     RouterModule.forChild(routes)
