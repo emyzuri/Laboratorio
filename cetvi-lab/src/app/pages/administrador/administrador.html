@@ -1,1 +1,38 @@
-<p>administrador works!</p>
+<div class="main__container">
+  <div class="container">
+    <div class="header-actions">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Buscar administrador..."
+          class="form-input"
+          [(ngModel)]="filtroNombre"
+        />
+      </div>
+    </div>
+
+    <div class="table-card shadow-box">
+      <table class="table__clientes">
+        <thead>
+          <tr>
+            <th>Nombre Completo</th>
+            <th>Rol Asignado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tbody>
+            <tr *ngFor="let user of usuarios">
+              <td>{{ user.nombre }} {{ user.apellido || '' }}</td>
+              <td>
+                <span [class.badge-admin]="user.idRol === 1" [class.badge-user]="user.idRol === 2">
+                  {{ user.idRol === 1 ? 'Administrador' : (user.idRol === 2 ? 'Usuario' : 'Sin Rol') }}
+                </span>
+              </td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+

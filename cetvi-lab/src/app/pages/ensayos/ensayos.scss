@@ -1,0 +1,137 @@
+/* --- CONTENEDOR PRINCIPAL Y CABECERA --- */
+.main__container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  width: 350px;
+  input { border: none; outline: none; margin-left: 10px; width: 100%; color: #333; }
+}
+
+.btn-gold {
+  background-color: #f1c40f;
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  &:hover { background-color: #d4ac0d; }
+}
+
+/* --- ESTILO DE LA TABLA --- */
+.table-card { background: white; border-radius: 12px; padding: 10px 20px; }
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+  th { text-align: left; padding: 18px; color: #2c3e50; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
+  td { padding: 18px; border-bottom: 1px solid #edf2f7; color: #4a5568; font-size: 0.95rem; }
+}
+
+.badge {
+  padding: 6px 14px; border-radius: 20px; color: white; font-size: 0.75rem; font-weight: bold; display: inline-block; min-width: 90px;
+  &.bg-red { background-color: #e74c3c; }
+  &.bg-orange { background-color: #f39c12; }
+  &.bg-green { background-color: #2ecc71; }
+}
+
+/* --- SISTEMA DE MODALES (LO QUE FALTABA) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Fondo oscuro transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  width: 500px;
+  max-width: 95%;
+  border-radius: 15px;
+  padding: 0; /* Controlado por header/body/footer */
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  h3 { margin: 0; font-size: 1.2rem; color: #2c3e50; }
+  .close-btn { cursor: pointer; font-size: 1.5rem; color: #999; &:hover { color: #333; } }
+}
+
+.modal-body { padding: 25px; }
+
+/* Cuadrícula del formulario */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas */
+  gap: 20px;
+
+  .full-width { grid-column: span 2; } /* Ocupa todo el ancho */
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  label { font-weight: 600; color: #4a5568; font-size: 0.9rem; }
+  .form-input {
+    padding: 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    &:focus { outline: none; border-color: #f1c40f; }
+  }
+}
+
+.modal-footer {
+  padding: 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+/* Botones del Modal */
+.btn-cancel { background: #edf2f7; color: #4a5568; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.btn-confirm { background: #f1c40f; color: #000; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 700; }
+
+/* Estilo para el Modal de Éxito */
+.modal-success {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 400px;
+  .success-icon { font-size: 70px; color: #2ecc71; margin-bottom: 20px; display: block; }
+  h2 { margin-top: 10px; color: #2d3748; }
+  p { color: #718096; margin-bottom: 25px; }
+}
+
+.shadow-box { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }

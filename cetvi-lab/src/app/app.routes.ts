@@ -11,13 +11,18 @@ export const routes: Routes = [
     component: GlobalLayoutComponent,
     children: [
       { path: '', redirectTo: 'clientes', pathMatch: 'full' },
+
+      {
+        path: 'ensayos',
+        loadComponent: () => import('./pages/ensayos/ensayos').then(m => m.EnsayosComponent)
+      },
       {
         path: 'clientes',
         loadChildren: () => import('./pages/pantalla-inicial/pantalla-inicial-module').then(m => m.PantallaInicialRoutingModule)
       },
       {
-        path: 'administrador',
-        loadChildren: () => import('./pages/administrador/administrador-module').then(m => m.AdministradorModule)
+        path: 'usuarios',
+        loadComponent: () => import('./pages/administrador/administrador').then(m => m.AdministradorComponent)
       },
     ]
   },
