@@ -229,7 +229,7 @@ sgc-card app-logo img {
 .cl-submenu {
   background-color: #fafafa !important;
   li {
-    all: unset !important; /* Limpia cualquier estilo de li de styles.scss */
+    all: unset !important;
     display: block !important;
     padding: 10px 10px 10px 45px !important;
     font-size: 0.85rem !important;
@@ -246,7 +246,7 @@ sgc-card app-logo img {
 }
 
 .cl-btn-logout {
-  all: unset !important; /* IMPORTANTE: Mata el estilo de button de style.scss */
+  all: unset !important;
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
@@ -264,7 +264,7 @@ sgc-card app-logo img {
 .cl-content { padding: 25px !important; overflow-y: auto !important; flex-grow: 1 !important; }
 
 .cl-logo {
-  width: 140px !important; // Aumentado para máxima visibilidad
+  width: 140px !important;
   height: auto !important;
   margin: 10px auto !important;
   display: block !important;

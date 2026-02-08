@@ -11,23 +11,28 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  async login(usuario: string) {
-  if (!usuario) return alert('Ingresa un usuario');
+  async login(usuario: string, password: string) {
+    if (!usuario || !password) return alert('⚠️ Por favor, ingresa usuario y contraseña');
 
-  try {
-    const datos = await this.authService.loginAPI(usuario);
+    try {
+      const respuesta = await this.authService.loginAPI(usuario, password);
 
-    if (datos && datos.idUsuario) {
-      localStorage.setItem('IdSesion', datos.idSesion);
-      localStorage.setItem('UsuarioNombre', datos.nombre || 'Ingeniero');
+      if (respuesta && respuesta.esExitoso === true) {
 
-      this.router.navigateByUrl('/principal');
-    } else {
-      alert('Usuario no encontrado');
+        const data = respuesta.datos;
+
+        if (data && data.idSesion) {
+          localStorage.setItem('IdSesion', data.idSesion);
+          localStorage.setItem('IdUsuario', data.idUsuario.toString());
+
+          this.router.navigateByUrl('/principal');
+        }
+      } else {
+        alert('❌ Error de Acceso: ' + (respuesta?.mensaje || 'Credenciales inválidas'));
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      alert('🚫 Error de comunicación: El servidor no responde. Revisa que no esté pausado en Visual Studio.');
     }
-  } catch (error: any) {
-    alert('Error al validar: ' + (error.message || 'Servidor desconectado'));
   }
 }
-}
-

@@ -1,24 +1,181 @@
-<main class="p-lg">
-  <div class="bg-white rounded-md shadow-box border overflow-hidden">
-    <table class="full-width" style="border-collapse: collapse;">
-      <thead>
-        <tr style="background-color: #f8f9fa;">
-          <th class="p-sm text-left border-b">Razón Social</th>
-          <th class="p-sm text-left border-b">RUC / ID</th>
-          <th class="p-sm text-center border-b">Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let c of clientes" class="border-b">
-          <td class="p-sm" style="font-weight: 600;">{{ c.nombre }}</td>
-          <td class="p-sm">{{ c.ruc || c.identificacion }}</td>
-          <td class="p-sm text-center">
-            <span style="padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: #e6fffa; color: #2c7a7b;">
-              {{ c.estado || 'ACTIVO' }}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<div class="main__container">
+  <div class="container">
+
+    <div class="header-actions">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Buscar por Cédula"
+          class="form-input"
+          [(ngModel)]="filtroCedula"
+          (input)="paginaActual = 1"
+        />
+      </div>
+      <button class="new__customer" (click)="openNewClientModal()">
+        Nuevo Cliente <span class="material-symbols-outlined">person_add</span>
+      </button>
+    </div>
+
+    <h2 class="subtitle m-b-md">Gestión de Clientes - CETVI</h2>
+
+    <div class="table-card shadow-box">
+      <table class="table__clientes">
+        <thead>
+          <tr>
+            <th>Nombre Completo</th>
+            <th>Cédula</th>
+            <th>Título / Profesión</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cliente of clientesPaginados">
+            <td>{{ cliente.cl_nombre || cliente.nombre }} {{ cliente.cl_apellido || cliente.apellido }}</td>
+            <td>{{ cliente.cl_cedula || cliente.cedula }}</td>
+            <td>{{ cliente.cl_titulo || cliente.titulo }}</td>
+            <td class="table__acciones">
+              <div class="icon-actions-container">
+                <button class="action-btn" (click)="handleAction('detalle', cliente)" title="Ver Detalle">
+                  <span class="material-symbols-outlined">visibility</span>
+                </button>
+                <button class="action-btn" (click)="handleAction('editar', cliente)" title="Editar">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button class="action-btn" (click)="handleAction('eliminar', cliente)" title="Eliminar">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="clientesPaginados.length === 0">
+            <td colspan="4" class="text-center" style="padding: 20px; color: var(--text-muted);">
+              No se encontraron clientes activos con los criterios de búsqueda.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination-container m-t-md" *ngIf="totalPaginas > 1">
+        <button class="pagination-btn" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+          <span class="material-symbols-outlined">chevron_left</span> Anterior
+        </button>
+
+        <span class="page-info">
+          Página <strong>{{ paginaActual }}</strong> de {{ totalPaginas }}
+        </span>
+
+        <button class="pagination-btn" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
+          Siguiente <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
   </div>
-</main>
+</div>
+
+<div class="modal-overlay" *ngIf="showFormModal">
+  <div class="modal-content shadow-box">
+    <div class="modal-header">
+      <h3>{{ isEditing ? 'Actualizar Cliente' : 'Registrar Nuevo Cliente' }}</h3>
+      <span class="material-symbols-outlined close-icon" (click)="closeModals()">close</span>
+    </div>
+
+    <div class="modal-body-grid">
+      <div class="input-group">
+        <label>Cédula:</label>
+        <input type="text" [(ngModel)]="clientForm.cedula" class="form-input" [disabled]="isEditing">
+      </div>
+      <div class="input-group">
+        <label>Nombre:</label>
+        <input type="text" [(ngModel)]="clientForm.nombre" class="form-input">
+      </div>
+      <div class="input-group">
+        <label>Apellido:</label>
+        <input type="text" [(ngModel)]="clientForm.apellido" class="form-input">
+      </div>
+      <div class="input-group">
+        <label>Teléfono:</label>
+        <input type="text" [(ngModel)]="clientForm.telefono" class="form-input">
+      </div>
+      <div class="input-group">
+        <label>Dirección:</label>
+        <input type="text" [(ngModel)]="clientForm.direccion" class="form-input">
+      </div>
+      <div class="input-group">
+        <label>Ciudad:</label>
+        <input type="text" [(ngModel)]="clientForm.ciudad" class="form-input">
+      </div>
+      <div class="input-group">
+        <label>Título:</label>
+        <input type="text" [(ngModel)]="clientForm.titulo" class="form-input">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="primary" (click)="saveClient()">
+        {{ isEditing ? 'ACTUALIZAR' : 'GUARDAR REGISTRO' }}
+      </button>
+      <button class="btn-cancel" (click)="closeModals()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showDeleteConfirmModal">
+  <div class="modal-content shadow-box text-center" style="max-width: 400px;">
+    <div class="modal-header">
+      <h3 style="color: #e74c3c;">¿Eliminar Cliente?</h3>
+      <span class="material-symbols-outlined close-icon" (click)="closeModals()">close</span>
+    </div>
+    <div class="modal-body m-t-md">
+      <p>¿Estás seguro que deseas eliminar a <strong>{{ selectedClient?.cl_nombre || selectedClient?.nombre }}</strong>?</p>
+      <p class="text-muted" style="font-size: 0.8rem;">Esta acción desactivará al cliente del sistema.</p>
+    </div>
+    <div class="modal-actions justify-center m-t-md">
+      <button class="primary" style="background-color: #e74c3c !important; color: white;" (click)="deleteClient()">ELIMINAR</button>
+      <button class="btn-cancel" (click)="closeModals()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showDetailModal">
+  <div class="modal-content shadow-box">
+    <div class="modal-header">
+      <h3>Estado de Cuenta</h3>
+      <span class="material-symbols-outlined close-icon" (click)="closeModals()">close</span>
+    </div>
+    <div class="modal-body text-center">
+      <span class="material-symbols-outlined profile-icon" style="font-size: 60px; color: var(--primary-color);">account_circle</span>
+      <h4>{{ selectedClient?.cl_nombre || selectedClient?.nombre }} {{ selectedClient?.cl_apellido || selectedClient?.apellido }}</h4>
+
+      <div class="finance-card m-t-md" style="display: flex; gap: 15px;">
+        <div class="finance-item danger" style="flex: 1; padding: 15px; background: #fff5f5; border-radius: 10px; color: #e74c3c;">
+          <label style="font-size: 0.8rem; font-weight: 700;">Total a Pagar</label>
+          <span class="amount" style="font-size: 1.2rem; font-weight: 800; display: block;">$ {{ selectedClient?.deuda | number:'1.2-2' }}</span>
+        </div>
+        <div class="finance-item success" style="flex: 1; padding: 15px; background: #f4fbf3; border-radius: 10px; color: #27ae60;">
+          <label style="font-size: 0.8rem; font-weight: 700;">Total Abonado</label>
+          <span class="amount" style="font-size: 1.2rem; font-weight: 800; display: block;">$ {{ selectedClient?.abono | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="balance-footer m-t-md" style="padding: 15px; background: #f8fafc; border-radius: 10px;">
+        <label style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted);">SALDO PENDIENTE</label>
+        <h2 [style.color]="selectedClient?.saldo > 0 ? '#e74c3c' : '#27ae60'">$ {{ selectedClient?.saldo | number:'1.2-2' }}</h2>
+      </div>
+    </div>
+    <div class="modal-actions m-t-md">
+      <button class="primary full-width" (click)="closeModals()">CERRAR VISTA</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showSuccessModal">
+  <div class="modal-content success-modal shadow-box text-center" style="max-width: 350px; padding: 40px;">
+    <div class="success-icon-container">
+      <span class="material-symbols-outlined success-check" style="font-size: 80px; color: #a5dc86;">check_circle</span>
+    </div>
+    <h2 class="m-t-md" style="font-size: 1.5rem; font-weight: 600;">{{ successMessage }}</h2>
+    <div class="modal-actions justify-center m-t-md">
+      <button class="primary btn-ok" style="background: #70c9f0 !important; color: white; padding: 10px 40px;" (click)="closeSuccessModal()">OK</button>
+    </div>
+  </div>
+</div>
