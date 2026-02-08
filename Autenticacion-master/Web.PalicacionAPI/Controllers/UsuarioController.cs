@@ -36,5 +36,13 @@ namespace Web.PalicacionAPI.Controllers
             respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () => await mediador.Send(new ConsultarUsuariosCom()));
             return Ok(respuesta);
         }
+        [HttpGet("ListarUsuarios")]
+        public async Task<IActionResult> ListarUsuarios()
+        {
+            respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () =>
+                await mediador.Send(new ListarTodosUsuariosCom())
+            );
+            return Ok(respuesta);
+        }
     }
 }

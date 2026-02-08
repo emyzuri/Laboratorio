@@ -5,6 +5,7 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -68,6 +69,16 @@ namespace Core.DataAccess.Clientes.Servicio
             {
                 throw new DataException { HResult = respuesta };
             }
+
+            return resultado.ToList();
+        }
+        public async Task<List<UsuarioModel>> ObtenerUsuariosLista()
+        {
+            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
+            var resultado = await dbConnection.QueryAsync<UsuarioModel>(
+                "sps_consultar_usuarios_lista",
+                commandType: CommandType.StoredProcedure
+            );
 
             return resultado.ToList();
         }

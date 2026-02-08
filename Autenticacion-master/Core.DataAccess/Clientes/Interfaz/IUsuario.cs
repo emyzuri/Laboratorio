@@ -13,5 +13,6 @@ namespace Core.DataAccess.Clientes.Interfaz
         /// <exception cref="DataException">Control de errore</exception>
         Task<UsuarioModel> ObtenerUsuario(string usuario, string password);
         Task<List<UsuarioModel>> ObtenerUsuarios();
+
     }
 }

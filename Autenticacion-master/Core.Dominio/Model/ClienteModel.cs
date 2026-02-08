@@ -12,5 +12,6 @@
             public string Direccion { get; set; }
             public string Ciudad { get; set; }
             public string Titulo { get; set; }
-        }
+            public string Estado { get; set; }
+    }
     }

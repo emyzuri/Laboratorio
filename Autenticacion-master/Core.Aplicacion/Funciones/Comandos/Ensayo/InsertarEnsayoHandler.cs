@@ -13,22 +13,15 @@ namespace Core.Aplicacion.Funciones.Comandos.Ensayo
     public class InsertarEnsayoHandler : IRequestHandler<InsertarEnsayoCom, Unit>
     {
         private readonly IEnsayo iEnsayo;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly ICacheServicio cacheServicio;
 
-        public InsertarEnsayoHandler(IEnsayo iEnsayo, IHttpContextAccessor httpContextAccessor, ICacheServicio cacheServicio)
+        public InsertarEnsayoHandler(IEnsayo iEnsayo)
         {
             this.iEnsayo = iEnsayo ?? throw new ArgumentNullException(nameof(iEnsayo));
-            this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            this.cacheServicio = cacheServicio ?? throw new ArgumentNullException(nameof(cacheServicio));
         }
 
         public async Task<Unit> Handle(InsertarEnsayoCom request, CancellationToken cancellationToken)
         {
-            var idSesion = httpContextAccessor.HttpContext.Request.Headers["IdSesion"].ToString();
-            UsuarioModel usuario = await cacheServicio.Obtener<UsuarioModel>(idSesion);
-
-            if (usuario == null) throw new ArgumentException("Sesión no válida");
+            string usuarioNombre = "SISTEMA";
 
             int idPruebaExistente = await iEnsayo.ConsultarUltimoIdPrueba();
             double montoTotalParaElPago;
@@ -45,7 +38,7 @@ namespace Core.Aplicacion.Funciones.Comandos.Ensayo
 
                 foreach (var item in request.Ensayo.Ensayos)
                 {
-                    await iEnsayo.InsertarEnsayo(item, request.Ensayo.IdCliente, idPruebaExistente, usuario.Nombre);
+                    await iEnsayo.InsertarEnsayo(item, request.Ensayo.IdCliente, idPruebaExistente, usuarioNombre);
                 }
             }
 
@@ -53,7 +46,7 @@ namespace Core.Aplicacion.Funciones.Comandos.Ensayo
                 request.Ensayo.IdCliente,
                 request.Abono,
                 montoTotalParaElPago,
-                usuario.Nombre,
+                usuarioNombre,
                 idPruebaExistente
             );
 

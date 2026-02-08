@@ -23,9 +23,7 @@ namespace Web.PalicacionAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertarEnsayo(
-            [FromBody] InsertarEnsayoCom request,
-            [FromHeader] string IdSesion)
+        public async Task<IActionResult> InsertarEnsayo([FromBody] InsertarEnsayoCom request)
         {
             _respuesta = await RespestaServicio.CrearRespuestaExito(_logger, async () =>
                 await _mediador.Send(request));
@@ -41,6 +39,7 @@ namespace Web.PalicacionAPI.Controllers
 
             return Ok(_respuesta);
         }
+
         [HttpGet("Deudores")]
         public async Task<IActionResult> ObtenerClientesDeudores()
         {
