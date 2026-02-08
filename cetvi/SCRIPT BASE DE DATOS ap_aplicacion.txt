@@ -80,6 +80,7 @@ BEGIN
                     us_nombre AS 'Nombre', 
                     us_apellido AS 'Apellido', 
                     us_login AS 'Usuario', 
+		    us_idRol AS 'IdRol',
                     us_password AS 'Password', 
                     us_telefono AS 'Telefono', 
                     us_cedula AS 'Cedula', 
@@ -210,7 +211,8 @@ BEGIN
 
     SELECT @@ROWCOUNT AS FilasAfectadas;
 END
-GO-- sps_clientes
+GO
+-- sps_clientes
 USE ap_aplicacion
 GO
 
@@ -513,31 +515,20 @@ ALTER PROCEDURE sps_clientes
 )
 AS
 BEGIN
-    SELECT cl_id as IdCliente, cl_nombre as Nombre, cl_apellido as Apellido, 
-           cl_telefono as Telefono, cl_direccion as Direccion, cl_ciudad as Ciudad, 
-           cl_titulo as Titulo, cl_estado as Estado
+    SELECT 
+        cl_id as IdCliente, 
+        cl_cedula as Cedula, 
+        cl_nombre as Nombre, 
+        cl_apellido as Apellido, 
+        cl_telefono as Telefono, 
+        cl_direccion as Direccion, 
+        cl_ciudad as Ciudad, 
+        cl_titulo as Titulo, 
+        cl_estado as Estado
     FROM ap_cliente
     WHERE (@i_cl_id IS NULL OR cl_id = @i_cl_id)
       AND (@i_cl_estado IS NULL OR cl_estado = @i_cl_estado)
 END
-
---script de verificación de Alteración cliente
-
-//catalogo
-USE ap_aplicacion
-GO 
-CREATE TABLE [dbo].[ap_catalogo](
-	[ct_id] [int] IDENTITY (1,1),
-	[ct_nombre] [varchar](300) NOT NULL,
-	[ct_descripcion] [varchar] (500) NOT NULL,
-	[ct_estado] [int] NOT NULL,
-	[ct_fecha_registro] [date] NOT NULL,
-	[ct_fecha_actualizacion] [date] NOT NULL,
-CONSTRAINT [PK_ap_catalogo] PRIMARY KEY CLUSTERED 
-(
-    [ct_id] ASC
-)
-) ON [PRIMARY]
 
 
 //ensayo
@@ -608,7 +599,6 @@ GO
 
 --sps_prueba
 
- --script spi_menu
 USE ap_aplicacion
 GO
 
@@ -630,6 +620,46 @@ BEGIN
 END
 GO
 
+--sps_insertar
+USE ap_aplicacion
+GO
+
+ALTER PROCEDURE [dbo].[sps_insertar_ensayo_con_pago]
+    @i_en_idCliente INT,
+    @i_abono MONEY,        -- Nombre corregido
+    @i_montoTotal MONEY,   -- Nombre corregido para coincidir con C#
+    @i_nombreUsuario VARCHAR(300),
+    @i_idPrueba INT        -- Nombre corregido para coincidir con C#
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    BEGIN TRANSACTION;
+    BEGIN TRY
+        -- 1. Insertamos el pago vinculado a la prueba técnica
+        INSERT INTO dbo.ap_pagos (
+            pg_idEnsayo,        -- Este campo almacena el IdPrueba grupal
+            pg_montoTotal, 
+            pg_abono, 
+            pg_nombreUsuario, 
+            pg_fecha_registro
+        )
+        VALUES (
+            @i_idPrueba, 
+            @i_montoTotal, 
+            @i_abono, 
+            @i_nombreUsuario, 
+            CAST(GETDATE() AS DATE) 
+        );
+
+        COMMIT TRANSACTION;
+        RETURN 0;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
 
 //pagos
 USE ap_aplicacion
@@ -644,5 +674,123 @@ CREATE TABLE [dbo].[ap_pagos](
 CONSTRAINT [PK_ap_pagos] PRIMARY KEY CLUSTERED ([pg_id] ASC)
 )
 
+--sps_obtenerabonos
+USE ap_aplicacion
+GO
 
+ALTER PROCEDURE [dbo].[sps_consultar_abonos_cliente]
+    @i_idCliente INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
+    SELECT 
+        p.pg_id AS idPago,
+        p.pg_fecha_registro AS fecha,
+        p.pg_abono AS abonoRealizado,
+        -- Calculamos el saldo directamente de los valores registrados
+        (p.pg_montoTotal - p.pg_abono) AS saldo, 
+        p.pg_nombreUsuario AS usuario
+    FROM dbo.ap_pagos p
+    -- La clave es unir el pago (ID 4) con cualquiera de los ensayos del cliente 1 que tengan ese mismo ID de prueba
+    WHERE p.pg_idEnsayo IN (
+        SELECT DISTINCT en_idPrueba 
+        FROM dbo.ap_ensayo 
+        WHERE en_idCliente = @i_idCliente
+    )
+    ORDER BY p.pg_id DESC;
+END
+GO
+//total
+CREATE TABLE [dbo].[ap_total_diario] (
+    td_id INT IDENTITY(1,1) PRIMARY KEY,
+    td_monto MONEY NOT NULL,
+    td_usuario VARCHAR(300) NOT NULL,
+    td_fecha_actualizacion DATETIME DEFAULT GETDATE()
+);
+
+//tabla roles
+
+USE [ap_aplicacion]
+GO
+
+CREATE TABLE [dbo].[ap_roles] (
+    [rl_id] INT IDENTITY(1,1) PRIMARY KEY,
+    [rl_nombre] VARCHAR(50) NOT NULL,
+    [rl_descripcion] VARCHAR(200)
+);
+
+INSERT INTO [dbo].[ap_roles] (rl_nombre, rl_descripcion)
+VALUES 
+('Administrador', 'Acceso total al sistema y reportes'),
+('Usuario', 'Acceso limitado a ingreso de ensayos y pagos');
+GO
+
+--sps_login
+USE [ap_aplicacion]
+GO
+
+ALTER PROCEDURE [dbo].[sps_login_usuario]
+    @i_login VARCHAR(20),
+    @i_password VARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        us_id AS IdUsuario,
+        us_nombre AS Nombre,
+        us_idRol AS IdRol
+    FROM dbo.ap_usuario
+    WHERE us_login = @i_login 
+      AND us_password = @i_password
+      AND us_activo = 1; 
+END
+GO
+
+--sps_obtener_clientes_deudores
+USE ap_aplicacion
+GO
+
+CREATE PROCEDURE [dbo].[sps_obtener_clientes_deudores]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        CONCAT(c.cl_nombre, ' ', c.cl_apellido) AS NombreCompleto,
+        e.en_nombreUsuario AS Ensayo,
+        SUM(p.pg_abono) AS TotalAbonado,
+        MAX(p.pg_montoTotal) AS TotalAPagar,
+        (MAX(p.pg_montoTotal) - SUM(p.pg_abono)) AS SaldoPendiente,
+        MAX(p.pg_fecha_registro) AS FechaUltimoMovimiento
+    FROM dbo.ap_cliente c
+    INNER JOIN dbo.ap_ensayo e ON c.cl_id = e.en_idCliente
+    INNER JOIN dbo.ap_pagos p ON e.en_idPrueba = p.pg_idEnsayo
+    GROUP BY c.cl_id, c.cl_nombre, c.cl_apellido, e.en_nombreUsuario
+    HAVING SUM(p.pg_abono) < MAX(p.pg_montoTotal);
+END
+GO
+
+--alter_sps_ClientesDeudores
+USE ap_aplicacion
+GO
+
+ALTER PROCEDURE [dbo].[sps_obtener_clientes_deudores]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        c.cl_nombre AS NombreCompleto, 
+        e.en_nombreUsuario AS Ensayo,
+        ISNULL(SUM(p.pg_abono), 0) AS TotalAbonado,
+        MAX(e.en_monto) AS TotalAPagar,
+        (MAX(e.en_monto) - ISNULL(SUM(p.pg_abono), 0)) AS SaldoPendiente
+    FROM dbo.ap_cliente c
+    INNER JOIN dbo.ap_ensayo e ON c.cl_id = e.en_idCliente
+    LEFT JOIN dbo.ap_pagos p ON e.en_idPrueba = p.pg_idEnsayo
+    GROUP BY c.cl_id, c.cl_nombre, e.en_nombreUsuario
+    HAVING (MAX(e.en_monto) - ISNULL(SUM(p.pg_abono), 0)) > 0;
+END
+GO

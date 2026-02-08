@@ -7,6 +7,7 @@ namespace Core.Dominio.Model
         public int IdUsuario { get; set; }
         public string Nombre { get; set; }
         public Guid IdSesion { get; set; }
+        public int IdRol { get; set; }
 
         public UsuarioModel()
         {

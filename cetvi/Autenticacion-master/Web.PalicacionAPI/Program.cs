@@ -50,7 +50,7 @@ if (app.Environment.IsDevelopment())
 app.UseRouting(); 
 app.UseCors("PermitirTodo");
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

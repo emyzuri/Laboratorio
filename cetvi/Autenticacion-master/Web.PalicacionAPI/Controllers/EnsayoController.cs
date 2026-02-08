@@ -1,6 +1,6 @@
-﻿using Core.Aplicacion.Funciones.Comandos.Ensayo;
+﻿using Core.Aplicacion.Funciones.Comandos.Cliente;
+using Core.Aplicacion.Funciones.Comandos.Ensayo;
 using Core.Aplicacion.RespuestaUtilitario;
-using Core.Dominio.Request.Ensayos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,22 +11,42 @@ namespace Web.PalicacionAPI.Controllers
 {
     public class EnsayoController : BaseApiController
     {
-        readonly IMediator mediador;
-        protected Respuesta respuesta;
-        private ILogger<MenuController> logger;
+        private readonly IMediator _mediador;
+        protected Respuesta _respuesta;
+        private readonly ILogger<EnsayoController> _logger;
 
-        public EnsayoController(ILogger<MenuController> logger, IMediator mediador)
+        public EnsayoController(ILogger<EnsayoController> logger, IMediator mediador)
         {
-            this.mediador = mediador;
-            this.respuesta = new Respuesta();
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mediador = mediador;
+            _respuesta = new Respuesta();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertarEnsayo(InsertarEnsayoRequest ensayo)
+        public async Task<IActionResult> InsertarEnsayo(
+            [FromBody] InsertarEnsayoCom request,
+            [FromHeader] string IdSesion)
         {
-            respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () => await mediador.Send(new InsertarEnsayoCom(ensayo)));
-            return Ok(respuesta);
+            _respuesta = await RespestaServicio.CrearRespuestaExito(_logger, async () =>
+                await _mediador.Send(request));
+
+            return Ok(_respuesta);
+        }
+
+        [HttpGet("{idCliente}")]
+        public async Task<IActionResult> ConsultarAbonos(int idCliente)
+        {
+            _respuesta = await RespestaServicio.CrearRespuestaExito(_logger, async () =>
+                await _mediador.Send(new ConsultarAbonoCom(idCliente)));
+
+            return Ok(_respuesta);
+        }
+        [HttpGet("Deudores")]
+        public async Task<IActionResult> ObtenerClientesDeudores()
+        {
+            _respuesta = await RespestaServicio.CrearRespuestaExito(_logger, async () =>
+                await _mediador.Send(new ObtenerClientesDeudoresCom()));
+            return Ok(_respuesta);
         }
     }
 }

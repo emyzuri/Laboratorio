@@ -1,21 +1,23 @@
-﻿
-using Core.Dominio.Model;
+﻿using Core.Dominio.Model;
 using Core.Dominio.Request.Ensayos;
 using MediatR;
+using System.Linq;
 
 namespace Core.Aplicacion.Funciones.Comandos.Ensayo
 {
     public class InsertarEnsayoCom : IRequest<Unit>
     {
         public InsertarEnsayoModel Ensayo { get; set; }
-        public InsertarEnsayoCom(InsertarEnsayoRequest ensayo)
+        public double Abono { get; set; }
+        public InsertarEnsayoCom() { }
+        public InsertarEnsayoCom(InsertarEnsayoRequest request)
         {
-
-            Ensayo = new InsertarEnsayoModel
+            this.Abono = request.Abono;
+            this.Ensayo = new InsertarEnsayoModel
             {
-                IdCliente = ensayo.IdCliente,
-                Descripcion = ensayo.Descripcion,
-                Ensayos = ensayo.Ensayos.Select(e => new EnsayoModel
+                IdCliente = request.IdCliente,
+                Descripcion = request.Descripcion,
+                Ensayos = request.Ensayos.Select(e => new EnsayoModel
                 {
                     IdCatalogo = e.IdCatalogo,
                     Monto = e.Monto

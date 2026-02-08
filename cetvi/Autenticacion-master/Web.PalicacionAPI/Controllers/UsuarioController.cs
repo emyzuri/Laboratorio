@@ -21,10 +21,8 @@ namespace Web.PalicacionAPI.Controllers
             this.respuesta = new Respuesta();
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        //protected Respuesta respuesta;
-
         [HttpGet]
-        public async Task<IActionResult> ValidarCliente([FromHeader] string usuario, [FromHeader] string password)
+        public async Task<IActionResult> ValidarCliente([FromQuery] string usuario, [FromQuery] string password)
         {
             ValidarUsuarioCom validarUsuario = new(password, usuario);
             respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () => await mediador.Send(validarUsuario));
