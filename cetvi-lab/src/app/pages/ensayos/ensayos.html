@@ -1,0 +1,93 @@
+<div class="main__container">
+  <div class="container">
+    <div class="header-actions">
+      <div class="search-box">
+        <span class="material-symbols-outlined">search</span>
+        <input type="text" placeholder="Buscar por cliente o ensayo..." [(ngModel)]="filtroNombre">
+      </div>
+      <button class="btn-gold" (click)="openModal()">
+        Ingresar Ensayo <span class="material-symbols-outlined">add_circle</span>
+      </button>
+    </div>
+
+    <h2 class="section-title">Control de Ensayos y Deudores</h2>
+
+    <div class="table-card shadow-box">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Prueba Realizada</th>
+            <th>Abonado</th>
+            <th>Total a Pagar</th>
+            <th>Saldo Pendiente</th>
+            <th class="text-center">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of ensayosLista">
+            <td>{{ item.nombreCompleto }}</td>
+            <td>{{ item.ensayo }}</td>
+            <td>$ {{ item.totalAbonado | number:'1.2-2' }}</td>
+            <td>$ {{ item.totalAPagar | number:'1.2-2' }}</td>
+            <td class="text-danger"><strong>$ {{ item.saldoPendiente | number:'1.2-2' }}</strong></td>
+            <td class="text-center">
+              <span class="badge" [ngClass]="{
+                'bg-red': getEstadoDeuda(item) === 'Pendiente',
+                'bg-orange': getEstadoDeuda(item) === 'Abonado',
+                'bg-green': getEstadoDeuda(item) === 'Pagado'
+              }">{{ getEstadoDeuda(item) }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showFormModal">
+  <div class="modal-content shadow-box">
+    <div class="modal-header">
+      <h3>Registrar Nuevo Ensayo</h3>
+      <span class="close-btn" (click)="closeModals()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group full-width">
+          <label>Cliente Responsable:</label>
+          <select [(ngModel)]="ensayoForm.ensayo.idCliente" class="form-input">
+            <option [value]="0" disabled>-- Seleccione un cliente activo --</option>
+            <option *ngFor="let c of clientes" [value]="c.idCliente">{{ c.nombre }} {{ c.apellido }}</option>
+          </select>
+        </div>
+        <div class="input-group full-width">
+          <label>Descripción del Trabajo:</label>
+          <input type="text" [(ngModel)]="ensayoForm.ensayo.descripcion" placeholder="Ej: Análisis de Suelos" class="form-input">
+        </div>
+        <div class="input-group">
+          <label>Monto Total ($):</label>
+          <input type="number" [(ngModel)]="ensayoForm.ensayo.ensayos[0].monto" class="form-input">
+        </div>
+        <div class="input-group">
+          <label>Abono Inicial ($):</label>
+          <input type="number" [(ngModel)]="ensayoForm.abono" class="form-input">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModals()">CANCELAR</button>
+      <button class="btn-confirm" (click)="guardarEnsayo()">GUARDAR REGISTRO</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showSuccessModal">
+  <div class="modal-success shadow-box animate-in">
+    <div class="success-icon">
+      <span class="material-symbols-outlined">check_circle</span>
+    </div>
+    <h2>¡Guardado con Éxito!</h2>
+    <p>El ensayo y el abono inicial se registraron correctamente.</p>
+    <button class="btn-confirm" (click)="closeModals()">ACEPTAR</button>
+  </div>
+</div>

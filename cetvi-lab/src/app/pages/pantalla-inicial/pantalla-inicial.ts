@@ -28,16 +28,7 @@ export class PantallaInicialComponent implements OnInit {
   isEditing = false;
   successMessage = '';
 
-  clientForm = {
-    idCliente: 0,
-    cedula: '',
-    nombre: '',
-    apellido: '',
-    telefono: '',
-    direccion: '',
-    ciudad: '',
-    titulo: ''
-  };
+  clientForm = { idCliente: 0, cedula: '', nombre: '', apellido: '', telefono: '', direccion: '', ciudad: '', titulo: '' };
 
   nuevoCliente = {
     nombre: '',
@@ -51,7 +42,6 @@ export class PantallaInicialComponent implements OnInit {
   ngOnInit() {
     this.cargarClientes();
   }
-
   get clientesPaginados() {
     const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
     const fin = inicio + this.itemsPorPagina;
@@ -77,12 +67,15 @@ export class PantallaInicialComponent implements OnInit {
       this.paginaActual = nuevaPagina;
     }
   }
-
   async cargarClientes() {
     try {
       const respuesta = await this.authService.getClientes();
       if (respuesta?.esExitoso) {
-        this.clientes = (respuesta.datos || []).filter((c: any) => c.cl_estado !== 0);
+        this.clientes = (respuesta.datos || []).filter((c: any) => {
+          const valorEstado = c.cl_estado !== undefined ? c.cl_estado : c.estado;
+          return Number(valorEstado) !== 0;
+        });
+
         this.paginaActual = 1;
       }
     } catch (error) {
@@ -122,12 +115,9 @@ export class PantallaInicialComponent implements OnInit {
 
   async saveClient() {
     try {
-      let respuesta;
-      if (this.isEditing) {
-        respuesta = await this.authService.actualizarCliente(this.clientForm);
-      } else {
-        respuesta = await this.authService.insertarCliente(this.clientForm);
-      }
+      let respuesta = this.isEditing
+        ? await this.authService.actualizarCliente(this.clientForm)
+        : await this.authService.insertarCliente(this.clientForm);
 
       if (respuesta && respuesta.esExitoso) {
         this.successMessage = this.isEditing ? 'Actualizado Exitosamente' : 'Registrado Exitosamente';
@@ -159,15 +149,7 @@ export class PantallaInicialComponent implements OnInit {
 
   handleAction(action: string, client: any) {
     this.selectedClient = { ...client };
-    if (action === 'detalle') {
-      this.selectedClient = {
-        ...client,
-        deuda: client.totalAPagar || 0,
-        abono: client.totalAbonado || 0,
-        saldo: client.saldoPendiente || 0
-      };
-      this.showDetailModal = true;
-    } else if (action === 'editar') {
+    if (action === 'editar') {
       this.isEditing = true;
       this.clientForm = {
         idCliente: client.cl_id || client.idCliente || 0,
@@ -192,11 +174,7 @@ export class PantallaInicialComponent implements OnInit {
   }
 
   closeSuccessModal() { this.showSuccessModal = false; }
-
-  closeModals() {
-    this.showFormModal = this.showDetailModal = this.showDeleteConfirmModal = false;
-  }
-
+  closeModals() { this.showFormModal = this.showDetailModal = this.showDeleteConfirmModal = false; }
   resetForm() {
     this.clientForm = { idCliente: 0, cedula: '', nombre: '', apellido: '', telefono: '', direccion: '', ciudad: '', titulo: '' };
     this.filtroCedula = '';
