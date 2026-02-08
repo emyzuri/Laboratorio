@@ -1,43 +1,28 @@
 ﻿using Core.Aplicacion.RespuestaUtilitario;
+using Core.Dominio.Clientes;
+using Core.Dominio.Request.Clientes;
 using MediatR;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class CrearClienteCom : IRequest<Respuesta<int>>
+    public class CrearClienteCom : IRequest<CrearClienteModel>
     {
-        /// <summary>
-        /// Primer nombre del cliente
-        /// </summary>
-        public string PrimerNombre { get; set; }
-
-        /// <summary>
-        /// Segundo nombre del cliente
-        /// </summary>
-        public string SegundoNombre { get; set; }
-
-        /// <summary>
-        /// Primer apellido del cliente
-        /// </summary>
-        public string PrimerApellido { get; set; }
-
-        /// <summary>
-        /// Segundo apellido del cliente
-        /// </summary>
-        public string SegundoApellido { get; set; }
-
-        /// <summary>
-        /// Fecha de nacimiento del cliente
-        /// </summary>
-        public DateTime FechaNacimiento { get; set; }
-
-        /// <summary>
-        /// Teléfono del cliente
-        /// </summary>
+        public string Cedula { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
         public string Telefono { get; set; }
-
-        /// <summary>
-        /// Correo del cliente
-        /// </summary>
-        public string Correo { get; set; }
+        public string Direccion { get; set; }
+        public string Ciudad { get; set; }
+        public string Titulo { get; set; }
+        public CrearClienteCom(CrearClienteRequest cliente)
+        {
+            this.Cedula = cliente.Cedula;
+            this.Nombre = cliente.Nombre;
+            this.Apellido = cliente.Apellido;
+            this.Telefono = cliente.Telefono;
+            this.Direccion = cliente.Direccion;
+            this.Ciudad = cliente.Ciudad;
+            this.Titulo = cliente.Titulo;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Core.Aplicacion.Funciones.Comandos.Cliente;
+using Core.Aplicacion.Funciones.Comandos.Usuarios;
 using MediatR;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -36,7 +37,7 @@ namespace Web.PalicacionAPI.Controllers
             OpenIddictRequest peticion = HttpContext.GetOpenIddictServerRequest() ?? throw new InvalidOperationException("Error en la configuración endpoint identidad");
             if (peticion.IsPasswordGrantType())
             {
-                ValidarClienteCom usuario = new(peticion.Password, peticion.Username);
+                ValidarUsuarioCom usuario = new(peticion.Password, peticion.Username);
                 var cliente = await mediador.Send(usuario);
                 ClaimsIdentity claimsIdentity = new(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
                 claimsIdentity.AddClaim(OpenIddictConstants.Claims.Subject, OpenIddictConstants.Destinations.AccessToken);

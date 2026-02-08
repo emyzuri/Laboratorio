@@ -5,25 +5,12 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
     public class ValidarClienteCom : IRequest<ClienteModel>
     {
-        /// <summary>
-        /// Clave del usuario
-        /// </summary>
-        public string Clave { get; set; }
+        public int IdCliente { get; set; }
 
-        /// <summary>
-        /// Usuario
-        /// </summary>
-        public string Usuario { get; set; }
-
-        /// <summary>
-        /// Constructor de la clase
-        /// </summary>
-        /// <param name="clave">Clave del usuario</param>
-        /// <param name="usuario">Usuario</param>
-        public ValidarClienteCom(string clave, string usuario)
+        /// <param name="idCliente">Clave del usuario</param>
+        public ValidarClienteCom(int idCliente)
         {
-            this.Clave = clave;
-            this.Usuario = usuario;
+            this.IdCliente = idCliente;
         }
     }
 }

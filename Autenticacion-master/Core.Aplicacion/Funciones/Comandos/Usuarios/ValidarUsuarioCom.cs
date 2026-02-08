@@ -1,7 +1,7 @@
 ﻿using Core.Dominio.Model;
 using MediatR;
 
-namespace Core.Aplicacion.Funciones.Comandos.Usuario
+namespace Core.Aplicacion.Funciones.Comandos.Usuarios
 {
     public class ValidarUsuarioCom : IRequest<UsuarioModel>
     {
@@ -11,8 +11,8 @@ namespace Core.Aplicacion.Funciones.Comandos.Usuario
         /// <param name="Usuario">Usuario</param>
         public ValidarUsuarioCom(string Password, string Usuario)
         {
-            this.password = Password;
-            this.usuario = Usuario;
+            password = Password;
+            usuario = Usuario;
         }
     }
 }

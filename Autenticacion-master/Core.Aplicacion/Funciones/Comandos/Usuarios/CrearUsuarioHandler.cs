@@ -2,9 +2,9 @@
 using Core.Util;
 using MediatR;
 
-namespace Core.Aplicacion.Funciones.Comandos.Cliente
+namespace Core.Aplicacion.Funciones.Comandos.Usuarios
 {
-    public class CrearUsuarioHandler : IRequestHandler<CrearClienteCom, Respuesta<int>>
+    public class CrearUsuarioHandler : IRequestHandler<CrearUsuarioCom, int>
     {
         //private readonly ITipoIdentificacion tipoIdentificacion;
 
@@ -14,12 +14,12 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
         {
             this.cacheServicio = cacheServicio;
         }
-        public async Task<Respuesta<int>> Handle(CrearClienteCom request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CrearUsuarioCom request, CancellationToken cancellationToken)
         {
             await cacheServicio.Agregar("llave", "valor", new TimeSpan(0, 2, 0));
             string valor = await cacheServicio.Obtener<string>("llave");
             //var cons = await tipoIdentificacion.ObtenerIdentificaciones();
-            return new Respuesta<int>(8);
+            return 8;
         }
     }
 }
