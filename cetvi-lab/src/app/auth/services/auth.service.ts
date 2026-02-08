@@ -11,19 +11,9 @@ export class AuthService {
     return new HttpHeaders().set('IdSesion', localStorage.getItem('IdSesion') || '');
   }
 
-  async loginAPI(usuario: string): Promise<any> {
-    const headers = new HttpHeaders()
-      .set('usuario', usuario)
-      .set('password', '123')
-      .set('IdSesion', '83b5a7e2-eac8-4c8c-b74d-cb0be7e8b496');
-
-    return await lastValueFrom(this.http.get(`${this.URL_BASE}/Usuario`, { headers }));
-  }
-
-  async getClientes(): Promise<any[]> {
-    return await lastValueFrom(
-      this.http.get<any[]>(`${this.URL_BASE}/Cliente`, { headers: this.obtenerHeaders() })
-    );
+  async loginAPI(usuario: string, password: string): Promise<any> {
+    const url = `${this.URL_BASE}/Usuario?usuario=${usuario}&password=${password}`;
+    return await firstValueFrom(this.http.get<any>(url));
   }
 
   async getMenu(): Promise<any[]> {
@@ -31,8 +21,25 @@ export class AuthService {
       this.http.get<any[]>(`${this.URL_BASE}/Menu`, { headers: this.obtenerHeaders() })
     );
   }
-
-  insertarCliente(cliente: any) {
-    return this.http.post(`${this.URL_BASE}/Cliente`, cliente, { headers: this.obtenerHeaders() });
+  async getClientes(): Promise<any> {
+    const url = `${this.URL_BASE}/Cliente/Clientes`;
+    return await firstValueFrom(this.http.get<any>(url));
   }
+
+  async insertarCliente(cliente: any): Promise<any> {
+    const url = `${this.URL_BASE}/Cliente/Insertar`;
+    return await firstValueFrom(this.http.post<any>(url, cliente));
+  }
+
+  async actualizarCliente(cliente: any): Promise<any> {
+    const url = `${this.URL_BASE}/Cliente/Actualizar`;
+    return await firstValueFrom(this.http.put<any>(url, cliente));
+  }
+
+  async eliminarCliente(id: number): Promise<any> {
+    const url = `${this.URL_BASE}/Cliente/Eliminar`;
+    const headers = { 'idCliente': id.toString() };
+    return await firstValueFrom(this.http.delete<any>(url, { headers }));
+  }
+
 }

@@ -10,19 +10,18 @@
           <div class="cl-nav-item" (click)="toggleMenu(m.idMenu)" [class.active]="menusAbiertos[m.idMenu]">
             <div class="cl-nav-label">
               <span class="material-symbols-outlined">
-                {{ m.nombre.toLowerCase().includes('trans') ? 'payments' :
-                   m.nombre.toLowerCase().includes('segur') ? 'shield' : 'grid_view' }}
+                {{ m.nombre?.toLowerCase()?.includes('trans') ? 'payments' :
+                   m.nombre?.toLowerCase()?.includes('segur') ? 'shield' : 'grid_view' }}
               </span>
               <span>{{ m.nombre | titlecase }}</span>
             </div>
-
-            <span class="material-symbols-outlined" *ngIf="m.subMenus && m.subMenus.length > 0">
+            <span class="material-symbols-outlined" *ngIf="m.subMenus?.length > 0">
               {{ menusAbiertos[m.idMenu] ? 'expand_less' : 'expand_more' }}
             </span>
           </div>
 
           <ul class="cl-submenu" *ngIf="menusAbiertos[m.idMenu] && m.subMenus?.length > 0">
-            <li *ngFor="let sm of m.subMenus" [routerLink]="sm.url">
+            <li *ngFor="let sm of m.subMenus" [routerLink]="['/principal', sm.url]" routerLinkActive="active-submenu">
               {{ sm.nombre | titlecase }}
             </li>
           </ul>
@@ -39,7 +38,7 @@
   </aside>
 
   <main class="cl-main">
-    <header style="height: 60px; background: white; border-bottom: 1px solid var(--border-color);"></header>
+    <header style="height: 60px; background: white; border-bottom: 1px solid #ddd;"></header>
     <div class="cl-content">
       <router-outlet></router-outlet>
     </div>
