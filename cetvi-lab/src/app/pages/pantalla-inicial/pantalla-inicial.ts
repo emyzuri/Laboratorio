@@ -14,14 +14,13 @@ export class PantallaInicialComponent implements OnInit {
   private readonly authService = inject(AuthService);
 
   clientes: any[] = [];
-  filtroCedula: string = '';
+  filtroBusqueda: string = '';
   selectedClient: any = null;
 
   paginaActual: number = 1;
   itemsPorPagina: number = 10;
 
   showFormModal = false;
-  showDetailModal = false;
   showSuccessModal = false;
   showDeleteConfirmModal = false;
 
@@ -30,43 +29,58 @@ export class PantallaInicialComponent implements OnInit {
 
   clientForm = { idCliente: 0, cedula: '', nombre: '', apellido: '', telefono: '', direccion: '', ciudad: '', titulo: '' };
 
-  nuevoCliente = {
-    nombre: '',
-    apellido: '',
-    telefono: '',
-    direccion: '',
-    ciudad: '',
-    titulo: ''
-  };
-
   ngOnInit() {
     this.cargarClientes();
   }
-  get clientesPaginados() {
-    const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
-    const fin = inicio + this.itemsPorPagina;
 
-    const filtrados = this.clientes.filter(cliente => {
-      const cedulaStr = (cliente.cl_cedula || cliente.cedula || '').toString();
-      return cedulaStr.includes(this.filtroCedula);
+  get clientesPaginados() {
+    const filtrados = this.clientes.filter(c => {
+      const cedula = (c.cl_cedula || c.cedula || '').toLowerCase();
+      const nombre = (c.cl_nombre || c.nombre || '').toLowerCase();
+      const apellido = (c.cl_apellido || c.apellido || '').toLowerCase();
+      const busqueda = this.filtroBusqueda.toLowerCase();
+      return cedula.includes(busqueda) || nombre.includes(busqueda) || apellido.includes(busqueda);
+    }).sort((a, b) => {
+      const nombreA = (a.cl_nombre || a.nombre || '').toLowerCase();
+      const nombreB = (b.cl_nombre || b.nombre || '').toLowerCase();
+      return nombreA.localeCompare(nombreB);
     });
 
-    return filtrados.slice(inicio, fin);
+    const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
+    return filtrados.slice(inicio, inicio + this.itemsPorPagina);
   }
 
   get totalPaginas(): number {
-    const filtrados = this.clientes.filter(cliente => {
-      const cedulaStr = (cliente.cl_cedula || cliente.cedula || '').toString();
-      return cedulaStr.includes(this.filtroCedula);
+    const filtrados = this.clientes.filter(c => {
+      const busqueda = this.filtroBusqueda.toLowerCase();
+      return (c.cl_cedula || c.cedula || '').includes(busqueda) ||
+             (c.cl_nombre || c.nombre || '').toLowerCase().includes(busqueda);
     });
     return Math.ceil(filtrados.length / this.itemsPorPagina);
   }
-
-  cambiarPagina(nuevaPagina: number) {
-    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginas) {
-      this.paginaActual = nuevaPagina;
+  validarSoloNumeros(event: any) {
+    const pattern = /[0-9]/;
+    if (!pattern.test(String.fromCharCode(event.charCode))) {
+      event.preventDefault();
     }
   }
+
+  validarFormulario(): boolean {
+    const f = this.clientForm;
+    if (!f.cedula || !f.nombre || !f.apellido || !f.telefono) {
+      alert('⚠️ Complete los campos obligatorios (Cédula, Nombre, Apellido, Teléfono)');
+      return false;
+    }
+    if (!this.isEditing) {
+      const existe = this.clientes.some(c => (c.cl_cedula || c.cedula) === f.cedula);
+      if (existe) {
+        alert('🚫 Error: Esta cédula ya está registrada.');
+        return false;
+      }
+    }
+    return true;
+  }
+
   async cargarClientes() {
     try {
       const respuesta = await this.authService.getClientes();
@@ -75,76 +89,24 @@ export class PantallaInicialComponent implements OnInit {
           const valorEstado = c.cl_estado !== undefined ? c.cl_estado : c.estado;
           return Number(valorEstado) !== 0;
         });
-
-        this.paginaActual = 1;
       }
-    } catch (error) {
-      console.error('Error al cargar clientes:', error);
-    }
-
-    this.authService.insertarCliente(this.nuevoCliente).subscribe({
-      next: (res: any) => {
-        console.log('Respuesta del servidor:', res);
-
-        if (res.esExitoso || res.status === 'success') {
-          alert('Cliente guardado con éxito');
-
-          this.cargarDatos();
-          this.limpiarFormulario();
-        } else {
-          alert('El servidor respondió pero no se pudo guardar.');
-        }
-      },
-      error: (err) => {
-        console.error('Error al insertar:', err);
-        alert('Error de conexión: No se pudo guardar el cliente');
-      }
-    });
-  }
-
-  limpiarFormulario() {
-    this.nuevoCliente = {
-      nombre: '',
-      apellido: '',
-      telefono: '',
-      direccion: '',
-      ciudad: '',
-      titulo: ''
-    };
+    } catch (error) { console.error('Error al cargar clientes:', error); }
   }
 
   async saveClient() {
+    if (!this.validarFormulario()) return;
     try {
-      let respuesta = this.isEditing
+      const respuesta = this.isEditing
         ? await this.authService.actualizarCliente(this.clientForm)
         : await this.authService.insertarCliente(this.clientForm);
 
-      if (respuesta && respuesta.esExitoso) {
+      if (respuesta?.esExitoso) {
         this.successMessage = this.isEditing ? 'Actualizado Exitosamente' : 'Registrado Exitosamente';
         this.showFormModal = false;
         this.showSuccessModal = true;
         this.cargarClientes();
       }
-    } catch (error) {
-      alert('🚫 Error en la operación');
-    }
-  }
-
-  async deleteClient() {
-    if (!this.selectedClient) return;
-    try {
-      const id = this.selectedClient.idCliente || this.selectedClient.cl_id;
-      const respuesta = await this.authService.eliminarCliente(id);
-
-      if (respuesta?.esExitoso) {
-        this.successMessage = 'Eliminado Exitosamente';
-        this.showDeleteConfirmModal = false;
-        this.showSuccessModal = true;
-        this.cargarClientes();
-      }
-    } catch (error) {
-      alert('Error al eliminar');
-    }
+    } catch (error) { alert('🚫 Error en el servidor'); }
   }
 
   handleAction(action: string, client: any) {
@@ -167,17 +129,26 @@ export class PantallaInicialComponent implements OnInit {
     }
   }
 
-  openNewClientModal() {
-    this.isEditing = false;
-    this.resetForm();
-    this.showFormModal = true;
+  async deleteClient() {
+    if (!this.selectedClient) return;
+    try {
+      const id = this.selectedClient.cl_id || this.selectedClient.idCliente;
+      const respuesta = await this.authService.eliminarCliente(id);
+      if (respuesta?.esExitoso) {
+        this.successMessage = 'Eliminado Exitosamente';
+        this.showDeleteConfirmModal = false;
+        this.showSuccessModal = true;
+        this.cargarClientes();
+      }
+    } catch (error) { alert('Error al eliminar'); }
   }
 
+  cambiarPagina(p: number) { this.paginaActual = p; }
   closeSuccessModal() { this.showSuccessModal = false; }
-  closeModals() { this.showFormModal = this.showDetailModal = this.showDeleteConfirmModal = false; }
+  closeModals() { this.showFormModal = this.showDeleteConfirmModal = false; }
+  openNewClientModal() { this.isEditing = false; this.resetForm(); this.showFormModal = true; }
   resetForm() {
     this.clientForm = { idCliente: 0, cedula: '', nombre: '', apellido: '', telefono: '', direccion: '', ciudad: '', titulo: '' };
-    this.filtroCedula = '';
-    this.paginaActual = 1;
+    this.filtroBusqueda = '';
   }
 }

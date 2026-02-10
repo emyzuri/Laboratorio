@@ -5,19 +5,16 @@
         <span class="material-symbols-outlined">search</span>
         <input type="text" placeholder="Buscar por cliente o ensayo..." [(ngModel)]="filtroNombre">
       </div>
-      <button class="btn-gold" (click)="openModal()">
+      <button class="btn-action-gold" (click)="openModal()">
         Ingresar Ensayo <span class="material-symbols-outlined">add_circle</span>
       </button>
     </div>
-
-    <h2 class="section-title">Control de Ensayos y Deudores</h2>
-
     <div class="table-card shadow-box">
       <table class="table-custom">
-        <thead>
+        <thead class="bg-gold-header">
           <tr>
             <th>Cliente</th>
-            <th>Prueba Realizada</th>
+            <th>Fecha de Entrega</th>
             <th>Abonado</th>
             <th>Total a Pagar</th>
             <th>Saldo Pendiente</th>
@@ -27,10 +24,12 @@
         <tbody>
           <tr *ngFor="let item of ensayosLista">
             <td>{{ item.nombreCompleto }}</td>
-            <td>{{ item.ensayo }}</td>
+            <td>{{ item.fechaUltimoMovimiento | date:'dd/MM/yyyy' }}</td>
             <td>$ {{ item.totalAbonado | number:'1.2-2' }}</td>
             <td>$ {{ item.totalAPagar | number:'1.2-2' }}</td>
-            <td class="text-danger"><strong>$ {{ item.saldoPendiente | number:'1.2-2' }}</strong></td>
+            <td [class.text-danger]="item.saldoPendiente > 0">
+              <strong>$ {{ item.saldoPendiente | number:'1.2-2' }}</strong>
+            </td>
             <td class="text-center">
               <span class="badge" [ngClass]="{
                 'bg-red': getEstadoDeuda(item) === 'Pendiente',
@@ -46,48 +45,102 @@
 </div>
 
 <div class="modal-overlay" *ngIf="showFormModal">
-  <div class="modal-content shadow-box">
-    <div class="modal-header">
-      <h3>Registrar Nuevo Ensayo</h3>
+  <div class="modal-content shadow-box border-gold no-scroll">
+    <div class="modal-header bg-gold">
+      <h3>Registrar Nuevo Pedido</h3>
       <span class="close-btn" (click)="closeModals()">&times;</span>
     </div>
-    <div class="modal-body">
+
+    <div class="modal-body compact">
       <div class="form-grid">
         <div class="input-group full-width">
           <label>Cliente Responsable:</label>
           <select [(ngModel)]="ensayoForm.ensayo.idCliente" class="form-input">
-            <option [value]="0" disabled>-- Seleccione un cliente activo --</option>
-            <option *ngFor="let c of clientes" [value]="c.idCliente">{{ c.nombre }} {{ c.apellido }}</option>
+            <option [value]="0" disabled selected>-- Seleccione cliente activo --</option>
+            <option *ngFor="let c of clientes" [value]="c.idCliente">
+              {{ c.cedula }} - {{ c.nombre }} {{ c.apellido }}
+            </option>
           </select>
         </div>
-        <div class="input-group full-width">
-          <label>Descripción del Trabajo:</label>
-          <input type="text" [(ngModel)]="ensayoForm.ensayo.descripcion" placeholder="Ej: Análisis de Suelos" class="form-input">
-        </div>
         <div class="input-group">
-          <label>Monto Total ($):</label>
-          <input type="number" [(ngModel)]="ensayoForm.ensayo.ensayos[0].monto" class="form-input">
+          <label>Fecha de Entrega:</label>
+          <input type="date" [(ngModel)]="fechaEntrega" [min]="minFecha" class="form-input">
         </div>
         <div class="input-group">
           <label>Abono Inicial ($):</label>
-          <input type="number" [(ngModel)]="ensayoForm.abono" class="form-input">
+          <input type="number" min="0" [(ngModel)]="ensayoForm.abono" (keypress)="soloNumeros($event)" class="form-input">
+        </div>
+        <div class="input-group full-width">
+          <label>Descripción:</label>
+          <input type="text" [(ngModel)]="ensayoForm.ensayo.descripcion" placeholder="Detalles generales..." class="form-input">
         </div>
       </div>
+
+      <div class="gold-dashed">
+        <div class="summary-header">
+          <span>Ensayos Seleccionados ({{ listaEnsayosTmp.length }})</span>
+          <button class="btn-confirm-dark small" (click)="openEnsayoSelection()">
+            AGREGAR ENSAYO
+          </button>
+        </div>
+        <div class="mini-table-compact">
+          <div class="mini-row" *ngFor="let e of listaEnsayosTmp; let i = index">
+            <span>#{{ e.numero }} - {{ e.nombre }}</span>
+            <strong>$ {{ e.monto | number:'1.2-2' }}</strong>
+            <button class="remove-btn" (click)="eliminarFilaEnsayo(i)">&times;</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="total-bar-dark">
+        <span>TOTAL A PAGAR:</span>
+        <strong>$ {{ calcularTotalPedido() | number:'1.2-2' }}</strong>
+      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeModals()">CANCELAR</button>
-      <button class="btn-confirm" (click)="guardarEnsayo()">GUARDAR REGISTRO</button>
+
+    <div class="modal-footer footer-light">
+      <button class="btn-cancel-alt" (click)="closeModals()">CANCELAR</button>
+      <button class="btn-confirm-gold"
+              [disabled]="!formularioValido()"
+              (click)="guardarEnsayo()">
+        GUARDAR REGISTRO
+      </button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" *ngIf="showSuccessModal">
-  <div class="modal-success shadow-box animate-in">
-    <div class="success-icon">
-      <span class="material-symbols-outlined">check_circle</span>
+<div class="modal-overlay z-top" *ngIf="showSelectionModal">
+  <div class="modal-content shadow-box border-gold selection-small">
+    <div class="modal-header bg-gold">
+      <h3>Detalle del Ensayo</h3>
+      <span class="close-btn" (click)="showSelectionModal = false">&times;</span>
     </div>
-    <h2>¡Guardado con Éxito!</h2>
-    <p>El ensayo y el abono inicial se registraron correctamente.</p>
-    <button class="btn-confirm" (click)="closeModals()">ACEPTAR</button>
+    <div class="modal-body compact">
+      <div class="input-group full-width">
+        <label>Seleccione el Ensayo:</label>
+        <select [(ngModel)]="nuevoEnsayoTmp.nombre" (change)="onEnsayoChange()" class="form-input">
+          <option value="" disabled selected>-- Seleccione del catálogo --</option>
+          <option *ngFor="let cat of catalogoEnsayos" [value]="cat.nombre">
+            {{ cat.nombre }}
+          </option>
+        </select>
+      </div>
+      <div class="input-group full-width mt-10">
+        <label>Número de ensayo:</label>
+        <input type="number" min="1" [(ngModel)]="nuevoEnsayoTmp.numero" (keypress)="soloNumeros($event)" placeholder="Ej: 5" class="form-input">
+      </div>
+      <div class="input-group full-width mt-10">
+        <label>Costo del ensayo ($):</label>
+        <input type="number" min="0.01" step="0.01" [(ngModel)]="nuevoEnsayoTmp.monto" (keypress)="soloNumeros($event)" class="form-input" placeholder="0.00">
+      </div>
+    </div>
+    <div class="modal-footer footer-light">
+      <button class="btn-cancel-alt" (click)="showSelectionModal = false">VOLVER</button>
+      <button class="btn-confirm-dark"
+              [disabled]="!nuevoEnsayoTmp.nombre || nuevoEnsayoTmp.monto <= 0 || !nuevoEnsayoTmp.numero"
+              (click)="confirmarAgregarEnsayo()">
+        AGREGAR A LA LISTA
+      </button>
+    </div>
   </div>
 </div>
