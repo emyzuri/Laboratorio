@@ -27,7 +27,6 @@ export class AuthService {
     return await firstValueFrom(this.http.get<any>(url));
   }
 
-  // CORRECCIÓN: Apuntamos al endpoint de listado general
   async getUsuarios(): Promise<any> {
     const url = `${this.URL_BASE}/Usuario/ListarUsuarios`;
     return await firstValueFrom(
@@ -56,6 +55,12 @@ export class AuthService {
   }
   async getEnsayos(): Promise<any> {
     const url = `${this.URL_BASE}/Ensayo/Deudores`;
+    return await firstValueFrom(
+      this.http.get<any>(url, { headers: this.obtenerHeaders() })
+    );
+  }
+  async getCatalogoEnsayos(): Promise<any> {
+    const url = `${this.URL_BASE}/Ensayo/Catalogo`;
     return await firstValueFrom(
       this.http.get<any>(url, { headers: this.obtenerHeaders() })
     );
