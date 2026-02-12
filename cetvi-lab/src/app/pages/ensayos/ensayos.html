@@ -68,7 +68,7 @@
         </div>
         <div class="input-group">
           <label>Abono Inicial ($):</label>
-          <input type="number" min="0" [(ngModel)]="ensayoForm.abono" (keypress)="soloNumeros($event)" class="form-input">
+          <input type="number" min="0" placeholder="0" [(ngModel)]="ensayoForm.abono" (keypress)="soloNumeros($event)" class="form-input">
         </div>
         <div class="input-group full-width">
           <label>Descripción:</label>
@@ -79,9 +79,22 @@
       <div class="gold-dashed">
         <div class="summary-header">
           <span>Ensayos Seleccionados ({{ listaEnsayosTmp.length }})</span>
-          <button class="btn-confirm-dark small" (click)="openEnsayoSelection()">
-            AGREGAR ENSAYO
-          </button>
+          
+          <!-- Voy a agregar un botón más animado (innecesario pero bonito) -->
+          <div class="folder-btn-wrapper" (click)="openEnsayoSelection()">
+          <div class="folder-container">
+            <div class="folder">
+              <div class="front-side">
+              <div class="tip"></div>
+                <div class="cover"></div>
+              </div>
+                <div class="back-side cover"></div>
+              </div>
+              <label class="custom-file-upload">
+                Agregar Ensayo
+            </label>
+            </div>
+          </div>
         </div>
         <div class="mini-table-compact">
           <div class="mini-row" *ngFor="let e of listaEnsayosTmp; let i = index">
@@ -127,17 +140,17 @@
       </div>
       <div class="input-group full-width mt-10">
         <label>Número de ensayo:</label>
-        <input type="number" min="1" [(ngModel)]="nuevoEnsayoTmp.numero" (keypress)="soloNumeros($event)" placeholder="Ej: 5" class="form-input">
+        <input type="number" min="1" [(ngModel)]="nuevoEnsayoTmp.numero" placeholder="0"class="form-input">
       </div>
       <div class="input-group full-width mt-10">
         <label>Costo del ensayo ($):</label>
-        <input type="number" min="0.01" step="0.01" [(ngModel)]="nuevoEnsayoTmp.monto" (keypress)="soloNumeros($event)" class="form-input" placeholder="0.00">
+        <input type="number" min="0.01" step="0.01" [(ngModel)]="nuevoEnsayoTmp.monto" placeholder="0.00" class="form-input">
       </div>
     </div>
     <div class="modal-footer footer-light">
       <button class="btn-cancel-alt" (click)="showSelectionModal = false">VOLVER</button>
       <button class="btn-confirm-dark"
-              [disabled]="!nuevoEnsayoTmp.nombre || nuevoEnsayoTmp.monto <= 0 || !nuevoEnsayoTmp.numero"
+              [disabled]="!nuevoEnsayoTmp.nombre || nuevoEnsayoTmp.monto === null || nuevoEnsayoTmp.monto <= 0 || nuevoEnsayoTmp.numero === null || nuevoEnsayoTmp.numero <= 0 "
               (click)="confirmarAgregarEnsayo()">
         AGREGAR A LA LISTA
       </button>

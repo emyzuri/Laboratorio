@@ -25,21 +25,25 @@ export class EnsayosComponent implements OnInit {
   fechaEntrega: string = '';
 
   listaEnsayosTmp: any[] = [];
-  nuevoEnsayoTmp = {
-    nombre: '',
-    monto: 0,
-    numero: '',
-    idCatalogo: 0
-  };
-
-  ensayoForm = {
+  nuevoEnsayoTmp: {
+  nombre: string;
+  monto: number | null;
+  numero: number | null;
+  idCatalogo: number;
+} = {
+  nombre: '',
+  monto: null,
+  numero: null,
+  idCatalogo: 0
+};
+  ensayoForm: any = {
     ensayo: {
       idCliente: 0,
       descripcion: '',
-      ensayos: [] as any[]
+      ensayos: []
     },
-    abono: 0
-  };
+    abono: null
+};
 
   ngOnInit() {
     this.cargarEnsayos();
@@ -52,7 +56,7 @@ export class EnsayosComponent implements OnInit {
     const hoy = new Date();
     this.minFecha = hoy.toISOString().split('T')[0];
   }
- async cargarCatalogoMaster() {
+  async cargarCatalogoMaster() {
     try {
       const resp = await this.authService.getCatalogoEnsayos();
       if (resp?.esExitoso) {
@@ -93,10 +97,15 @@ export class EnsayosComponent implements OnInit {
     }
   }
 
-  openEnsayoSelection() {
-    this.nuevoEnsayoTmp = { nombre: '', monto: 0, numero: '', idCatalogo: 0 };
-    this.showSelectionModal = true;
-  }
+openEnsayoSelection() {
+  this.nuevoEnsayoTmp = { 
+    nombre: '', 
+    monto: null, 
+    numero: null, 
+    idCatalogo: 0 
+  };
+  this.showSelectionModal = true;
+}
   onEnsayoChange() {
   const seleccionado = this.catalogoEnsayos.find(e => e.nombre === this.nuevoEnsayoTmp.nombre);
   if (seleccionado) {
@@ -104,15 +113,31 @@ export class EnsayosComponent implements OnInit {
   }
 }
 
+  // confirmarAgregarEnsayo() {
+  //   const numEnsayo = Number(this.nuevoEnsayoTmp.numero);
+  //   if (this.nuevoEnsayoTmp.nombre && this.nuevoEnsayoTmp.monto !== null &&
+  //       this.nuevoEnsayoTmp.monto > 0 && !isNaN(numEnsayo) && numEnsayo > 0) {
+  //       this.listaEnsayosTmp.push({ ...this.nuevoEnsayoTmp });
+  //     this.showSelectionModal = false;
+  //   } else {
+  //     alert('Por favor, ingrese un número de ensayo válido y un costo mayor a cero.');
+  //   }
+  // }
+
   confirmarAgregarEnsayo() {
-    const numEnsayo = Number(this.nuevoEnsayoTmp.numero);
-    if (this.nuevoEnsayoTmp.nombre && this.nuevoEnsayoTmp.monto > 0 && !isNaN(numEnsayo) && numEnsayo > 0) {
-      this.listaEnsayosTmp.push({ ...this.nuevoEnsayoTmp });
-      this.showSelectionModal = false;
-    } else {
-      alert('Por favor, ingrese un número de ensayo válido y un costo mayor a cero.');
-    }
+  if (
+    this.nuevoEnsayoTmp.nombre &&
+    this.nuevoEnsayoTmp.monto !== null &&
+    this.nuevoEnsayoTmp.monto > 0 &&
+    this.nuevoEnsayoTmp.numero !== null &&
+    this.nuevoEnsayoTmp.numero > 0
+  ) {
+    this.listaEnsayosTmp.push({ ...this.nuevoEnsayoTmp });
+    this.showSelectionModal = false;
+  } else {
+    alert('Por favor, ingrese valores válidos.');
   }
+}
 
   eliminarFilaEnsayo(index: number) {
     this.listaEnsayosTmp.splice(index, 1);
@@ -182,7 +207,7 @@ export class EnsayosComponent implements OnInit {
     this.fechaEntrega = '';
     this.ensayoForm = {
       ensayo: { idCliente: 0, descripcion: '', ensayos: [] },
-      abono: 0
+      abono: null
     };
   }
   getEstadoDeuda(item: any): string {
