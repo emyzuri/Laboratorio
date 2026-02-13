@@ -1,0 +1,22 @@
+.screen-center {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #d9b26f, #f3e4c8);
+
+}
+
+sgc-logo {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+sgc-logo img {
+  width: 180px;
+}
+
+// sgc-card {
+//   max-width: 450px;   // prueba con esto
+//   width: 100%;
+// }
