@@ -1,22 +1,121 @@
-.screen-center {
-  min-height: 100vh;
+// .screen-center {
+//   min-height: 100vh;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   background: linear-gradient(135deg, #d9b26f, #f3e4c8);
+
+// }
+
+// sgc-logo {
+//   display: block;
+//   margin-bottom: 1rem;
+// }
+
+// sgc-logo img {
+//   width: 180px;
+// }
+
+// // sgc-card {
+// //   max-width: 450px;   // prueba con esto
+// //   width: 100%;
+// // }
+
+
+// NUEVO DISE;O
+.login-wrapper {
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #d9b26f, #f3e4c8);
-
 }
 
-sgc-logo {
-  display: block;
-  margin-bottom: 1rem;
+.login-container {
+  width: 900px;
+  height: 500px;
+  display: flex;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
 }
 
-sgc-logo img {
-  width: 180px;
+/* LADO IZQUIERDO */
+.login-left {
+  flex: 1;
+  background: #cfcfcf;
+  color: rgb(0, 0, 0);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  gap: 20px;
 }
 
-// sgc-card {
-//   max-width: 450px;   // prueba con esto
-//   width: 100%;
-// }
+.login-left h1 {
+  font-size: 28px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group input {
+  padding: 12px;
+  border: none;
+  border-bottom: 2px solid #555;
+  background: transparent;
+  color: rgb(0, 0, 0);
+  font-size: 1.1em;
+  outline: none;
+}
+
+/* LADO DERECHO */
+.login-right {
+  flex: 1;
+  background-image: linear-gradient(#83838399, #41414199), url('/fondo_de_pantalla.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+  position: relative;
+  margin-left: -50px;
+}
+
+
+
+.login-right h2 {
+  font-size: 32px;
+}
+
+.login-right p {
+  max-width: 300px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+
+  .login-container {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .login-right {
+    display: none;
+  }
+
+  .login-left {
+    padding: 40px;
+  }
+}
