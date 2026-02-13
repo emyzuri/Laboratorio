@@ -119,15 +119,15 @@ sgc-card {
   border-radius: var(--radius-md);
 }
 
-sgc-card sgc-logo img,
-sgc-card app-logo img {
-  max-width: 150px !important;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-}
+// sgc-card sgc-logo img,
+// sgc-card app-logo img {
+//   max-width: 150px !important;
+//   width: 100%;
+//   height: auto;
+//   object-fit: contain;
+//   display: block;
+//   margin: 0 auto;
+// }
 
 .form-group {
   margin-bottom: var(--space-md);

@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'sgc-logo',
@@ -8,7 +7,9 @@ import { Input } from '@angular/core';
   styleUrls: ['./logo.scss'],
 })
 export class LogoComponent {
+
   @Input() type: 'main' | 'secondary' = 'main';
+  @Input() width: string = '160px';   
 
   get logoPath() {
     return this.type === 'main' ? '/cetvi.jpeg' : '/herramienta.png';
