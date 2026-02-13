@@ -12,6 +12,6 @@ export class LogoComponent {
   @Input() width: string = '160px';   
 
   get logoPath() {
-    return this.type === 'main' ? '/cetvi.jpeg' : '/herramienta.png';
+    return this.type === 'main' ? '/cetvi-remove-bg.png' : '/herramienta.png';
   }
 }
