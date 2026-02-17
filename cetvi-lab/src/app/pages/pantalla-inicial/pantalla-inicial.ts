@@ -33,6 +33,46 @@ export class PantallaInicialComponent implements OnInit {
     this.cargarClientes();
   }
 
+  /**
+   * Algoritmo de validación de cédula ecuatoriana
+   */
+  validarCedulaEcuatoriana(cedula: string): boolean {
+    if (!cedula || cedula.length !== 10) return false;
+
+    // Verificar los dos primeros dígitos (provincia 01-24 o 30)
+    const provincia = parseInt(cedula.substring(0, 2), 10);
+    if (!((provincia >= 1 && provincia <= 24) || provincia === 30)) return false;
+
+    // Verificar el tercer dígito (debe ser menor a 6)
+    const tercerDigito = parseInt(cedula.substring(2, 3), 10);
+    if (tercerDigito >= 6) return false;
+
+    // Coeficientes para el algoritmo de módulo 10
+    const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+    const verificador = parseInt(cedula.substring(9, 10), 10);
+    let suma = 0;
+
+    for (let i = 0; i < 9; i++) {
+      let valor = parseInt(cedula.substring(i, i + 1), 10) * coeficientes[i];
+      if (valor >= 10) valor -= 9;
+      suma += valor;
+    }
+
+    const totalCalculado = suma % 10 === 0 ? 0 : 10 - (suma % 10);
+    return totalCalculado === verificador;
+  }
+
+  /**
+   * Getter que valida campos llenos y cédula válida de Ecuador
+   */
+  get formularioValido(): boolean {
+    const f = this.clientForm;
+    const camposLlenos = !!(f.cedula && f.nombre && f.apellido && f.telefono);
+    const cedulaCorrecta = this.validarCedulaEcuatoriana(f.cedula);
+
+    return camposLlenos && cedulaCorrecta;
+  }
+
   get clientesPaginados() {
     const filtrados = this.clientes.filter(c => {
       const cedula = (c.cl_cedula || c.cedula || '').toLowerCase();
@@ -58,27 +98,12 @@ export class PantallaInicialComponent implements OnInit {
     });
     return Math.ceil(filtrados.length / this.itemsPorPagina);
   }
+
   validarSoloNumeros(event: any) {
     const pattern = /[0-9]/;
     if (!pattern.test(String.fromCharCode(event.charCode))) {
       event.preventDefault();
     }
-  }
-
-  validarFormulario(): boolean {
-    const f = this.clientForm;
-    if (!f.cedula || !f.nombre || !f.apellido || !f.telefono) {
-      alert('⚠️ Complete los campos obligatorios (Cédula, Nombre, Apellido, Teléfono)');
-      return false;
-    }
-    if (!this.isEditing) {
-      const existe = this.clientes.some(c => (c.cl_cedula || c.cedula) === f.cedula);
-      if (existe) {
-        alert('🚫 Error: Esta cédula ya está registrada.');
-        return false;
-      }
-    }
-    return true;
   }
 
   async cargarClientes() {
@@ -94,7 +119,16 @@ export class PantallaInicialComponent implements OnInit {
   }
 
   async saveClient() {
-    if (!this.validarFormulario()) return;
+    if (!this.formularioValido) return;
+
+    if (!this.isEditing) {
+      const existe = this.clientes.some(c => (c.cl_cedula || c.cedula) === this.clientForm.cedula);
+      if (existe) {
+        alert('🚫 Error: Esta cédula ya está registrada.');
+        return;
+      }
+    }
+
     try {
       const respuesta = this.isEditing
         ? await this.authService.actualizarCliente(this.clientForm)
@@ -149,6 +183,5 @@ export class PantallaInicialComponent implements OnInit {
   openNewClientModal() { this.isEditing = false; this.resetForm(); this.showFormModal = true; }
   resetForm() {
     this.clientForm = { idCliente: 0, cedula: '', nombre: '', apellido: '', telefono: '', direccion: '', ciudad: '', titulo: '' };
-    this.filtroBusqueda = '';
   }
 }

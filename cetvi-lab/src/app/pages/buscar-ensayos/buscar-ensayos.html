@@ -1,0 +1,50 @@
+<div class="main__container">
+  <div class="container">
+    <div class="header-actions">
+      <div class="search-box">
+        <label style="margin-right: 15px; font-weight: 600; color: #333;">Filtrar por Fecha:</label>
+        <input type="date"
+               [(ngModel)]="fechaBusqueda"
+               (change)="buscarEnsayos()"
+               class="form-input">
+      </div>
+    </div>
+
+    <div class="table-card shadow-box">
+
+      <div *ngIf="busquedaRealizada && listaResultados.length === 0" class="no-data-alert">
+        <span class="material-symbols-outlined">event_busy</span>
+        <p>No existe Ensayos en esta fecha</p>
+      </div>
+
+      <table class="table-custom" *ngIf="listaResultados.length > 0">
+        <thead class="bg-gold-header">
+          <tr>
+            <th>ID</th>
+            <th>Cédula</th>
+            <th>Cliente</th>
+            <th>Ensayo Realizado</th>
+            <th>Monto Total</th>
+            <th class="text-center">Saldo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of listaResultados">
+            <td><strong>#{{ item.IdPrueba }}</strong></td>
+            <td>{{ item.Cedula }}</td>
+            <td>{{ item.NombreCompleto }}</td>
+            <td>{{ item.NombreCatalogo }}</td>
+            <td>$ {{ item.MontoTotal | number:'1.2-2' }}</td>
+            <td class="text-center">
+              <span [class.text-danger]="item.SaldoIndividual > 0"
+                    [class.text-success]="item.SaldoIndividual <= 0"
+                    style="font-weight: bold;">
+                $ {{ item.SaldoIndividual | number:'1.2-2' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
