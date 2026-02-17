@@ -1,0 +1,139 @@
+.main__container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+// SECCIÓN DE CABECERA Y FILTROS
+.header-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 25px;
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        background: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e0e0e0;
+
+        label {
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        .form-input {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 8px 12px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            cursor: pointer;
+
+            &:focus {
+                border-color: #d4af37; // Color dorado del proyecto
+            }
+        }
+    }
+}
+
+// TARJETA DE TABLA
+.table-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 10px;
+
+    &.shadow-box {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+}
+
+// MENSAJE DE "NO EXISTE ENSAYOS EN ESTA FECHA"
+.no-data-alert {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background-color: #fffdf5;
+    border: 2px dashed #d4af37;
+    border-radius: 15px;
+    color: #856404;
+    margin: 20px 0;
+    text-align: center;
+
+    span {
+        font-size: 56px;
+        margin-bottom: 15px;
+        color: #d4af37;
+    }
+
+    p {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+}
+
+// ESTILO DE TABLA CUSTOM
+.table-custom {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    .bg-gold-header {
+        background-color: #fff9e6; // Fondo suave para el header
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #555;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #d4af37;
+        }
+    }
+
+    tbody {
+        tr {
+            transition: background 0.2s ease;
+
+            &:hover {
+                background-color: #fffcf0;
+            }
+
+            td {
+                padding: 15px;
+                border-bottom: 1px solid #f0f0f0;
+                color: #333;
+                font-size: 0.95rem;
+
+                strong {
+                    color: #222;
+                }
+            }
+        }
+    }
+}
+
+// UTILIDADES DE TEXTO
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-center {
+    text-align: center !important;
+}

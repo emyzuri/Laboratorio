@@ -42,7 +42,7 @@
             </td>
           </tr>
           <tr *ngIf="clientesPaginados.length === 0">
-            <td colspan="4" class="text-center" style="padding: 20px; color: var(--text-muted);">
+            <td colspan="4" class="text-center" style="padding: 20px; color: #888;">
               No se encontraron clientes que coincidan con la búsqueda.
             </td>
           </tr>
@@ -73,6 +73,10 @@
         <label>Cédula *:</label>
         <input type="text" [(ngModel)]="clientForm.cedula" class="form-input"
                [disabled]="isEditing" (keypress)="validarSoloNumeros($event)" maxlength="10">
+        <small *ngIf="clientForm.cedula.length === 10 && !validarCedulaEcuatoriana(clientForm.cedula)"
+               class="text-danger" style="font-size: 0.7rem; font-weight: bold; display: block; margin-top: 4px;">
+          ⚠️ Cédula no válida en Ecuador
+        </small>
       </div>
       <div class="input-group">
         <label>Nombre *:</label>
@@ -101,7 +105,11 @@
       </div>
     </div>
     <div class="modal-actions">
-      <button class="primary" (click)="saveClient()">
+      <button class="primary"
+              (click)="saveClient()"
+              [disabled]="!formularioValido"
+              [style.opacity]="!formularioValido ? '0.5' : '1'"
+              [style.cursor]="!formularioValido ? 'not-allowed' : 'pointer'">
         {{ isEditing ? 'ACTUALIZAR' : 'GUARDAR REGISTRO' }}
       </button>
       <button class="btn-cancel" (click)="closeModals()">CANCELAR</button>
@@ -117,7 +125,6 @@
     </div>
     <div class="modal-body m-t-md">
       <p>¿Estás seguro que deseas eliminar a <strong>{{ selectedClient?.cl_nombre || selectedClient?.nombre }}</strong>?</p>
-      <p class="text-muted" style="font-size: 0.8rem;">Esta acción desactivará al cliente del sistema.</p>
     </div>
     <div class="modal-actions justify-center m-t-md">
       <button class="primary" style="background-color: #e74c3c !important; color: white;" (click)="deleteClient()">ELIMINAR</button>
