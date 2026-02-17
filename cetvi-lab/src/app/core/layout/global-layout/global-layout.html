@@ -1,26 +1,36 @@
-<div class="cl-dashboard">
+<div class="cl-dashboard" [class.collapsed]="!isMenuExpanded">
   <aside class="cl-sidebar">
-    <div class="cl-header">
-      <img src="/cetvi.jpeg" alt="Logo" class="cl-logo">
+    <div class="cl-sidebar-header">
+      <button class="menu-toggle-btn" (click)="toggleSidebar()" title="Alternar menú">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <img *ngIf="isMenuExpanded" src="/cetvi-remove-bg.png" alt="Logo" class="cl-logo">
     </div>
 
     <nav class="cl-nav">
       <ul>
         <li *ngFor="let m of listaMenu">
-          <div class="cl-nav-item" (click)="toggleMenu(m.idMenu)" [class.active]="menusAbiertos[m.idMenu]">
+          <div class="cl-nav-item" 
+              (click)="isMenuExpanded ? toggleMenu(m.idMenu) : toggleSidebar()" 
+              [class.active]="menusAbiertos[m.idMenu]">
+            
             <div class="cl-nav-label">
-              <span class="material-symbols-outlined">
-                {{ m.nombre?.toLowerCase()?.includes('trans') ? 'payments' :
-                   m.nombre?.toLowerCase()?.includes('segur') ? 'shield' : 'grid_view' }}
+              <span class="material-symbols-outlined icon-lg" [title]="m.nombre">
+                {{ 
+                  m.nombre?.toLowerCase()?.includes('ensayo') ? 'science' : 
+                  m.nombre?.toLowerCase()?.includes('cliente') ? 'group' :
+                  m.nombre?.toLowerCase()?.includes('usuario') ? 'manage_accounts' : 'grid_view' 
+                }}
               </span>
-              <span>{{ m.nombre | titlecase }}</span>
+              <span class="menu-text" *ngIf="isMenuExpanded">{{ m.nombre | titlecase }}</span>
             </div>
-            <span class="material-symbols-outlined" *ngIf="m.subMenus?.length > 0">
-              {{ menusAbiertos[m.idMenu] ? 'expand_less' : 'expand_more' }}
+            
+            <span class="material-symbols-outlined arrow" *ngIf="m.subMenus?.length > 0 && isMenuExpanded">
+              expand_more
             </span>
           </div>
 
-          <ul class="cl-submenu" *ngIf="menusAbiertos[m.idMenu] && m.subMenus?.length > 0">
+          <ul class="cl-submenu" *ngIf="isMenuExpanded && menusAbiertos[m.idMenu] && m.subMenus?.length > 0">
             <li *ngFor="let sm of m.subMenus" [routerLink]="['/principal', sm.url]" routerLinkActive="active-submenu">
               {{ sm.nombre | titlecase }}
             </li>
@@ -31,16 +41,16 @@
 
     <div class="cl-footer">
       <button type="button" class="cl-btn-logout" (click)="cerrarSesion()">
-        <span class="material-symbols-outlined">logout</span>
-        <span>Cerrar Sesión</span>
+        <span class="material-symbols-outlined icon-lg" title="Cerrar Sesión">logout</span>
+        <span class="menu-text" *ngIf="isMenuExpanded">Cerrar Sesión</span>
       </button>
     </div>
   </aside>
 
   <main class="cl-main">
-    <header style="height: 60px; background: white; border-bottom: 1px solid #ddd;"></header>
+    <header class="cl-top-header"></header>
     <div class="cl-content">
       <router-outlet></router-outlet>
     </div>
   </main>
-</div>
+  </div>

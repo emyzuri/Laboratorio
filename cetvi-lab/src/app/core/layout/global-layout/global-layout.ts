@@ -14,6 +14,8 @@ export class GlobalLayoutComponent implements OnInit {
 
   listaMenu: any[] = [];
   menusAbiertos: { [key: number]: boolean } = {};
+  
+  isMenuExpanded: boolean = true; 
 
   ngOnInit() {
     this.cargarMenu();
@@ -22,19 +24,21 @@ export class GlobalLayoutComponent implements OnInit {
   async cargarMenu() {
     try {
       const respuesta: any = await this.authService.getMenu();
-
       if (respuesta && respuesta.esExitoso === true) {
         this.listaMenu = respuesta.datos || [];
-      } else {
-        console.error('Error en carga de menú:', respuesta?.mensaje);
       }
     } catch (error) {
-      console.error('Error de comunicación con el servidor:', error);
+      console.error('Error de comunicación:', error);
     }
   }
 
   toggleMenu(idMenu: number) {
     this.menusAbiertos[idMenu] = !this.menusAbiertos[idMenu];
+  }
+
+  // Nueva función para colapsar/expandir el sidebar
+  toggleSidebar() {
+    this.isMenuExpanded = !this.isMenuExpanded;
   }
 
   cerrarSesion() {

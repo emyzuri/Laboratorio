@@ -1,0 +1,183 @@
+/* VARIABLES */
+$primary-yellow: #f1c40f;
+$bg-main: #f8f9fa;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 70px;
+$header-height: 150px; /* Definimos una altura fija para la cabecera */
+
+/* CONTENEDOR PRINCIPAL */
+.cl-dashboard {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: $bg-main;
+
+&.collapsed {
+    .cl-sidebar {
+        width: $sidebar-collapsed-width !important;
+        min-width: $sidebar-collapsed-width !important;
+    }
+    
+    /* Forzamos que la cabecera no cambie de tamaño ni posición */
+    .cl-sidebar-header {
+        height: $header-height;
+        padding-top: 25px !important;
+        justify-content: center !important; /* Centra el botón cuando no hay logo */
+    }
+    
+    .menu-text, .arrow, .cl-submenu, .cl-logo {
+        display: none !important;
+    }
+
+    .cl-nav-item {
+        justify-content: center !important;
+        margin-bottom: 7px;
+    //   padding: 12px 0 !important;
+    //   margin: 4px 10px !important;
+    }
+
+    // .cl-nav-label { gap: 0 !important; }
+
+    .cl-footer span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+  }
+}
+
+/* SIDEBAR */
+.cl-sidebar {
+    width: $sidebar-width;
+    min-width: $sidebar-width;
+    height: 100%;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    transition: $transition;
+    border-right: 1px solid #eee;
+
+.cl-sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 25px 15px 0 15px; /* 25px desde el techo siempre */
+    height: $header-height;    /* Altura fija */
+    gap: 10px;
+    box-sizing: border-box;    /* Asegura que el padding no sume a la altura */
+    
+    .cl-logo {
+        height: 30px;
+        width: auto;
+    }
+  }
+}
+
+/* NAVEGACIÓN */
+.cl-nav {
+    flex: 1;
+    padding: 10px 10px;
+    overflow-y: auto;
+
+    ul { list-style: none; padding: 0; margin: 0; }
+
+    .cl-nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px; 
+        margin: 2px 0px;
+        border-radius: 10px;
+        color: #444;
+        cursor: pointer;
+        transition: $transition;
+        min-height: 40px;
+
+    &:hover { background: rgba($primary-yellow, 0.15); }
+
+    &.active {
+        background: rgba($primary-yellow, 0.12);
+        font-weight: 600;
+        color: #000;
+        .arrow { transform: rotate(180deg); }
+    }
+
+    .cl-nav-label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .arrow {
+        transition: transform 0.3s ease;
+        font-size: 20px;
+    }
+  }
+}
+
+/* ICONOS */
+.material-symbols-outlined.icon-lg {
+    font-size: 24px !important;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* SUBMENÚ */
+.cl-submenu {
+    margin: 0 10px 5px 10px !important;
+    background: #fdfdfd;
+    border-left: 3px solid #f1c40f;  
+    transition: all 0.3s ease;
+    
+li {
+    padding: 8px 15px 8px 40px;
+    font-size: 0.85rem;
+    color: #666;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: $transition;
+    
+    &:hover { background: #f0f0f0; color: #000; }
+
+    &.active-submenu {
+        color: #000;
+        font-weight: 600;
+        background: rgba($primary-yellow, 0.1);
+        border-left: 3px solid #f1c40f;
+        padding-left: 37px;
+        }
+    }
+}
+
+/* BOTÓN HAMBURGUESA */
+.menu-toggle-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Evita que se encoja */
+    &:hover { background: #f0f0f0; }
+}
+
+/* RESTO DEL LAYOUT... */
+.cl-main {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    .cl-top-header { height: 70px; background: #fdda87; border-bottom: 1px solid #eee; }
+    .cl-content { flex: 1; padding: 20px; overflow-y: auto; background: #fed57557; }
+}
+
+.cl-footer {
+    padding: 15px; border-top: 1px solid #eee;
+    .cl-btn-logout {
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    padding: 10px 15px; border: none; background: transparent;
+    color: #e74c3c; cursor: pointer; border-radius: 10px;
+    &:hover { background: #fff5f5; }
+    }
+}
