@@ -18,7 +18,8 @@ $success-soft-text: #027A48;
 .main__container {
   padding: 30px;
   background-color: $light-bg;
-  min-height: 100vh;
+  min-height: calc(100vh - 120px);
+  box-shadow: 0 0 16px 6px #ccc;
   font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -30,24 +31,15 @@ $success-soft-text: #027A48;
 }
 
 .search-box {
-  display: flex;
-  align-items: center;
-  background: $white;
-  padding: 12px 18px;
-  border-radius: 8px;
-  border: 1px solid #E5E7EB;
-  width: 400px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  flex: 1;
+  max-width: 250px;}
 
-  input {
-    border: none;
-    outline: none;
-    margin-left: 10px;
-    width: 100%;
-    background: transparent;
-    color: $dark-grey;
+.form-input {
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    &:focus { outline: none; border-color: #f1c40f; }
   }
-}
 
 .btn-action-gold {
   background-color: $gold-primary;

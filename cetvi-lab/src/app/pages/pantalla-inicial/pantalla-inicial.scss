@@ -4,9 +4,10 @@
 .justify-center { justify-content: center !important; }
 
 .main__container {
-  padding: 20px;
+  padding: 30px;
   background-color: #f4f7f6;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 120px);
+  box-shadow: 0 0 16px 6px #ccc;
 }
 
 .container {
@@ -28,7 +29,7 @@
 
 .new__customer {
   all: unset;
-  background-color: var(--primary-color) !important;
+  background-color: #F4D77A;
   color: var(--secondary-color) !important;
   padding: 10px 20px;
   border-radius: 8px;
