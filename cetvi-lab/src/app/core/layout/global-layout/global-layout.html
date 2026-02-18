@@ -48,7 +48,40 @@
   </aside>
 
   <main class="cl-main">
-    <header class="cl-top-header"></header>
+<header class="cl-top-header">
+  <div class="user-profile-container">
+    <button class="profile-trigger" (click)="toggleProfileMenu()">
+      <img src="/cetvi-lab/public/user.png" alt="User" class="avatar">
+    </button>
+
+    <div class="profile-dropdown" [class.active]="isProfileMenuOpen">
+      <div class="user-info">
+        <p class="user-name">User</p>
+        <p class="user-email">user@ejemplo.com</p>
+      </div>
+      
+      <hr>
+
+      <ul class="menu-list">
+        <li>
+          <button (click)="irAConfiguracion()">
+            Configuración
+          </button>
+        </li>
+        <li>
+          <button (click)="cambiarUsuario()">
+            Cambiar usuario
+          </button>
+        </li>
+        <li class="logout-item">
+          <button (click)="cerrarSesion()">
+            Cerrar Sesión
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
     <div class="cl-content">
       <router-outlet></router-outlet>
     </div>
