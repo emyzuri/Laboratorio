@@ -2,8 +2,12 @@
   <div class="container">
     <div class="header-actions">
       <div class="search-box">
-        <input type="text" placeholder="Buscar por Cédula o Nombre..." class="form-input"
-               [(ngModel)]="filtroBusqueda" (input)="paginaActual = 1" />
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input type="text"
+               placeholder="Buscar por nombre o cédula..."
+               class="form-input"
+               [(ngModel)]="filtroBusqueda"
+               (input)="paginaActual = 1" />
       </div>
       <button class="new__customer" (click)="openNewClientModal()">
         Nuevo Cliente <span class="material-symbols-outlined">person_add</span>
@@ -22,29 +26,29 @@
         </thead>
         <tbody>
           <tr *ngFor="let cliente of clientesPaginados">
-            <td>{{ cliente.cl_nombre || cliente.nombre }} {{ cliente.cl_apellido || cliente.apellido }}</td>
+            <td>{{ (cliente.cl_nombre || cliente.nombre) }} {{ (cliente.cl_apellido || cliente.apellido) }}</td>
             <td>{{ cliente.cl_cedula || cliente.cedula }}</td>
             <td>{{ cliente.cl_titulo || cliente.titulo }}</td>
             <td class="table__acciones">
               <div class="icon-actions-container">
-                <button class="action-btn" (click)="handleAction('editar', cliente)" title="Editar">
+                <button class="action-btn edit" (click)="handleAction('editar', cliente)" title="Editar">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button class="action-btn" (click)="handleAction('eliminar', cliente)" title="Eliminar">
+                <button class="action-btn delete" (click)="handleAction('eliminar', cliente)" title="Eliminar">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
             </td>
           </tr>
           <tr *ngIf="clientesPaginados.length === 0">
-            <td colspan="4" class="text-center" style="padding: 20px; color: #888;">
-              No se encontraron clientes.
+            <td colspan="4" class="text-center" style="padding: 40px; color: #94a3b8;">
+              No se encontraron registros activos.
             </td>
           </tr>
         </tbody>
       </table>
 
-      <div class="pagination-container m-t-md" *ngIf="totalPaginas > 1">
+      <div class="pagination-container" *ngIf="totalPaginas > 1">
         <button class="pagination-btn" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
           <span class="material-symbols-outlined">chevron_left</span> Anterior
         </button>
@@ -58,51 +62,38 @@
 </div>
 
 <div class="modal-overlay" *ngIf="showFormModal">
-  <div class="modal-content shadow-box border-gold selection-small">
-    <div class="modal-header bg-gold">
+  <div class="modal-content shadow-box">
+    <div class="modal-header">
       <h3>{{ isEditing ? 'Actualizar Cliente' : 'Registrar Nuevo Cliente' }}</h3>
-      <span class="close-btn" (click)="closeModals()">&times;</span>
+      <span class="material-symbols-outlined close-icon" (click)="closeModals()">close</span>
     </div>
 
     <div class="modal-body-grid">
       <div class="input-group">
-        <label>Cédula :</label>
+        <label>Cédula *:</label>
         <input type="text" [(ngModel)]="clientForm.cedula" class="form-input"
                [disabled]="isEditing" (keypress)="validarSoloNumeros($event)" maxlength="10">
-        <small *ngIf="clientForm.cedula.length === 10 && !esCedulaEcuatorianaValida" style="color: #e74c3c; font-size: 11px;">
-          * Cédula ecuatoriana inválida
-        </small>
       </div>
-
       <div class="input-group">
-        <label>Nombre :</label>
+        <label>Nombre *:</label>
         <input type="text" [(ngModel)]="clientForm.nombre" class="form-input">
       </div>
-
       <div class="input-group">
-        <label>Apellido :</label>
+        <label>Apellido *:</label>
         <input type="text" [(ngModel)]="clientForm.apellido" class="form-input">
       </div>
-
       <div class="input-group">
-        <label>Teléfono :</label>
-        <input type="text" [(ngModel)]="clientForm.telefono" class="form-input"
-               (keypress)="validarSoloNumeros($event)" maxlength="10">
-        <small *ngIf="clientForm.telefono && clientForm.telefono.length < 10" style="color: #f39c12; font-size: 11px;">
-          * Debe tener 10 dígitos
-        </small>
+        <label>Teléfono *:</label>
+        <input type="text" [(ngModel)]="clientForm.telefono" class="form-input" maxlength="10" (keypress)="validarSoloNumeros($event)">
       </div>
-
-      <div class="input-group">
+      <div class="input-group full-width">
         <label>Dirección:</label>
         <input type="text" [(ngModel)]="clientForm.direccion" class="form-input">
       </div>
-
       <div class="input-group">
         <label>Ciudad:</label>
         <input type="text" [(ngModel)]="clientForm.ciudad" class="form-input">
       </div>
-
       <div class="input-group">
         <label>Título / Profesión:</label>
         <input type="text" [(ngModel)]="clientForm.titulo" class="form-input">
@@ -110,32 +101,22 @@
     </div>
 
     <div class="modal-actions">
-  <button
-    type="button"
-    class="primary"
-    (click)="saveClient()"
-    [disabled]="!formularioValido"
-    [style.opacity]="formularioValido ? '1' : '0.5'"
-    [style.cursor]="formularioValido ? 'pointer' : 'not-allowed'">
-    {{ isEditing ? 'ACTUALIZAR' : 'GUARDAR REGISTRO' }}
-  </button>
-
-  <button type="button" class="btn-cancel" (click)="closeModals()">
-    CANCELAR
-  </button>
-</div>
+      <button type="button" class="primary" (click)="saveClient()" [disabled]="!formularioValido">
+        {{ isEditing ? 'ACTUALIZAR' : 'GUARDAR' }}
+      </button>
+      <button type="button" class="btn-cancel" (click)="closeModals()">CANCELAR</button>
+    </div>
   </div>
 </div>
 
 <div class="modal-overlay" *ngIf="showDeleteConfirmModal">
-  <div class="modal-content shadow-box modal-sm">
-    <div class="modal-header">
-      <h3>Confirmar Eliminación</h3>
-      <span class="material-symbols-outlined close-icon" (click)="showDeleteConfirmModal = false">close</span>
+  <div class="modal-content modal-sm shadow-box text-center">
+    <div class="modal-header" style="background: #fee2e2; border-bottom: 1px solid #fecaca;">
+      <h3 style="color: #dc2626;">¿Eliminar Cliente?</h3>
     </div>
-    <div class="modal-body text-center">
-      <p>¿Estás seguro de que deseas eliminar a <strong>{{ selectedClient?.cl_nombre || selectedClient?.nombre }}</strong>?</p>
-      <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+    <div class="modal-body">
+      <p>¿Seguro de eliminar a <strong>{{ selectedClient?.cl_nombre || selectedClient?.nombre }}</strong>?</p>
+      <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">El registro dejará de ser visible en el sistema.</p>
     </div>
     <div class="modal-actions">
       <button class="btn-danger" (click)="confirmDelete()">ELIMINAR</button>
