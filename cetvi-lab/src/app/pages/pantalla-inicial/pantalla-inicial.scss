@@ -1,3 +1,11 @@
+$gold-primary: #F4D77A;
+$gold-soft: #FFF7E0;
+$gold-border: #F1D27A;
+
+$dark-grey: #1F2937;
+$light-bg: #F4F6F8;
+$white: #FFFFFF;
+
 .text-center { text-align: center !important; }
 .m-t-md { margin-top: 20px !important; }
 .full-width { width: 100% !important; }
@@ -39,7 +47,8 @@
   align-items: center;
   gap: 8px;
   transition: 0.3s;
-  &:hover { filter: brightness(0.9); transform: translateY(-1px); }
+  &:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
 }
 
 .table-card {
@@ -128,31 +137,81 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
+  backdrop-filter: blur(3px);
 }
 
 .modal-content {
-  background: white;
-  padding: 25px 30px;
+  // background: white;
+  // padding: 25px 30px;
+  // border-radius: 16px;
+  // width: 95%;
+  // max-width: 700px;
+  // box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+  background: $white;
+  width: 560px;
+  max-height: 85vh; 
   border-radius: 16px;
-  width: 95%;
-  max-width: 700px;
-  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+  border: 1.5px solid $gold-border;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
+//MODAL HEADER
 .modal-header {
+  background-color: $gold-soft;
+  padding: 18px 24px;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
-  h3 { color: #1e293b; font-size: 1.25rem; font-weight: 700; }
-  .close-icon { cursor: pointer; color: #94a3b8; &:hover { color: #ef4444; } }
+  align-items: center;
+  border-bottom: 1px solid $gold-border;
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $dark-grey;
+  }
+
+  .close-btn {
+    font-size: 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
 }
+// .modal-header {
+//   background-color: #FFF7E0;
+//   padding: 18px 24px;
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   border-bottom: 1px solid #FFF7E0;
+//   // margin-bottom: 20px;
+//   h3 { 
+//     color: #1e293b; 
+//     font-size: 1.25rem; 
+//     font-weight: 700; 
+//   }
+//   .close-icon { 
+//     cursor: pointer; 
+//     color: #94a3b8; 
+//       &:hover { 
+//         color: #ef4444; 
+//       } 
+//     }
+// }
 
 .modal-body-grid {
+  padding: 22px 24px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
@@ -175,9 +234,10 @@
 
 .modal-actions {
   display: flex;
+  background-color: #F8FAFC;
   justify-content: flex-end;
   gap: 12px;
-  padding-top: 15px;
+  padding: 18px 24px;
   border-top: 1px solid #e5e7eb;
   button {
     padding: 12px 24px;

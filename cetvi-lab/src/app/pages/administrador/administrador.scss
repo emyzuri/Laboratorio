@@ -1,13 +1,3 @@
-// ==========================================
-// VARIABLES Y UTILIDADES
-// ==========================================
-$gold-primary: #F4D77A;
-$gold-hover: #f1c40f;
-$dark-text: #2d3748;
-$light-gray: #e2e8f0;
-$danger: #e53e3e;
-$success: #2e7d32;
-
 .text-center { text-align: center !important; }
 .m-b-md { margin-bottom: 20px !important; }
 .m-t-md { margin-top: 20px !important; }
@@ -166,51 +156,39 @@ $success: #2e7d32;
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
-  padding: 20px;
 }
 
 .modal-content {
   background: white;
-  padding: 0; // Se maneja el padding interno por secciones
+  padding: 30px;
   border-radius: 15px;
-  width: 100%;
+  width: 90%;
   max-width: 600px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  overflow: hidden;
-  animation: modalFadeIn 0.3s ease;
-
-  &.success-modal { max-width: 400px; }
-  &.role-modal { max-width: 450px; }
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
+// MODAL HEADER
 .modal-header {
-  background: #fafafa;
-  padding: 20px 25px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #eee;
-
-  h3 { font-weight: 800; color: #1a202c; margin: 0; font-size: 1.1rem; }
-  .close-icon {
-    cursor: pointer;
-    color: #a0aec0;
-    transition: 0.2s;
-    &:hover { color: $danger; transform: scale(1.1); }
-  }
+  margin-bottom: 25px;
+  h3 { font-weight: 700; color: #1a202c; margin: 0; }
+  .close-icon { cursor: pointer; color: #a0aec0; &:hover { color: #e53e3e; } }
 }
 
+
+// MODAL BODY
 .modal-body-grid {
-  padding: 25px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+  margin-bottom: 25px;
 }
 
 .modal-body { padding: 25px; }
@@ -218,41 +196,13 @@ $success: #2e7d32;
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-
-  label { font-size: 0.75rem; font-weight: 800; color: #4a5568; text-transform: uppercase; }
-
-  input {
+  gap: 8px;
+  label { font-size: 0.8rem; font-weight: 800; color: #4a5568; }
+  .form-input {
     padding: 12px;
-    border: 1px solid $light-gray;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 0.9rem;
-    &:focus { outline: none; border-color: $gold-hover; box-shadow: 0 0 0 3px rgba(241, 196, 15, 0.1); }
-  }
-
-  .error-text { color: $danger; font-size: 0.7rem; margin-top: 2px; }
-}
-
-// Lista de Roles en el Modal
-.roles-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 10px;
-
-  .role-item {
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      font-weight: 500;
-      color: #2d3748;
-
-      input { width: 18px; height: 18px; cursor: pointer; accent-color: $gold-hover; }
-
-      &:hover { color: #000; }
-    }
+    &:focus { outline: none; border-color: #f1c40f; }
   }
 }
 
@@ -260,43 +210,28 @@ $success: #2e7d32;
   background: #fafafa;
   padding: 20px 25px;
   display: flex;
+  background-color: #F8FAFC;
   justify-content: flex-end;
-  gap: 12px;
-  border-top: 1px solid #eee;
-
+  gap: 15px;
+  margin-top: 30px;
   button {
-    padding: 10px 22px;
+    padding: 10px 25px;
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
     border: none;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-
-    &.primary {
-      background-color: $gold-hover;
-      color: #000;
-      &:disabled { background-color: #fbd38d; cursor: not-allowed; opacity: 0.7; }
-      &:hover:not(:disabled) { filter: brightness(1.05); }
-    }
-
-    &.btn-cancel {
-      background-color: #edf2f7;
-      color: #4a5568;
-      &:hover { background-color: #e2e8f0; }
-    }
+    &.primary { background-color: #f1c40f; color: #000; }
+    &.btn-cancel { background-color: #edf2f7; color: #4a5568; }
   }
 }
-
-// Animación de entrada
-@keyframes modalFadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Quitar efecto óvalo de los roles */
+.table__clientes tbody tr td div span {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  color: #444 !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
 }
 
-// Responsive
-@media (max-width: 600px) {
-  .modal-body-grid { grid-template-columns: 1fr; }
-  .header-actions { flex-direction: column; gap: 15px; align-items: stretch; }
-  .search-box { max-width: 100%; }
-}

@@ -11,35 +11,34 @@ export class BuscarEnsayosComponent {
 
   private readonly authService = inject(AuthService);
 
-  fechaInicio: string = '';
-  fechaFin: string = '';
+  // Variable que coincide con el [(ngModel)] del HTML
+  fechaBusqueda: string = '';
 
   listaResultados: any[] = [];
   busquedaRealizada: boolean = false;
 
   async buscarEnsayos() {
-
-    if (!this.fechaInicio || !this.fechaFin) return;
+    // Si no hay fecha seleccionada, no hacemos la búsqueda
+    if (!this.fechaBusqueda) return;
 
     try {
-
       this.busquedaRealizada = true;
 
-      const start = new Date(this.fechaInicio);
-      const end = new Date(this.fechaFin);
-      end.setHours(23, 59, 59, 999);
+      // Creamos el objeto fecha para la comparación
+      // Usamos toDateString() para comparar solo año, mes y día (sin horas)
+      const fechaFiltro = new Date(this.fechaBusqueda).toDateString();
 
       const resp = await this.authService.getEnsayosDeudores();
 
       if (resp?.esExitoso && resp.datos) {
 
         this.listaResultados = resp.datos.filter((e: any) => {
-
           if (!e.fechaRegistro) return false;
 
-          const fechaRegistro = new Date(e.fechaRegistro);
+          const fechaReg = new Date(e.fechaRegistro).toDateString();
 
-          return fechaRegistro >= start && fechaRegistro <= end;
+          // Retorna verdadero si el registro coincide con la fecha seleccionada
+          return fechaReg === fechaFiltro;
         });
 
       } else {
@@ -47,7 +46,6 @@ export class BuscarEnsayosComponent {
       }
 
     } catch (error) {
-
       console.error('Error al filtrar ensayos:', error);
       this.listaResultados = [];
       alert('🚫 No se pudo obtener la información del servidor');
