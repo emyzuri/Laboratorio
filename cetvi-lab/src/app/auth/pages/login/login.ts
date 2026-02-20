@@ -9,31 +9,43 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./login.scss']
 })
 export class LoginComponent {
-  private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
 
-  async login(usuario: string, password: string) {
-    if (!usuario || !password) return alert('⚠️ Por favor, ingresa usuario y contraseña');
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-    try {
-      const respuesta = await this.authService.loginAPI(usuario, password);
+  login(usuario: string, password: string): void {
 
-      if (respuesta && respuesta.esExitoso === true) {
+    console.log('Intentando login...');
 
-        const data = respuesta.datos;
-
-        if (data && data.idSesion) {
-          localStorage.setItem('IdSesion', data.idSesion);
-          localStorage.setItem('IdUsuario', data.idUsuario.toString());
-
-          this.router.navigateByUrl('/principal');
-        }
-      } else {
-        alert('❌ Error de Acceso: ' + (respuesta?.mensaje || 'Credenciales inválidas'));
-      }
-    } catch (error) {
-      console.error('Error de red:', error);
-      alert('🚫 Error de comunicación: El servidor no responde. Revisa que no esté pausado en Visual Studio.');
+    if (!usuario || !password) {
+      alert('⚠️ Por favor, ingresa usuario y contraseña');
+      return;
     }
+
+    this.authService.loginAPI(usuario, password)
+      .subscribe({
+        next: (respuesta) => {
+
+          console.log('Respuesta backend:', respuesta);
+
+          if (respuesta?.esExitoso && respuesta?.datos) {
+
+            const data = respuesta.datos;
+
+            localStorage.setItem('IdSesion', data.idSesion);
+            localStorage.setItem('usuarioLogueado', JSON.stringify(data));
+            localStorage.setItem('token', data.token || '');
+
+            this.router.navigateByUrl('/principal');
+
+          } else {
+            alert('❌ Credenciales inválidas');
+          }
+        },
+        error: (error) => {
+          console.error('Error HTTP:', error);
+          alert('🚫 Error de comunicación con el servidor');
+        }
+      });
   }
 }

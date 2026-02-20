@@ -10,7 +10,7 @@
       path: 'principal',
       component: GlobalLayoutComponent,
       children: [
-        { path: '', redirectTo: 'clientes', pathMatch: 'full' },
+        { path: '', redirectTo: 'ensayos', pathMatch: 'full' },
 
         {
           path: 'ensayos',

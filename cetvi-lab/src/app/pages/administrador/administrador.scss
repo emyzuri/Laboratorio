@@ -1,7 +1,20 @@
+// ==========================================
+// VARIABLES Y UTILIDADES
+// ==========================================
+$gold-primary: #F4D77A;
+$gold-hover: #f1c40f;
+$dark-text: #2d3748;
+$light-gray: #e2e8f0;
+$danger: #e53e3e;
+$success: #2e7d32;
+
 .text-center { text-align: center !important; }
 .m-b-md { margin-bottom: 20px !important; }
 .m-t-md { margin-top: 20px !important; }
 
+// ==========================================
+// CONTENEDOR PRINCIPAL
+// ==========================================
 .main__container {
   padding: 30px;
   background-color: #f4f7f6;
@@ -14,6 +27,9 @@
   margin: 0 auto;
 }
 
+// ==========================================
+// CABECERA Y BUSCADOR
+// ==========================================
 .header-actions {
   display: flex;
   justify-content: space-between;
@@ -23,149 +39,264 @@
 
 .search-box {
   flex: 1;
-  max-width: 250px;
+  max-width: 300px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    color: #a0aec0;
+    font-size: 20px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid $light-gray;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.3s;
+    &:focus {
+      outline: none;
+      border-color: $gold-hover;
+      box-shadow: 0 0 0 3px rgba(241, 196, 15, 0.2);
+    }
+  }
 }
 
 .new__customer {
   all: unset;
-  background-color: #F4D77A !important;
+  background-color: $gold-primary !important;
   color: #000 !important;
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
-  transition: transform 0.2s;
-  &:hover { transform: translateY(-2px); filter: brightness(1.05); }
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  &:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
 }
 
+// ==========================================
+// TABLA Y FILAS
+// ==========================================
 .table-card {
   background: white;
   border-radius: 12px;
-  padding: 20px;
+  padding: 10px 20px 20px 20px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  overflow-x: auto;
 }
 
 .table__clientes {
   width: 100%;
   border-collapse: collapse;
+
   th {
     text-align: left;
-    padding: 15px;
+    padding: 18px 15px;
     color: #5a6a85;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    font-weight: 800;
     text-transform: uppercase;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid $light-gray;
   }
+
   td {
-    padding: 15px;
+    padding: 16px 15px;
     border-bottom: 1px solid #f1f5f9;
-    color: #2d3748;
+    color: $dark-text;
     vertical-align: middle;
   }
 }
 
-.icon-actions-container {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
+// Botón Gestionar Roles
+.btn-roles {
+  background: white;
+  border: 1.5px solid $gold-hover;
+  color: #000;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
 
-  .action-btn {
-    all: unset;
-    cursor: pointer;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: white !important;
-    border: 2px solid #f1c40f !important;
-    transition: 0.3s;
-
-    span {
-      font-size: 18px;
-      color: #000 !important;
-    }
-
-    &:hover {
-      background-color: #f1c40f !important;
-    }
+  &:hover {
+    background-color: $gold-hover;
+    color: #000;
   }
 }
 
+// Estilo de Badges para Roles en la tabla
+.roles-badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+}
+
+.role-badge {
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 4px !important;
+  padding: 3px 8px !important;
+  color: #495057 !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-transform: capitalize;
+}
+
+// ==========================================
+// MODALES (NUEVO USUARIO Y ROLES)
+// ==========================================
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
+  padding: 20px;
 }
 
 .modal-content {
   background: white;
-  padding: 30px;
+  padding: 0; // Se maneja el padding interno por secciones
   border-radius: 15px;
-  width: 90%;
+  width: 100%;
   max-width: 600px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  overflow: hidden;
+  animation: modalFadeIn 0.3s ease;
+
+  &.success-modal { max-width: 400px; }
+  &.role-modal { max-width: 450px; }
 }
 
 .modal-header {
+  background: #fafafa;
+  padding: 20px 25px;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 25px;
-  h3 { font-weight: 700; color: #1a202c; margin: 0; }
-  .close-icon { cursor: pointer; color: #a0aec0; &:hover { color: #e53e3e; } }
+  align-items: center;
+  border-bottom: 1px solid #eee;
+
+  h3 { font-weight: 800; color: #1a202c; margin: 0; font-size: 1.1rem; }
+  .close-icon {
+    cursor: pointer;
+    color: #a0aec0;
+    transition: 0.2s;
+    &:hover { color: $danger; transform: scale(1.1); }
+  }
 }
 
 .modal-body-grid {
+  padding: 25px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
+.modal-body { padding: 25px; }
+
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  label { font-size: 0.8rem; font-weight: 800; color: #4a5568; }
-  .form-input {
+  gap: 6px;
+
+  label { font-size: 0.75rem; font-weight: 800; color: #4a5568; text-transform: uppercase; }
+
+  input {
     padding: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid $light-gray;
     border-radius: 8px;
-    &:focus { outline: none; border-color: #f1c40f; }
+    font-size: 0.9rem;
+    &:focus { outline: none; border-color: $gold-hover; box-shadow: 0 0 0 3px rgba(241, 196, 15, 0.1); }
+  }
+
+  .error-text { color: $danger; font-size: 0.7rem; margin-top: 2px; }
+}
+
+// Lista de Roles en el Modal
+.roles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+
+  .role-item {
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #2d3748;
+
+      input { width: 18px; height: 18px; cursor: pointer; accent-color: $gold-hover; }
+
+      &:hover { color: #000; }
+    }
   }
 }
 
 .modal-actions {
+  background: #fafafa;
+  padding: 20px 25px;
   display: flex;
   justify-content: flex-end;
-  gap: 15px;
-  margin-top: 30px;
+  gap: 12px;
+  border-top: 1px solid #eee;
+
   button {
-    padding: 10px 25px;
+    padding: 10px 22px;
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
     border: none;
-    &.primary { background-color: #f1c40f; color: #000; }
-    &.btn-cancel { background-color: #edf2f7; color: #4a5568; }
+    font-size: 0.85rem;
+    transition: all 0.2s;
+
+    &.primary {
+      background-color: $gold-hover;
+      color: #000;
+      &:disabled { background-color: #fbd38d; cursor: not-allowed; opacity: 0.7; }
+      &:hover:not(:disabled) { filter: brightness(1.05); }
+    }
+
+    &.btn-cancel {
+      background-color: #edf2f7;
+      color: #4a5568;
+      &:hover { background-color: #e2e8f0; }
+    }
   }
 }
-/* Quitar efecto óvalo de los roles */
-.table__clientes tbody tr td div span {
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  padding: 0 !important;
-  color: #444 !important;
-  font-size: 0.9rem !important;
-  font-weight: 500 !important;
+
+// Animación de entrada
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+// Responsive
+@media (max-width: 600px) {
+  .modal-body-grid { grid-template-columns: 1fr; }
+  .header-actions { flex-direction: column; gap: 15px; align-items: stretch; }
+  .search-box { max-width: 100%; }
+}

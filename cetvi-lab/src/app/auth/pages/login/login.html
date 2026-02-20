@@ -1,47 +1,37 @@
-<!-- <div class="screen-center">
-  <sgc-card class="m-x-md" align="center">
-    <sgc-logo width="240px"></sgc-logo>
-    <h1 class="m-t-md">Inicio de Sesión</h1>
-
-    <div class="form-group text-left m-b-md">
-      <input #u type="text" class="form-input full-width" placeholder="ej. bory">
-      <input #p type="password" class="form-input full-width" placeholder="123" (keyup.enter)="login(u.value, p.value)">
-    </div>
-
-    <sgc-button [fullWidth]="true" variant="primary" (click)="login(u.value, p.value)">
-      <sgc-icon icon="house"></sgc-icon>
-      Iniciar sesión
-    </sgc-button>
-  </sgc-card>
-</div> -->
-
-<!-- NUEVO DISEÑO -->
 <div class="login-wrapper">
 
   <div class="login-container">
 
-    <!-- LADO IZQUIERDO -->
     <div class="login-left">
 
-      
       <h1>Iniciar Sesión</h1>
-      
+
       <div class="form-group">
-        <input #u type="text" placeholder="Usuario" />
-        <input #p type="password" placeholder="Contraseña"
-        (keyup.enter)="login(u.value, p.value)" />
+        <input
+          #u
+          type="text"
+          placeholder="Usuario"
+          (keyup.enter)="login(u.value, p.value)"
+        />
+
+        <input
+          #p
+          type="password"
+          placeholder="Contraseña"
+          (keyup.enter)="login(u.value, p.value)"
+        />
       </div>
 
-      <sgc-button
-      [fullWidth]="true"
-      variant="primary"
-      (click)="login(u.value, p.value)">
-      Ingresar
-      </sgc-button>
-      
+      <!-- Botón normal para asegurar funcionamiento -->
+      <button
+        type="button"
+        class="btn-login"
+        (click)="login(u.value, p.value)">
+        Ingresar
+      </button>
+
     </div>
 
-    <!-- LADO DERECHO -->
     <div class="login-right">
       <sgc-logo width="300px"></sgc-logo>
     </div>

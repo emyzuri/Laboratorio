@@ -1,45 +1,56 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
   selector: 'app-buscar-ensayos',
-  standalone: false, // Vinculado a BuscarEnsayosModule
+  standalone: false,
   templateUrl: './buscar-ensayos.html',
   styleUrls: ['./buscar-ensayos.scss']
 })
 export class BuscarEnsayosComponent {
+
   private readonly authService = inject(AuthService);
 
-  fechaBusqueda: string = '';
+  fechaInicio: string = '';
+  fechaFin: string = '';
+
   listaResultados: any[] = [];
   busquedaRealizada: boolean = false;
 
   async buscarEnsayos() {
-    if (!this.fechaBusqueda) return;
+
+    if (!this.fechaInicio || !this.fechaFin) return;
 
     try {
-      // Consumimos el nuevo endpoint detallado
-      const resp = await this.authService.getEnsayosDetallados();
+
       this.busquedaRealizada = true;
 
-      if (resp?.esExitoso) {
-        // FILTRADO CLAVE: Usamos 'FechaRegistro' con Mayúscula
-        this.listaResultados = (resp.datos || []).filter((e: any) => {
-          if (e.FechaRegistro) {
-            // Comparamos solo la parte de la fecha YYYY-MM-DD
-            const fechaLimpia = e.FechaRegistro.split('T')[0];
-            return fechaLimpia === this.fechaBusqueda;
-          }
-          return false;
+      const start = new Date(this.fechaInicio);
+      const end = new Date(this.fechaFin);
+      end.setHours(23, 59, 59, 999);
+
+      const resp = await this.authService.getEnsayosDeudores();
+
+      if (resp?.esExitoso && resp.datos) {
+
+        this.listaResultados = resp.datos.filter((e: any) => {
+
+          if (!e.fechaRegistro) return false;
+
+          const fechaRegistro = new Date(e.fechaRegistro);
+
+          return fechaRegistro >= start && fechaRegistro <= end;
         });
+
       } else {
         this.listaResultados = [];
       }
+
     } catch (error) {
-      console.error('Error al buscar ensayos por fecha:', error);
+
+      console.error('Error al filtrar ensayos:', error);
       this.listaResultados = [];
+      alert('🚫 No se pudo obtener la información del servidor');
     }
   }
 }

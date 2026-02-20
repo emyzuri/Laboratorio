@@ -1,50 +1,99 @@
 <div class="main__container">
   <div class="container">
+
+    <!-- FILTRO POR FECHAS -->
     <div class="header-actions">
-      <div class="search-box">
-        <label style="margin-right: 15px; font-weight: 600; color: #333;">Filtrar por Fecha:</label>
-        <input type="date"
-               [(ngModel)]="fechaBusqueda"
-               (change)="buscarEnsayos()"
-               class="form-input">
+      <div class="search-box-rango">
+        <div class="date-field">
+          <label>Desde:</label>
+          <input type="date"
+                 [(ngModel)]="fechaInicio"
+                 (change)="buscarEnsayos()"
+                 class="form-input">
+        </div>
+
+        <div class="date-field">
+          <label>Hasta:</label>
+          <input type="date"
+                 [(ngModel)]="fechaFin"
+                 (change)="buscarEnsayos()"
+                 class="form-input">
+        </div>
       </div>
     </div>
 
+    <!-- TABLA -->
     <div class="table-card shadow-box">
 
-      <div *ngIf="busquedaRealizada && listaResultados.length === 0" class="no-data-alert">
+      <!-- MENSAJE SI NO HAY RESULTADOS -->
+      <div *ngIf="busquedaRealizada && listaResultados.length === 0"
+           class="no-data-alert">
         <span class="material-symbols-outlined">event_busy</span>
-        <p>No existe Ensayos en esta fecha</p>
+        <p>No existen Ensayos registrados en este rango de fechas</p>
       </div>
 
+      <!-- TABLA DE RESULTADOS -->
       <table class="table-custom" *ngIf="listaResultados.length > 0">
+
         <thead class="bg-gold-header">
           <tr>
-            <th>ID</th>
-            <th>Cédula</th>
-            <th>Cliente</th>
-            <th>Ensayo Realizado</th>
-            <th>Monto Total</th>
+            <th>Cliente / Cédula</th>
+            <th>Ensayos</th>
+            <th>Abono Total</th>
+            <th>Total General</th>
             <th class="text-center">Saldo</th>
+            <th>Fecha Registro</th>
           </tr>
         </thead>
+
         <tbody>
           <tr *ngFor="let item of listaResultados">
-            <td><strong>#{{ item.IdPrueba }}</strong></td>
-            <td>{{ item.Cedula }}</td>
-            <td>{{ item.NombreCompleto }}</td>
-            <td>{{ item.NombreCatalogo }}</td>
-            <td>$ {{ item.MontoTotal | number:'1.2-2' }}</td>
+
+            <!-- CLIENTE -->
+            <td>
+              <div class="user-cell">
+                <span class="user-name">{{ item.nombreCompleto }}</span>
+                <span class="user-id">{{ item.cedula }}</span>
+              </div>
+            </td>
+
+            <!-- LISTA DE ENSAYOS -->
+            <td>
+              <div *ngFor="let ensayo of item.ensayos">
+                • {{ ensayo.nombreCatalogo }}
+              </div>
+            </td>
+
+            <!-- TOTAL ABONADO -->
+            <td class="text-success" style="font-weight: 600;">
+              $ {{ item.totalAbonado | number:'1.2-2' }}
+            </td>
+
+            <!-- TOTAL A PAGAR -->
+            <td>
+              $ {{ item.totalAPagar | number:'1.2-2' }}
+            </td>
+
+            <!-- SALDO -->
             <td class="text-center">
-              <span [class.text-danger]="item.SaldoIndividual > 0"
-                    [class.text-success]="item.SaldoIndividual <= 0"
-                    style="font-weight: bold;">
-                $ {{ item.SaldoIndividual | number:'1.2-2' }}
+              <span
+                [class.text-danger]="item.saldoPendiente > 0"
+                [class.text-success]="item.saldoPendiente <= 0"
+                style="font-weight: bold;">
+                $ {{ item.saldoPendiente | number:'1.2-2' }}
               </span>
             </td>
+
+            <!-- FECHA -->
+            <td>
+              {{ item.fechaRegistro | date:'dd/MM/yyyy' }}
+            </td>
+
           </tr>
         </tbody>
+
       </table>
+
     </div>
   </div>
 </div>

@@ -10,21 +10,21 @@
     <nav class="cl-nav">
       <ul>
         <li *ngFor="let m of listaMenu">
-          <div class="cl-nav-item" 
-              (click)="isMenuExpanded ? toggleMenu(m.idMenu) : toggleSidebar()" 
-              [class.active]="menusAbiertos[m.idMenu]">
-            
+          <div class="cl-nav-item"
+               (click)="isMenuExpanded ? toggleMenu(m.idMenu) : toggleSidebar()"
+               [class.active]="menusAbiertos[m.idMenu]">
+
             <div class="cl-nav-label">
               <span class="material-symbols-outlined icon-lg" [title]="m.nombre">
-                {{ 
-                  m.nombre?.toLowerCase()?.includes('ensayo') ? 'science' : 
+                {{
+                  m.nombre?.toLowerCase()?.includes('ensayo') ? 'science' :
                   m.nombre?.toLowerCase()?.includes('cliente') ? 'group' :
-                  m.nombre?.toLowerCase()?.includes('usuario') ? 'manage_accounts' : 'grid_view' 
+                  m.nombre?.toLowerCase()?.includes('usuario') ? 'manage_accounts' : 'grid_view'
                 }}
               </span>
               <span class="menu-text" *ngIf="isMenuExpanded">{{ m.nombre | titlecase }}</span>
             </div>
-            
+
             <span class="material-symbols-outlined arrow" *ngIf="m.subMenus?.length > 0 && isMenuExpanded">
               expand_more
             </span>
@@ -38,52 +38,40 @@
         </li>
       </ul>
     </nav>
-
-    <div class="cl-footer">
-      <button type="button" class="cl-btn-logout" (click)="cerrarSesion()">
-        <span class="material-symbols-outlined icon-lg" title="Cerrar Sesión">logout</span>
-        <span class="menu-text" *ngIf="isMenuExpanded">Cerrar Sesión</span>
-      </button>
-    </div>
   </aside>
 
   <main class="cl-main">
-<header class="cl-top-header">
-  <div class="user-profile-container">
-    <button class="profile-trigger" (click)="toggleProfileMenu()">
-      <img src="/cetvi-lab/public/user.png" alt="User" class="avatar">
-    </button>
+    <header class="cl-top-header">
+      <div class="user-profile-container">
+        <button class="profile-trigger" (click)="toggleProfileMenu()">
+          <span class="material-symbols-outlined user-icon">account_circle</span>
+        </button>
 
-    <div class="profile-dropdown" [class.active]="isProfileMenuOpen">
-      <div class="user-info">
-        <p class="user-name">User</p>
-        <p class="user-email">user@ejemplo.com</p>
+        <div class="profile-dropdown" [class.active]="isProfileMenuOpen">
+          <div class="user-info">
+            <p class="user-name">{{ nombreUsuario | titlecase }}</p>
+
+            <p class="user-detail"><strong>Usuario:</strong> {{ usuario }}</p>
+            <p class="user-detail"><strong>Teléfono:</strong> {{ telefono }}</p>
+            <p class="user-detail"><strong>Cédula:</strong> {{ cedula }}</p>
+          </div>
+
+          <hr>
+
+          <ul class="menu-list">
+            <li class="logout-item">
+              <button (click)="cerrarSesion()">
+                <span class="material-symbols-outlined">logout</span>
+                Cerrar Sesión
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
-      
-      <hr>
+    </header>
 
-      <ul class="menu-list">
-        <li>
-          <button (click)="irAConfiguracion()">
-            Configuración
-          </button>
-        </li>
-        <li>
-          <button (click)="cambiarUsuario()">
-            Cambiar usuario
-          </button>
-        </li>
-        <li class="logout-item">
-          <button (click)="cerrarSesion()">
-            Cerrar Sesión
-          </button>
-        </li>
-      </ul>
-    </div>
-  </div>
-</header>
     <div class="cl-content">
       <router-outlet></router-outlet>
     </div>
   </main>
-  </div>
+</div>
