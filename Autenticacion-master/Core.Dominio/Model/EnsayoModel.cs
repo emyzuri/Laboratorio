@@ -4,6 +4,7 @@
     {
         public int IdCatalogo { get; set; }
         public decimal Monto { get; set; }
-        public double Abono { get; set; }
+        public int NumeroEnsayo { get; set; }
+        public string Usuario { get; set; }
     }
 }

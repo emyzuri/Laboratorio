@@ -27,7 +27,6 @@ namespace Core.DataAccess.Clientes.Servicio
             p.Add("@i_en_idCatalogo", dbType: DbType.Int32, value: ensayo.IdCatalogo);
             p.Add("@i_en_idPrueba", dbType: DbType.Int32, value: idPrueba);
             p.Add("@i_en_nombreUsuario", dbType: DbType.String, value: usuario);
-            p.Add("@i_en_monto", dbType: DbType.Double, value: ensayo.Monto);
 
             await db.ExecuteAsync("spi_ensayo", p, commandType: CommandType.StoredProcedure);
         }
@@ -39,16 +38,18 @@ namespace Core.DataAccess.Clientes.Servicio
 
             return await db.ExecuteScalarAsync<int>("sps_id_prueba", p, commandType: CommandType.StoredProcedure);
         }
-        public async Task RegistrarPago(int idCliente, double abono, double montoTotal, string usuario, int idPrueba)
+        public async Task RegistrarPago(int idCliente, decimal abono, decimal montoTotal, string usuario, int idPrueba, DateTime fechaEntrega, string descripcion)
         {
             using IDbConnection db = sqlConfiguracion.CrearConexion();
             DynamicParameters p = new();
 
             p.Add("@i_en_idCliente", dbType: DbType.Int32, value: idCliente);
-            p.Add("@i_abono", dbType: DbType.Double, value: abono);
-            p.Add("@i_montoTotal", dbType: DbType.Double, value: montoTotal); 
+            p.Add("@i_abono", dbType: DbType.Decimal, value: abono);
+            p.Add("@i_montoTotal", dbType: DbType.Decimal, value: montoTotal); 
             p.Add("@i_nombreUsuario", dbType: DbType.String, value: usuario);
             p.Add("@i_idPrueba", dbType: DbType.Int32, value: idPrueba);
+            p.Add("@i_fecha_entrega", dbType: DbType.DateTime, value: fechaEntrega);
+            p.Add("@i_descripcion", dbType: DbType.String, value: descripcion);
 
             await db.ExecuteAsync("sps_insertar_ensayo_con_pago", p, commandType: CommandType.StoredProcedure);
         }
@@ -74,6 +75,39 @@ namespace Core.DataAccess.Clientes.Servicio
             using IDbConnection db = sqlConfiguracion.CrearConexion();
             return await db.QueryAsync<ClienteDeudorModel>(
                 "sps_obtener_clientes_deudores",
+                commandType: CommandType.StoredProcedure
+            );
+        }
+        public async Task<IEnumerable<CatalogoEnsayoModel>> ObtenerCatalogoEnsayo()
+        {
+            using IDbConnection db = sqlConfiguracion.CrearConexion();
+            IEnumerable<CatalogoEnsayoModel> resultado = await db.QueryAsync<CatalogoEnsayoModel>("sps_obtener_catalogo_ensayo", commandType: CommandType.StoredProcedure);
+
+            return resultado;
+        }
+        public async Task<bool> RegistrarNuevoAbono(int idEnsayo, decimal monto, string usuario)
+        {
+            using IDbConnection db = sqlConfiguracion.CrearConexion();
+            var parametros = new DynamicParameters();
+            parametros.Add("@i_id_prueba", dbType: DbType.Int32, value: idEnsayo);
+            parametros.Add("@i_abono", dbType: DbType.Decimal, value: monto);
+            parametros.Add("@i_usuario", dbType: DbType.String, value: usuario);
+            int filas = await db.ExecuteAsync(
+                "spi_insertar_abono",
+                parametros,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return true;
+        }
+        public async Task<IEnumerable<EnsayoDetalladoModel>> ObtenerEnsayosDetallados(int idPrueba)
+        {
+            using IDbConnection db = sqlConfiguracion.CrearConexion();
+            var parametros = new DynamicParameters();
+            parametros.Add("@i_id_prueba", dbType: DbType.Int32, value: idPrueba);
+            return await db.QueryAsync<EnsayoDetalladoModel>(
+                "sps_obtener_ensayos_detallados",
+                parametros,
                 commandType: CommandType.StoredProcedure
             );
         }

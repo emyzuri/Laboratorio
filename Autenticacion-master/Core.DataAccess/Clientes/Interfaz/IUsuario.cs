@@ -13,6 +13,9 @@ namespace Core.DataAccess.Clientes.Interfaz
         /// <exception cref="DataException">Control de errore</exception>
         Task<UsuarioModel> ObtenerUsuario(string usuario, string password);
         Task<List<UsuarioModel>> ObtenerUsuarios();
+        Task<bool> RegistrarUsuario(UsuarioModel usuario, List<int> roles);
+        Task<bool> ActualizarRolesUsuario(int idUsuario, List<int> roles);
+        Task<List<RolModel>> ObtenerRoles();
 
     }
 }

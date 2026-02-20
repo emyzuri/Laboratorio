@@ -4,7 +4,6 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using Core.DataAccess.Menu.Interfaz;
 
@@ -16,41 +15,31 @@ namespace Core.DataAccess.Menu.Servicio
 
         public MenuServicio(SqlConfiguracion sqlConfiguracion)
         {
-            this.sqlConfiguracion = sqlConfiguracion ?? throw new ArgumentException(nameof(sqlConfiguracion));
+            this.sqlConfiguracion = sqlConfiguracion ?? throw new ArgumentNullException(nameof(sqlConfiguracion));
         }
-
         public async Task<IEnumerable<MenuModel>> ObtenerMenu()
         {
-            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
-            DynamicParameters parametros = new();
-            parametros.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
-
-            IEnumerable<MenuModel> resultado = await dbConnection.QueryAsync<MenuModel>("sps_menus", parametros, commandType: CommandType.StoredProcedure);
-
-            int respuesta = parametros.Get<int>("@ReturnValue");
-            if (respuesta != 0)
-            {
-                throw new DataException { HResult = respuesta };
-            }
-
-            return resultado;
+            return await ObtenerMenus();
         }
 
         public async Task<IEnumerable<MenuModel>> ObtenerMenus()
         {
             using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
+            return await dbConnection.QueryAsync<MenuModel>(
+                "sps_menus",
+                commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task<IEnumerable<MenuModel>> ObtenerMenusPorRol(int idRol)
+        {
+            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
             DynamicParameters parametros = new();
-            parametros.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+            parametros.Add("@w_ur_id_usuario", idRol);
 
-            IEnumerable<MenuModel> resultado = await dbConnection.QueryAsync<MenuModel>("sps_menus", parametros, commandType: CommandType.StoredProcedure);
-
-            int respuesta = parametros.Get<int>("@ReturnValue");
-            if (respuesta != 0)
-            {
-                throw new DataException { HResult = respuesta };
-            }
-
-            return resultado;
+            return await dbConnection.QueryAsync<MenuModel>(
+                "sps_obtener_menu_por_rol",
+                parametros,
+                commandType: CommandType.StoredProcedure);
         }
     }
 }

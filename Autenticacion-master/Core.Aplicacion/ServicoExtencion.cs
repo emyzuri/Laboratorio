@@ -25,7 +25,10 @@ namespace Core.Aplicacion
             servicios.AddScoped<IUsuario, UsuarioServicio>();
             servicios.AddScoped<IMenu, MenuServicio>();
             servicios.AddScoped<IEnsayo, EnsayoServicio>();
+            servicios.AddScoped<IRegistrarLog, RegistrarLogServicio>();
+            servicios.AddScoped<IPermiso, PermisoServicio>();
             servicios.AddSingleton<ICacheServicio, CacheServicio>();
+            servicios.AddTransient<MiddlewareExtension>();
             servicios.AddAutoMapper(Assembly.GetExecutingAssembly());
             servicios.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             servicios.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))  ;

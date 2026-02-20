@@ -41,6 +41,9 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
                 {
                     throw new ManejoExcepciones("Ya existe un cliente con la cédula proporcionada.");
                 }
+                nuevoCliente.IdCliente = clienteBd.IdCliente;
+                await _clienteServicio.ActualizarCliente(nuevoCliente);
+                await _clienteServicio.ActivarCliente(clienteBd.Cedula);
                 return clienteBd;
             }
             return await _clienteServicio.InsertarCliente(nuevoCliente);

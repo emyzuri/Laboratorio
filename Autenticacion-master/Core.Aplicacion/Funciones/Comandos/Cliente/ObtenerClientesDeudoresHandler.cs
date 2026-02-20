@@ -14,7 +14,18 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
         }
         public async Task<IEnumerable<ClienteDeudorModel>> Handle(ObtenerClientesDeudoresCom request, CancellationToken cancellationToken)
         {
-            return await _iEnsayo.ObtenerClientesDeudores();
+            IEnumerable<ClienteDeudorModel> clientes = await _iEnsayo.ObtenerClientesDeudores();
+            if (clientes != null)
+            {
+                foreach (var cliente in clientes)
+                {
+                    cliente.Ensayos = await _iEnsayo.ObtenerEnsayosDetallados(cliente.IdEnsayo);
+                    cliente.NombreCompleto = cliente.Ensayos.FirstOrDefault().NombreCompleto;
+                    cliente.IdCliente = cliente.Ensayos.FirstOrDefault().IdCliente;
+                    cliente.Cedula = cliente.Ensayos.FirstOrDefault().Cedula;
+                }
+            }
+            return clientes;
         }
     }
 }

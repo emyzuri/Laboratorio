@@ -3,6 +3,7 @@ using Core.Infraestructura.Extension;
 using Core.Util;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
@@ -37,6 +38,10 @@ var redisConfiguration = builder.Configuration.GetSection("Redis")["ConnectionSt
 var redis = ConnectionMultiplexer.Connect(redisConfiguration);
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 builder.Services.AddSingleton<ICacheServicio, CacheServicio>();
+builder.Logging.AddDbLogger(options =>
+{
+    builder.Configuration.GetSection("Logging").GetSection("DataBase").GetSection("Options").Bind(options);
+});
 
 WebApplication app = builder.Build();
 
@@ -55,5 +60,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/HealthCheck");
+app.UseMiddleware<MiddlewareExtension>();
 
 app.Run();

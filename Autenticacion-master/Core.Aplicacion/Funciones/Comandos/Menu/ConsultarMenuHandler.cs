@@ -4,6 +4,11 @@ using Core.Dominio.Model;
 using Core.Util;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Core.Aplicacion.Funciones.Comandos.Menu
 {
@@ -15,9 +20,9 @@ namespace Core.Aplicacion.Funciones.Comandos.Menu
 
         public ConsultarMenuHandler(IMenu iMenu, ICacheServicio cacheServicio, IHttpContextAccessor httpContextAccessor)
         {
-            this.iMenu = iMenu ?? throw new ArgumentException(nameof(iMenu));
-            this.cacheServicio = cacheServicio ?? throw new ArgumentException(nameof(cacheServicio));
-            this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentException(nameof(httpContextAccessor));
+            this.iMenu = iMenu ?? throw new ArgumentNullException(nameof(iMenu));
+            this.cacheServicio = cacheServicio ?? throw new ArgumentNullException(nameof(cacheServicio));
+            this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public async Task<List<MenuModel>> Handle(ConsultarMenuCom request, CancellationToken cancellationToken)
@@ -28,13 +33,21 @@ namespace Core.Aplicacion.Funciones.Comandos.Menu
             {
                 throw new ArgumentException("Sesión caducada");
             }
-
-            var todosLosMenus = await iMenu.ObtenerMenus();
+            var todosLosMenus = (await iMenu.ObtenerMenus()).ToList();
+            if (usuario.IdRol == 2)
+            {
+                todosLosMenus = todosLosMenus.Where(m =>
+                    !m.Nombre.Contains("Usuario", StringComparison.OrdinalIgnoreCase) &&
+                    !(m.Url ?? "").Contains("usuario", StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
             var listaJerarquica = todosLosMenus.Where(m => m.IdPadre == 0).ToList();
+
             foreach (var padre in listaJerarquica)
             {
                 padre.SubMenus = todosLosMenus.Where(m => m.IdPadre == padre.IdMenu).ToList();
             }
+
             return listaJerarquica;
         }
     }

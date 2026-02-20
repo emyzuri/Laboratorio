@@ -14,6 +14,7 @@ namespace Core.DataAccess.Clientes.Servicio
 {
     public class UsuarioServicio : IUsuario
     {
+        
         /// <summary>
         /// Instancia de conexión
         /// </summary>
@@ -82,7 +83,97 @@ namespace Core.DataAccess.Clientes.Servicio
 
             return resultado.ToList();
         }
+        /// <summary>
+        /// Registra un nuevo usuario y su rol asociado en la base de datos
+        /// </summary>
+        /// <param name="usuario">Modelo con la información del usuario y el ID del rol</param>
+        /// <returns>True si el registro fue exitoso, False en caso de error</returns>
+        public async Task<bool> RegistrarUsuario(UsuarioModel usuario, List<int> roles)
+        {
+            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
+            dbConnection.Open();
 
+            using var transaction = dbConnection.BeginTransaction();
 
+            try
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@i_nombre", usuario.Nombre);
+                parametros.Add("@i_apellido", usuario.Apellido);
+                parametros.Add("@i_usuario", usuario.Usuario);
+                parametros.Add("@i_password", usuario.Password);
+                parametros.Add("@i_telefono", usuario.Telefono);
+                parametros.Add("@i_cedula", usuario.Cedula);
+                parametros.Add("@i_roles", string.Join(",", roles));
+
+                parametros.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+                await dbConnection.ExecuteAsync(
+                    "spi_registrar_usuario_con_roles",
+                    parametros,
+                    transaction,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                int respuesta = parametros.Get<int>("@ReturnValue");
+
+                if (respuesta != 0)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                transaction.Commit();
+                return true;
+            }
+            catch
+            {
+                transaction.Rollback();
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Actualiza los roles de un usuario existente
+        /// </summary>
+        /// <param name="idUsuario">ID del usuario</param>
+        /// <param name="roles">Lista de IDs de roles</param>
+        /// <returns>True si fue exitoso</returns>
+        public async Task<bool> ActualizarRolesUsuario(int idUsuario, List<int> roles)
+        {
+            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
+
+            try
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@i_id_usuario", idUsuario); 
+
+                string rolesString = string.Join(",", roles);
+                parametros.Add("@i_roles", rolesString);
+
+                parametros.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+                await dbConnection.ExecuteAsync(
+                    "spu_actualizar_roles_usuario",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                int respuesta = parametros.Get<int>("@ReturnValue");
+                return respuesta == 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<RolModel>> ObtenerRoles()
+        {
+            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
+            string sql = "SELECT rl_id as IdRol, rl_nombre as NombreRol, rl_descripcion as Descripcion FROM dbo.ap_roles";
+            var resultado = await dbConnection.QueryAsync<RolModel>(sql);
+            return resultado.ToList();
+        }
     }
 }

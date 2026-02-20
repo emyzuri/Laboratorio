@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="OpenIddict" Version="5.2.0" />
     <PackageReference Include="OpenIddict.AspNetCore" Version="5.2.0" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.2.0" />

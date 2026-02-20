@@ -8,5 +8,6 @@ namespace Core.DataAccess.Menu.Interfaz
     {
         Task<IEnumerable<MenuModel>> ObtenerMenu();
         Task<IEnumerable<MenuModel>> ObtenerMenus();
+        Task<IEnumerable<MenuModel>> ObtenerMenusPorRol(int idRol);
     }
 }

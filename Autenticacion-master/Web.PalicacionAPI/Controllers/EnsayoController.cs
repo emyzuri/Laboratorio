@@ -1,6 +1,7 @@
 ﻿using Core.Aplicacion.Funciones.Comandos.Cliente;
 using Core.Aplicacion.Funciones.Comandos.Ensayo;
 using Core.Aplicacion.RespuestaUtilitario;
+using Core.Dominio.Request.Ensayos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,10 +24,10 @@ namespace Web.PalicacionAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertarEnsayo([FromBody] InsertarEnsayoCom request)
+        public async Task<IActionResult> InsertarEnsayo([FromBody] InsertarEnsayoRequest request)
         {
             _respuesta = await RespestaServicio.CrearRespuestaExito(_logger, async () =>
-                await _mediador.Send(request));
+                await _mediador.Send(new InsertarEnsayoCom(request)));
 
             return Ok(_respuesta);
         }
@@ -45,6 +46,30 @@ namespace Web.PalicacionAPI.Controllers
         {
             _respuesta = await RespestaServicio.CrearRespuestaExito(_logger, async () =>
                 await _mediador.Send(new ObtenerClientesDeudoresCom()));
+            return Ok(_respuesta);
+        }
+        [HttpGet("Catalogo")]
+        public async Task<IActionResult> ObtenerCatalogoEnsayo()
+        {
+            _respuesta = await RespestaServicio.CrearRespuestaExito(_logger, async () =>
+                await _mediador.Send(new ObtenerCatalogoCom()));
+            return Ok(_respuesta);
+        }
+        [HttpPost("InsertarAbono")]
+        public async Task<IActionResult> InsertarAbono([FromBody] InsertarAbonoCom comando)
+        {
+            var usuarioHeader = Request.Headers["Usuario"].ToString();
+            comando.Usuario = !string.IsNullOrEmpty(usuarioHeader) ? usuarioHeader : "SISTEMA";
+
+            var resultado = await _mediador.Send(comando);
+            return Ok(new { esExitoso = resultado });
+        }
+        [HttpGet("Detallados")]
+        public async Task<IActionResult> ObtenerEnsayosDetallados([FromQuery] int idPrueba)
+        {
+            _respuesta = await RespestaServicio.CrearRespuestaExito(_logger, async () =>
+                await _mediador.Send(new ObtenerEnsayoCom(idPrueba)));
+
             return Ok(_respuesta);
         }
     }
