@@ -63,10 +63,10 @@
 </div>
 
 <div class="modal-overlay" *ngIf="showFormModal">
-  <div class="modal-content shadow-box">
-    <div class="modal-header">
+  <div class="modal-content shadow-box border-gold selection-small">
+    <div class="modal-header bg-gold">
       <h3>{{ isEditing ? 'Actualizar Cliente' : 'Registrar Nuevo Cliente' }}</h3>
-      <span class="material-symbols-outlined close-icon" (click)="closeModals()">close</span>
+      <span class="close-btn" (click)="closeModals()">&times;</span>
     </div>
     <div class="modal-body-grid">
       <div class="input-group">
