@@ -1,6 +1,23 @@
+// VARIABLES DE DISEÑO
+$gold-primary: #d4af37;
+$gold-light: #fff9e6;
+$bg-main: #f8f9fa;
+$border-color: #e0e0e0;
+$text-dark: #333;
+$text-muted: #777;
+$danger: #dc3545;
+$success: #28a745;
+
+// MIXIN PARA FLEX CENTRADO
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .main__container {
     padding: 20px;
-    background-color: #f8f9fa;
+    background-color: $bg-main;
     min-height: calc(100vh - 120px);
     box-shadow: 0 0 16px 6px #ccc;
 
@@ -10,36 +27,43 @@
     }
 }
 
-// SECCIÓN DE CABECERA Y FILTROS
+// SECCIÓN DE FILTROS (RANGO DE FECHAS)
 .header-actions {
-    display: flex;
-    justify-content: flex-start;
     margin-bottom: 25px;
 
-    .search-box {
+    .search-box-rango {
         display: flex;
-        align-items: center;
+        gap: 20px;
         background: white;
-        padding: 12px 20px;
-        border-radius: 10px;
+        padding: 15px 25px;
+        border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e0e0e0;
+        border: 1px solid $border-color;
+        width: fit-content;
 
-        label {
-            font-size: 0.95rem;
-            color: #444;
+        .date-field {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            label {
+                font-weight: 600;
+                color: $text-dark;
+                font-size: 0.9rem;
+            }
         }
 
         .form-input {
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 6px;
             padding: 8px 12px;
             outline: none;
-            transition: border-color 0.3s ease;
-            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
 
             &:focus {
-                border-color: #d4af37; // Color dorado del proyecto
+                border-color: $gold-primary;
+                box-shadow: 0 0 0 3px rgba($gold-primary, 0.1);
             }
         }
     }
@@ -48,93 +72,99 @@
 // TARJETA DE TABLA
 .table-card {
     background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    padding: 10px;
+    border-radius: 15px;
+    padding: 15px;
 
     &.shadow-box {
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 }
 
-// MENSAJE DE "NO EXISTE ENSAYOS EN ESTA FECHA"
-.no-data-alert {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    background-color: #fffdf5;
-    border: 2px dashed #d4af37;
-    border-radius: 15px;
-    color: #856404;
-    margin: 20px 0;
-    text-align: center;
-
-    span {
-        font-size: 56px;
-        margin-bottom: 15px;
-        color: #d4af37;
-    }
-
-    p {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 0;
-    }
-}
-
-// ESTILO DE TABLA CUSTOM
+// ESTILO DE TABLA CUSTOMIZADA
 .table-custom {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
 
-    .bg-gold-header {
-        background-color: #fff9e6; // Fondo suave para el header
+    thead {
+        background-color: $gold-light;
 
         th {
-            padding: 15px;
+            padding: 16px;
             text-align: left;
             color: #555;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.85rem;
-            border-bottom: 2px solid #d4af37;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid $gold-primary;
         }
     }
 
     tbody {
         tr {
             transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
 
             &:hover {
-                background-color: #fffcf0;
+                background-color: rgba($gold-primary, 0.03);
+            }
+
+            &:last-child {
+                border-bottom: none;
             }
 
             td {
-                padding: 15px;
-                border-bottom: 1px solid #f0f0f0;
-                color: #333;
-                font-size: 0.95rem;
-
-                strong {
-                    color: #222;
-                }
+                padding: 14px 16px;
+                color: $text-dark;
+                vertical-align: middle;
             }
+        }
+    }
+
+    // Contenedores de información unificada (Nombre + Cédula / Ensayo + Desc)
+    .user-cell, .desc-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        strong, .user-name, .test-name {
+            font-weight: 600;
+            color: $text-dark;
+            font-size: 0.95rem;
+        }
+
+        span, small, .user-id, .test-desc {
+            color: $text-muted;
+            font-size: 0.82rem;
         }
     }
 }
 
-// UTILIDADES DE TEXTO
-.text-danger {
-    color: #dc3545 !important;
+// ALERTA SIN DATOS
+.no-data-alert {
+    @include flex-center;
+    flex-direction: column;
+    padding: 80px 20px;
+    background-color: #fffdf5;
+    border: 2px dashed $gold-primary;
+    border-radius: 15px;
+    color: #856404;
+    margin: 20px 0;
+
+    span {
+        font-size: 64px;
+        margin-bottom: 15px;
+        color: $gold-primary;
+    }
+
+    p {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0;
+    }
 }
 
-.text-success {
-    color: #28a745 !important;
-}
-
-.text-center {
-    text-align: center !important;
-}
+// UTILIDADES GLOBALES
+.text-danger { color: $danger !important; }
+.text-success { color: $success !important; }
+.text-center { text-align: center !important; }

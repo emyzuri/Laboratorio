@@ -1,12 +1,10 @@
-/* VARIABLES */
 $primary-yellow: #f1c40f;
 $bg-main: #f8f9fa;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 $sidebar-width: 260px;
 $sidebar-collapsed-width: 70px;
-$header-height: 150px; /* Definimos una altura fija para la cabecera */
+$header-height: 150px;
 
-/* CONTENEDOR PRINCIPAL */
 .cl-dashboard {
     display: flex;
     width: 100vw;
@@ -19,14 +17,13 @@ $header-height: 150px; /* Definimos una altura fija para la cabecera */
         width: $sidebar-collapsed-width !important;
         min-width: $sidebar-collapsed-width !important;
     }
-    
-    /* Forzamos que la cabecera no cambie de tamaño ni posición */
+
     .cl-sidebar-header {
         height: $header-height;
         padding-top: 25px !important;
-        justify-content: center !important; /* Centra el botón cuando no hay logo */
+        justify-content: center !important;
     }
-    
+
     .menu-text, .arrow, .cl-submenu, .cl-logo {
         display: none !important;
     }
@@ -34,11 +31,7 @@ $header-height: 150px; /* Definimos una altura fija para la cabecera */
     .cl-nav-item {
         justify-content: center !important;
         margin-bottom: 7px;
-    //   padding: 12px 0 !important;
-    //   margin: 4px 10px !important;
     }
-
-    // .cl-nav-label { gap: 0 !important; }
 
     .cl-footer span:not(.material-symbols-outlined) {
         display: none !important;
@@ -46,7 +39,6 @@ $header-height: 150px; /* Definimos una altura fija para la cabecera */
     }
 }
 
-/* SIDEBAR */
 .cl-sidebar {
     width: $sidebar-width;
     min-width: $sidebar-width;
@@ -60,11 +52,11 @@ $header-height: 150px; /* Definimos una altura fija para la cabecera */
 .cl-sidebar-header {
     display: flex;
     align-items: center;
-    padding: 25px 15px 0 15px; /* 25px desde el techo siempre */
-    height: $header-height;    /* Altura fija */
+    padding: 25px 15px 0 15px;
+    height: $header-height;
     gap: 10px;
-    box-sizing: border-box;    /* Asegura que el padding no sume a la altura */
-    
+    box-sizing: border-box;
+
     .cl-logo {
         height: 30px;
         width: auto;
@@ -72,7 +64,6 @@ $header-height: 150px; /* Definimos una altura fija para la cabecera */
     }
 }
 
-/* NAVEGACIÓN */
 .cl-nav {
     flex: 1;
     padding: 10px 10px;
@@ -84,7 +75,7 @@ $header-height: 150px; /* Definimos una altura fija para la cabecera */
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 8px 10px; 
+        padding: 8px 10px;
         margin: 2px 0px;
         border-radius: 10px;
         color: #444;
@@ -114,7 +105,6 @@ $header-height: 150px; /* Definimos una altura fija para la cabecera */
     }
 }
 
-/* ICONOS */
 .material-symbols-outlined.icon-lg {
     font-size: 24px !important;
     width: 24px;
@@ -124,13 +114,12 @@ $header-height: 150px; /* Definimos una altura fija para la cabecera */
     justify-content: center;
 }
 
-/* SUBMENÚ */
 .cl-submenu {
     margin: 0 10px 5px 10px !important;
     background: #fdfdfd;
-    border-left: 3px solid #f1c40f;  
+    border-left: 3px solid #f1c40f;
     transition: all 0.3s ease;
-    
+
 li {
     padding: 8px 15px 8px 40px;
     font-size: 0.85rem;
@@ -138,7 +127,7 @@ li {
     cursor: pointer;
     border-radius: 8px;
     transition: $transition;
-    
+
     &:hover { background: #f0f0f0; color: #000; }
 
     &.active-submenu {
@@ -151,7 +140,6 @@ li {
     }
 }
 
-/* BOTÓN HAMBURGUESA */
 .menu-toggle-btn {
     background: transparent;
     border: none;
@@ -161,11 +149,10 @@ li {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* Evita que se encoja */
+    flex-shrink: 0;
     &:hover { background: #f0f0f0; }
 }
 
-/* RESTO DEL LAYOUT... */
 .cl-main {
     flex: 1; display: flex; flex-direction: column; overflow: hidden;
     .cl-top-header { height: 70px; background: #fdda87; border-bottom: 1px solid #eee; }
@@ -183,11 +170,9 @@ li {
 }
 
 
-// PERFIL SUPERIOR DERECHA
-/* Contenedor del header (asegúrate de que tenga esto) */
 .cl-top-header {
   display: flex;
-  justify-content: flex-end; /* Empuja el perfil a la derecha */
+  justify-content: flex-end;
   align-items: center;
   padding: 0 2rem;
   height: 60px;
@@ -222,30 +207,29 @@ li {
     }
   }
 
-  /* El Menú Desplegable */
   .profile-dropdown {
     position: absolute;
-    top: 55px; /* Separación del header */
+    top: 55px;
     right: 0;
     width: 240px;
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     border: 1px solid #edf2f7;
-    display: none; // Oculto por defecto
+    display: none;
     flex-direction: column;
     z-index: 1000;
     overflow: hidden;
     animation: fadeInSlide 0.2s ease-out;
 
     &.active {
-      display: flex; // Se muestra con la clase del .ts
+      display: flex;
     }
 
     .user-info {
       padding: 16px;
       background-color: #f8fafc;
-      
+
       .user-name {
         display: block;
         font-weight: 700;
@@ -253,7 +237,7 @@ li {
         margin-bottom: 2px;
         font-size: 0.95rem;
       }
-      
+
       .user-email {
         display: block;
         font-size: 0.8rem;
@@ -289,13 +273,13 @@ li {
 
           &:hover {
             background-color: #f7fafc;
-            color: #3182ce; /* Color azul al pasar el mouse */
+            color: #3182ce;
             padding-left: 20px;
           }
         }
 
         &.logout-item button {
-          color: #e53e3e; /* Rojo para cerrar sesión */
+          color: #e53e3e;
           &:hover {
             background-color: #fff5f5;
             color: #c53030;
@@ -306,7 +290,6 @@ li {
   }
 }
 
-/* Animación de entrada */
 @keyframes fadeInSlide {
   from {
     opacity: 0;
@@ -316,4 +299,68 @@ li {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.profile-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .user-icon {
+    font-size: 40px;
+    color: #555;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.user-info {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  /* Estilo para el nombre principal (Borys Villarroel) */
+  .user-name {
+    font-size: 1.1rem;      /* Tamaño destacado */
+    font-weight: 700;       /* Negrita fuerte */
+    color: #1a1a1a;         /* Color oscuro para resaltar */
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+  }
+
+  /* Estilo para los detalles (Usuario, Teléfono, Cédula) */
+  .user-detail {
+    font-size: 0.85rem;     /* Tamaño pequeño como 'Sin sesión activa' */
+    color: #64748b;         /* Gris azulado sutil */
+    margin: 0;
+    display: flex;
+    gap: 5px;
+
+    /* Estilo opcional para las etiquetas 'Usuario:', 'Teléfono:', etc. */
+    strong {
+      font-weight: 600;
+      color: #475569;       /* Un gris ligeramente más oscuro para la etiqueta */
+    }
+  }
+}
+
+/* Línea separadora sutil */
+hr {
+  border: 0;
+  border-top: 1px solid #f1f5f9;
+  margin: 8px 0;
 }

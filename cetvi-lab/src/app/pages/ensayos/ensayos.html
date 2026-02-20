@@ -2,8 +2,11 @@
   <div class="container">
     <div class="header-actions">
       <div class="search-box">
-        <input type="text" placeholder="Buscar por cliente o cédula..." [(ngModel)]="filtroNombre" class="form-input">
-        <!-- <span class="material-symbols-outlined">search</span> -->
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input type="text"
+               placeholder="Filtrar por cliente, cédula o ensayo..."
+               [(ngModel)]="filtroNombre"
+               class="form-input">
       </div>
       <button class="btn-action-gold" (click)="openModal()">
         Ingresar Ensayo <span class="material-symbols-outlined">add_circle</span>
@@ -14,60 +17,57 @@
       <table class="table-custom">
         <thead class="bg-gold-header">
           <tr>
-            <th style="width: 50px;"></th> <th>Cédula</th>
+            <th style="width: 50px;"></th>
+            <th>Cédula</th>
             <th>Cliente</th>
-            <th>Abonado Total</th>
-            <th>Total General</th>
-            <th>Saldo Pendiente</th>
+            <th>Abonado</th>
+            <th>Total</th>
+            <th>Saldo</th>
             <th class="text-center">Acción</th>
           </tr>
         </thead>
 
-        <ng-container *ngFor="let cliente of clientesDeudores">
+        <ng-container *ngFor="let ens of ensayosFiltradosPorBusqueda">
           <tbody>
             <tr class="row-master">
-              <td class="text-center clickable" (click)="toggleCliente(cliente)">
-                <span class="material-symbols-outlined expand-icon" [class.rotated]="cliente.expandido">
+              <td class="text-center clickable" (click)="toggleEnsayo(ens)">
+                <span class="material-symbols-outlined expand-icon" [class.rotated]="ens.expandido">
                   keyboard_arrow_down
                 </span>
               </td>
-              <td>{{ cliente.cedula }}</td>
-              <td><strong>{{ cliente.nombreCompleto }}</strong></td>
-              <td>$ {{ cliente.totalAbonado | number:'1.2-2' }}</td>
-              <td>$ {{ cliente.totalAPagar | number:'1.2-2' }}</td>
+              <td>{{ ens.cedula }}</td>
+              <td><strong>{{ ens.nombreCompleto }}</strong></td>
+              <td>$ {{ ens.totalAbonado | number:'1.2-2' }}</td>
+              <td>$ {{ ens.totalAPagar | number:'1.2-2' }}</td>
               <td class="text-danger">
-                <strong>$ {{ cliente.saldoPendiente | number:'1.2-2' }}</strong>
+                <strong>$ {{ ens.saldoPendiente | number:'1.2-2' }}</strong>
               </td>
               <td class="text-center">
                 <button class="btn-abono-action"
-                        [disabled]="cliente.saldoPendiente <= 0"
-                        (click)="openAbonoModal(cliente)">
+                        [disabled]="ens.saldoPendiente <= 0"
+                        (click)="openAbonoModal(ens)">
                   <span class="material-symbols-outlined">payments</span>
-                  Ingresar Abono
+                  Abonar
                 </button>
               </td>
             </tr>
 
-            <tr *ngIf="cliente.expandido" class="row-detail">
+            <tr *ngIf="ens.expandido" class="row-detail">
               <td colspan="7">
                 <div class="detail-container">
                   <table class="table-inner">
                     <thead>
                       <tr>
                         <th>Catálogo / Ensayo</th>
-                        <th>ID Prueba</th>
-                        <th>Saldo Individual</th>
                         <th>Estado</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr *ngFor="let ens of cliente.detalles">
-                        <td>{{ ens.nombreCatalogo }}</td>
-                        <td>{{ ens.idPrueba }}</td>
-                        <td>$ {{ ens.saldoPendiente | number:'1.2-2' }}</td>
+                      <tr *ngFor="let sub of ens.subensayos">
+                        <td>{{ sub.nombreSubEnsayo }}</td>
                         <td>
-                          <span class="badge" [ngClass]="ens.saldoPendiente <= 0 ? 'bg-success' : 'bg-warning'">
-                            {{ ens.saldoPendiente <= 0 ? 'Pagado' : 'Pendiente' }}
+                          <span class="badge" [ngClass]="sub.saldoSub <= 0 ? 'bg-success' : 'bg-warning'">
+                            {{ sub.saldoSub <= 0 ? 'Pagado' : 'Pendiente' }}
                           </span>
                         </td>
                       </tr>
@@ -79,6 +79,11 @@
           </tbody>
         </ng-container>
       </table>
+
+      <div *ngIf="ensayosFiltradosPorBusqueda.length === 0" class="no-results" style="padding: 40px; text-align: center;">
+        <span class="material-symbols-outlined" style="font-size: 48px;">search_off</span>
+        <p>No se encontraron resultados para "{{ filtroNombre }}"</p>
+      </div>
     </div>
   </div>
 </div>
@@ -93,10 +98,18 @@
       <div class="form-grid">
         <div class="input-group full-width">
           <label>Cliente Responsable:</label>
-          <select [(ngModel)]="ensayoForm.ensayo.idCliente" class="form-input">
-            <option [value]="0" disabled selected>-- Seleccione cliente activo --</option>
-            <option *ngFor="let c of clientes" [value]="c.idCliente">{{ c.cedula }} - {{ c.nombre }} {{ c.apellido }}</option>
-          </select>
+          <input type="text"
+                 [(ngModel)]="filtroClienteBusqueda"
+                 (input)="onClienteSearchChange()"
+                 list="listaClientes"
+                 placeholder="Busque por cédula o nombre..."
+                 class="form-input">
+          <datalist id="listaClientes">
+            <option *ngFor="let c of clientes"
+                    [value]="(c.cedula || c.cl_cedula) + ' - ' + (c.nombre || c.cl_nombre) + ' ' + (c.apellido || c.cl_apellido)">
+            </option>
+          </datalist>
+          <small *ngIf="ensayoForm.ensayo.idCliente > 0" style="color: green;">✓ Cliente Validado</small>
         </div>
         <div class="input-group">
           <label>Fecha de Entrega:</label>
@@ -104,42 +117,32 @@
         </div>
         <div class="input-group">
           <label>Abono Inicial ($):</label>
-          <input type="number" min="0" placeholder="0.00" [(ngModel)]="ensayoForm.abono" (keypress)="soloNumeros($event)" class="form-input">
-        </div>
-        <div class="input-group full-width">
-          <label>Descripción:</label>
-          <input type="text" [(ngModel)]="ensayoForm.ensayo.descripcion" placeholder="Detalles generales..." class="form-input">
+          <input type="number" [(ngModel)]="ensayoForm.abono" (keypress)="soloNumeros($event)" class="form-input">
         </div>
       </div>
+
       <div class="gold-dashed">
         <div class="summary-header">
           <span>Ensayos Seleccionados ({{ listaEnsayosTmp.length }})</span>
-          <div class="folder-btn-wrapper" (click)="openEnsayoSelection()">
-            <div class="folder-container">
-              <div class="folder">
-                <div class="front-side"><div class="tip"></div><div class="cover"></div></div>
-                <div class="back-side cover"></div>
-              </div>
-              <label class="custom-file-upload">Agregar Ensayo</label>
-            </div>
-          </div>
+          <button class="btn-confirm-dark" style="padding: 5px 15px;" (click)="showSelectionModal = true">Agregar +</button>
         </div>
         <div class="mini-table-compact">
           <div class="mini-row" *ngFor="let e of listaEnsayosTmp; let i = index">
             <span>#{{ e.numero }} - {{ e.nombre }}</span>
             <strong>$ {{ e.monto | number:'1.2-2' }}</strong>
-            <button class="remove-btn" (click)="eliminarFilaEnsayo(i)">&times;</button>
+            <button class="remove-btn" (click)="listaEnsayosTmp.splice(i, 1)">&times;</button>
           </div>
         </div>
       </div>
+
       <div class="total-bar-dark">
-        <span>TOTAL A PAGAR:</span>
+        <span>TOTAL:</span>
         <strong>$ {{ calcularTotalPedido() | number:'1.2-2' }}</strong>
       </div>
     </div>
     <div class="modal-footer footer-light">
       <button class="btn-cancel-alt" (click)="closeModals()">CANCELAR</button>
-      <button class="btn-confirm-gold" [disabled]="!formularioValido()" (click)="guardarEnsayo()">GUARDAR REGISTRO</button>
+      <button class="btn-confirm-gold" [disabled]="!formularioValido()" (click)="guardarEnsayo()">GUARDAR</button>
     </div>
   </div>
 </div>
@@ -152,24 +155,27 @@
     </div>
     <div class="modal-body compact">
       <div class="input-group full-width">
-        <label>Seleccione el Ensayo:</label>
+        <label>Seleccione Ensayo:</label>
         <select [(ngModel)]="nuevoEnsayoTmp.nombre" (change)="onEnsayoChange()" class="form-input">
-          <option value="" disabled selected>-- Seleccione del catálogo --</option>
+          <option value="" disabled selected>-- Ver catálogo --</option>
           <option *ngFor="let cat of catalogoEnsayos" [value]="cat.nombre">{{ cat.nombre }}</option>
         </select>
       </div>
-      <div class="input-group full-width mt-10">
-        <label>Número de ensayo:</label>
-        <input type="number" min="1" [(ngModel)]="nuevoEnsayoTmp.numero" placeholder="Escriba el número..." class="form-input">
-      </div>
-      <div class="input-group full-width mt-10">
-        <label>Costo del ensayo ($):</label>
-        <input type="number" min="0.01" step="0.01" [(ngModel)]="nuevoEnsayoTmp.monto" placeholder="0.00" class="form-input">
+      <div class="form-grid mt-10">
+        <div class="input-group">
+          <label>Número:</label>
+          <input type="number" [(ngModel)]="nuevoEnsayoTmp.numero" class="form-input">
+        </div>
+        <div class="input-group">
+          <label>Costo ($):</label>
+          <input type="number" [(ngModel)]="nuevoEnsayoTmp.monto" class="form-input">
+        </div>
       </div>
     </div>
-    <div class="modal-footer footer-light">
-      <button class="btn-cancel-alt" (click)="showSelectionModal = false">VOLVER</button>
-      <button class="btn-confirm-dark" [disabled]="!nuevoEnsayoTmp.nombre || !nuevoEnsayoTmp.monto || !nuevoEnsayoTmp.numero" (click)="confirmarAgregarEnsayo()">AGREGAR A LA LISTA</button>
+    <div class="modal-footer">
+      <button class="btn-confirm-dark"
+              [disabled]="!nuevoEnsayoTmp.nombre || !nuevoEnsayoTmp.monto"
+              (click)="confirmarAgregarEnsayo()">AÑADIR</button>
     </div>
   </div>
 </div>
@@ -177,25 +183,25 @@
 <div class="modal-overlay z-top" *ngIf="showAbonoModal">
   <div class="modal-content shadow-box border-gold selection-small">
     <div class="modal-header bg-dark">
-      <h3 class="text-white">Registrar Abono</h3>
-      <span class="close-btn text-white" (click)="showAbonoModal = false">&times;</span>
+      <h3 style="color: white;">Registrar Abono</h3>
+      <span class="close-btn" style="color: white;" (click)="closeModals()">&times;</span>
     </div>
     <div class="modal-body compact" *ngIf="selectedEnsayoForAbono">
-      <div class="info-abono-card">
-        <p><strong>Cliente:</strong> {{ selectedEnsayoForAbono.nombreCompleto }}</p>
-        <p><strong>Saldo Pendiente:</strong> <span class="text-danger">$ {{ selectedEnsayoForAbono.saldoPendiente | number:'1.2-2' }}</span></p>
-        <p *ngIf="selectedEnsayoForAbono.nombreCatalogo"><strong>Ensayo:</strong> {{ selectedEnsayoForAbono.nombreCatalogo }}</p>
-      </div>
+      <p><strong>Cliente:</strong> {{ selectedEnsayoForAbono.nombreCompleto }}</p>
+      <p><strong>Saldo Actual:</strong> <span class="text-danger">$ {{ selectedEnsayoForAbono.saldoPendiente | number:'1.2-2' }}</span></p>
       <div class="input-group full-width mt-10">
         <label>Monto a Abonar ($):</label>
-        <input type="number" min="0.01" [max]="selectedEnsayoForAbono.saldoPendiente" [(ngModel)]="nuevoAbonoMonto" placeholder="Ingrese el monto..." class="form-input">
+        <input type="number"
+               [(ngModel)]="nuevoAbonoMonto"
+               [max]="selectedEnsayoForAbono.saldoPendiente"
+               (keypress)="soloNumeros($event)"
+               class="form-input">
       </div>
     </div>
-    <div class="modal-footer footer-light">
-      <button class="btn-cancel-alt" (click)="showAbonoModal = false">CANCELAR</button>
+    <div class="modal-footer">
       <button class="btn-confirm-gold"
               [disabled]="!nuevoAbonoMonto || nuevoAbonoMonto <= 0 || nuevoAbonoMonto > selectedEnsayoForAbono?.saldoPendiente"
-              (click)="guardarNuevoAbono()">CONFIRMAR ABONO</button>
+              (click)="guardarNuevoAbono()">CONFIRMAR</button>
     </div>
   </div>
 </div>

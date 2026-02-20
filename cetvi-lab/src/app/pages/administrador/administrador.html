@@ -1,13 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Usuarios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <!-- Aquí puedes enlazar tu CSS -->
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+</head>
+<body>
+
 <div class="main__container">
   <div class="container">
 
     <div class="header-actions">
       <div class="search-box">
-        <input type="text" placeholder="Buscar administrador..." class="form-input" [(ngModel)]="filtroNombre"/>
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input type="text"
+               placeholder="Buscar por nombre o cédula..."
+               class="form-input"
+               [(ngModel)]="filtroNombre" />
       </div>
 
       <button class="new__customer"
-              (click)="openNewUserModal()"> Nuevo Usuario
+              (click)="openNewUserModal()">
+        Nuevo Usuario
         <span class="material-symbols-outlined">person_add</span>
       </button>
     </div>
@@ -22,48 +42,59 @@
           </tr>
         </thead>
         <tbody>
-
           <tr *ngFor="let user of usuariosFiltrados">
-
             <td style="padding:15px;">
-              {{ user.nombreCompleto }}
+              <div class="user-info">
+                <strong>{{ user.nombreCompleto }}</strong>
+              </div>
             </td>
 
             <td style="text-align:center;">
-              <span *ngFor="let rol of user.listaRoles">
-                {{ rol }}
-              </span>
+              <div class="roles-badge-container">
+                <span class="role-badge" *ngFor="let rol of user.listaRoles">
+                  {{ rol }}
+                </span>
+                <span *ngIf="user.listaRoles.length === 0"
+                      style="color: #999; font-style: italic; font-size: 0.8rem;">
+                  Sin roles
+                </span>
+              </div>
             </td>
 
             <td style="text-align:center;">
-              <button class="btn-roles"
-                      (click)="openRolesModal(user)">
+              <button class="btn-roles" (click)="openRolesModal(user)">
+                <span class="material-symbols-outlined" style="font-size: 18px;">
+                  settings_accessibility
+                </span>
                 Gestionar Roles
               </button>
             </td>
-
           </tr>
 
           <tr *ngIf="usuariosFiltrados.length === 0">
-            <td colspan="3" style="text-align:center; padding:50px;">
-              No se encontraron usuarios activos.
+            <td colspan="3" style="text-align:center; padding:60px;">
+              <span class="material-symbols-outlined"
+                    style="font-size: 48px; color: #ccc;">
+                group_off
+              </span>
+              <p style="color: #666; margin-top: 10px;">
+                No se encontraron usuarios que coincidan con la búsqueda.
+              </p>
             </td>
           </tr>
-
         </tbody>
       </table>
     </div>
-
   </div>
 </div>
 
-<!-- MODAL FORMULARIO NUEVO USUARIO -->
+<!-- MODAL NUEVO USUARIO -->
 <div class="modal-overlay" *ngIf="showFormModal">
-  <div class="modal-content shadow-box border-gold selection-small">
+  <div class="modal-content shadow-box">
 
-    <div class="modal-header bg-gold">
+    <div class="modal-header">
       <h3>Nuevo Usuario</h3>
-      <span class="material-symbols-outlined close"
+      <span class="material-symbols-outlined"
             (click)="closeModals()">close</span>
     </div>
 
@@ -71,22 +102,22 @@
 
       <div class="input-group">
         <label>Nombre *:</label>
-        <input type="text" [(ngModel)]="usuarioForm.nombre" class="form-input">
+        <input type="text" [(ngModel)]="usuarioForm.nombre">
       </div>
 
       <div class="input-group">
         <label>Apellido *:</label>
-        <input type="text" [(ngModel)]="usuarioForm.apellido" class="form-input">
+        <input type="text" [(ngModel)]="usuarioForm.apellido">
       </div>
 
       <div class="input-group">
         <label>Usuario (Login) *:</label>
-        <input type="text" [(ngModel)]="usuarioForm.login" class="form-input">
+        <input type="text" [(ngModel)]="usuarioForm.login">
       </div>
 
       <div class="input-group">
         <label>Contraseña *:</label>
-        <input type="password" [(ngModel)]="usuarioForm.password" class="form-input">
+        <input type="password" [(ngModel)]="usuarioForm.password">
       </div>
 
       <div class="input-group">
@@ -94,8 +125,7 @@
         <input type="text"
                maxlength="10"
                [(ngModel)]="usuarioForm.telefono"
-               (input)="soloNumeros($event); validarTelefono()"
-               class="form-input">
+               (input)="soloNumeros($event); validarTelefono()">
 
         <small *ngIf="usuarioForm.telefono && !telefonoValido"
                style="color:red;">
@@ -108,8 +138,7 @@
         <input type="text"
                maxlength="10"
                [(ngModel)]="usuarioForm.cedula"
-               (input)="soloNumeros($event); validarCedula()"
-               class="form-input">
+               (input)="soloNumeros($event); validarCedula()">
 
         <small *ngIf="usuarioForm.cedula && !cedulaValida"
                style="color:red;">
@@ -120,62 +149,40 @@
     </div>
 
     <div class="modal-actions">
-
       <button class="primary"
-              *ngIf="formularioValido && !cargando"
+              [disabled]="!formularioValido || cargando"
               (click)="guardarUsuario()">
-        GUARDAR USUARIO
+        {{ cargando ? 'GUARDANDO...' : 'GUARDAR USUARIO' }}
       </button>
-
       <button class="btn-cancel"
-              (click)="closeModals()">
-        CANCELAR
-      </button>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- MODAL ÉXITO -->
-<div class="modal-overlay" *ngIf="showSuccessModal">
-  <div class="modal-content success-modal shadow-box">
-    <div style="text-align:center; padding:20px;">
-      <h2 style="color:#2e7d32;">✅ Usuario registrado correctamente</h2>
-      <button class="primary"
-              style="margin-top:20px;"
-              (click)="closeSuccessModal()">
-        ACEPTAR
-      </button>
+              (click)="closeModals()">CANCELAR</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL GESTIONAR ROLES -->
+<!-- 🔵 MODAL GESTIONAR ROLES -->
 <div class="modal-overlay" *ngIf="showRolesModal">
-  <div class="modal-content shadow-box">
-
+  <div class="modal-content shadow-box role-modal">
     <div class="modal-header">
       <h3>Gestionar Roles - {{ usuarioSeleccionado?.nombreCompleto }}</h3>
-      <span class="material-symbols-outlined close"
+      <span class="material-symbols-outlined"
             (click)="closeRolesModal()">close</span>
     </div>
 
-    <div class="modal-body">
-      <div *ngFor="let rol of listaRolesDisponibles" class="rol-item">
-        <label class="checkbox-wrapper">
-          <input type="checkbox" 
-                  [id]="'rol-' + rol.id" 
-                  hidden=""
-                  [checked]="rolSeleccionado(rol.id)"
-                  (change)="toggleRol(rol.id, $event)">
-          <label [for]="'rol-' + rol.id" class="checkmark"></label>
-          <span class="rol-nombre">{{ rol.nombre }}</span>
-        </label>
-      </div>
-    </div>
+    <div style="padding:20px;">
 
-      <div class="modal-actions gestionar_roles">
+      <div *ngFor="let rol of listaRolesDisponibles">
+
+        <input type="checkbox"
+               [checked]="rolSeleccionado(rol.id)"
+               (change)="toggleRol(rol.id, $event)">
+
+        {{ rol.nombre }}
+
+      </div>
+
+      <div style="margin-top:20px; text-align:right;">
+
         <button class="primary"
                 (click)="guardarRoles()">
           GUARDAR ROLES
@@ -185,6 +192,13 @@
                 (click)="closeRolesModal()">
           CANCELAR
         </button>
+
       </div>
+
+    </div>
+
   </div>
 </div>
+
+</body>
+</html>
