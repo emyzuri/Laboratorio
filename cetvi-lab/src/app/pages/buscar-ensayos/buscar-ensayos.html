@@ -3,12 +3,22 @@
 
     <!-- FILTRO POR FECHAS -->
     <div class="header-actions">
-      <div class="search-box">
-        <label style="margin-right: 15px; font-weight: 600; color: #333;">Filtrar por Fecha:</label>
-        <input type="date"
-               [(ngModel)]="fechaBusqueda"
-               (change)="buscarEnsayos()"
-               class="form-input">
+      <div class="search-box-rango">
+        <div class="date-field">
+          <label>Desde:</label>
+          <input type="date"
+                 [(ngModel)]="fechaInicio"
+                 (change)="buscarEnsayos()"
+                 class="form-input">
+        </div>
+
+        <div class="date-field">
+          <label>Hasta:</label>
+          <input type="date"
+                 [(ngModel)]="fechaFin"
+                 (change)="buscarEnsayos()"
+                 class="form-input">
+        </div>
       </div>
     </div>
 
