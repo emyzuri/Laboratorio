@@ -1,28 +1,19 @@
-// .screen-center {
-//   min-height: 100vh;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   background: linear-gradient(135deg, #d9b26f, #f3e4c8);
+$gold-primary: #F4D77A;
+$gold-soft: #FFF7E0;
+$gold-border: #F1D27A;
 
-// }
+$dark-grey: #1F2937;
+$light-bg: #F4F6F8;
+$white: #FFFFFF;
 
-// sgc-logo {
-//   display: block;
-//   margin-bottom: 1rem;
-// }
+$danger-soft-bg: #FDECEC;
+$danger-soft-text: #B42318;
 
-// sgc-logo img {
-//   width: 180px;
-// }
+$warning-soft-bg: #FFF4E5;
+$warning-soft-text: #B45309;
 
-// // sgc-card {
-// //   max-width: 450px;   // prueba con esto
-// //   width: 100%;
-// // }
-
-
-// NUEVO DISE;O
+$success-soft-bg: #ECFDF3;
+$success-soft-text: #027A48;
 .login-wrapper {
   height: 100vh;
   display: flex;
@@ -118,4 +109,48 @@
   .login-left {
     padding: 40px;
   }
+}
+/* ============================= */
+/* BOTÓN LOGIN */
+/* ============================= */
+
+.btn-login {
+  width: 100%;
+  padding: 12px 0;
+
+  background-color: $gold-primary;
+  color: #111;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+/* Hover */
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.5);
+}
+
+/* Click */
+.btn-login:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(212, 175, 55, 0.4);
+}
+
+/* Disabled */
+.btn-login:disabled {
+  background: #555;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }

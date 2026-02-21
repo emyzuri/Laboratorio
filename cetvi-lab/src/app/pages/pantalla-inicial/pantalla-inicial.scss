@@ -62,28 +62,66 @@ $text-muted: #64748b;
 }
 
 // TABLA PRINCIPAL
+/* ============================= */
+/* TABLA PRINCIPAL MEJORADA */
+/* ============================= */
+
 .table-card {
   background: $white;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-
-  .table__clientes {
-    width: 100%;
-    border-collapse: collapse;
-    th {
-      text-align: left;
-      padding: 15px;
-      color: $text-muted;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      border-bottom: 2px solid $gold-soft;
-    }
-    td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-  }
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eef2f7;
 }
 
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* HEADER */
+.table-custom thead {
+  background: $gold-soft;
+}
+
+.table-custom th {
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #475569;
+  border-bottom: 1px solid $gold-border;
+}
+
+/* BODY */
+.table-custom td {
+  padding: 16px 20px;
+  font-size: 0.92rem;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+/* Hover elegante */
+.table-custom tbody tr {
+  transition: background 0.2s ease;
+}
+
+.table-custom tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Última fila sin borde */
+.table-custom tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Celda de acciones centrada */
+.table__acciones {
+  text-align: center;
+}
 // SISTEMA DE MODALES (OPTIMIZADO)
 .modal-overlay {
   position: fixed;
@@ -122,12 +160,24 @@ $text-muted: #64748b;
     align-items: center;
     border-bottom: 1px solid $gold-border;
 
-    h3 { margin: 0; font-size: 1.2rem; color: $dark-grey; font-weight: 800; }
-    .close-icon, .close-btn {
+    h3 {
+      margin: 0;
+      font-size: 1.05rem;      // un poco más pequeño
+      color: $dark-grey;          // color exacto que quieres
+      font-weight: 600;        // menos pesado que 800
+      letter-spacing: 0.3px;   // sutil mejora visual
+    }
+
+    .close-icon,
+    .close-btn {
       cursor: pointer;
       color: $text-muted;
-      @include transition;
-      &:hover { color: $danger-red; transform: scale(1.1); }
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: $danger-red;
+        transform: scale(1.08);
+      }
     }
   }
 
