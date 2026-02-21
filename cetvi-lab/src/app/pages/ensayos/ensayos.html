@@ -4,7 +4,7 @@
       <div class="search-box">
         <span class="material-symbols-outlined search-icon">search</span>
         <input type="text"
-               placeholder="Filtrar por cliente, cédula o ensayo..."
+               placeholder="Buscar por Nombre"
                [(ngModel)]="filtroNombre"
                class="form-input">
       </div>
@@ -88,6 +88,7 @@
   </div>
 </div>
 
+<!-- Modal Registrar Pedido -->
 <div class="modal-overlay" *ngIf="showFormModal">
   <div class="modal-content shadow-box border-gold no-scroll">
     <div class="modal-header bg-gold">
@@ -111,21 +112,40 @@
           </datalist>
           <small *ngIf="ensayoForm.ensayo.idCliente > 0" style="color: green;">✓ Cliente Validado</small>
         </div>
+
         <div class="input-group">
           <label>Fecha de Entrega:</label>
           <input type="date" [(ngModel)]="fechaEntrega" [min]="minFecha" class="form-input">
         </div>
+
         <div class="input-group">
           <label>Abono Inicial ($):</label>
-          <input type="number" [(ngModel)]="ensayoForm.abono" (keypress)="soloNumeros($event)" class="form-input">
+          <input type="number"
+                 min="0"
+                 [(ngModel)]="ensayoForm.abono"
+                 (keypress)="soloNumeros($event)"
+                 (paste)="evitarPegadoNegativo($event)"
+                 class="form-input">
         </div>
       </div>
 
       <div class="gold-dashed">
         <div class="summary-header">
           <span>Ensayos Seleccionados ({{ listaEnsayosTmp.length }})</span>
-          <button class="btn-confirm-dark" style="padding: 5px 15px;" (click)="showSelectionModal = true">Agregar +</button>
+          <div class="folder-btn-wrapper" (click)="showSelectionModal = true">
+            <div class="folder-container">
+              <div class="folder">
+                <div class="front-side">
+                  <div class="tip"></div>
+                  <div class="cover"></div>
+                </div>
+                <div class="back-side cover"></div>
+              </div>
+              <label class="custom-file-upload">Agregar Ensayo</label>
+            </div>
+          </div>
         </div>
+
         <div class="mini-table-compact">
           <div class="mini-row" *ngFor="let e of listaEnsayosTmp; let i = index">
             <span>#{{ e.numero }} - {{ e.nombre }}</span>
@@ -140,6 +160,7 @@
         <strong>$ {{ calcularTotalPedido() | number:'1.2-2' }}</strong>
       </div>
     </div>
+
     <div class="modal-footer footer-light">
       <button class="btn-cancel-alt" (click)="closeModals()">CANCELAR</button>
       <button class="btn-confirm-gold" [disabled]="!formularioValido()" (click)="guardarEnsayo()">GUARDAR</button>
@@ -147,6 +168,7 @@
   </div>
 </div>
 
+<!-- Modal Selección de Ensayo -->
 <div class="modal-overlay z-top" *ngIf="showSelectionModal">
   <div class="modal-content shadow-box border-gold selection-small">
     <div class="modal-header bg-gold">
@@ -161,17 +183,29 @@
           <option *ngFor="let cat of catalogoEnsayos" [value]="cat.nombre">{{ cat.nombre }}</option>
         </select>
       </div>
+
       <div class="form-grid mt-10">
         <div class="input-group">
           <label>Número:</label>
-          <input type="number" [(ngModel)]="nuevoEnsayoTmp.numero" class="form-input">
+          <input type="number"
+                 min="0"
+                 [(ngModel)]="nuevoEnsayoTmp.numero"
+                 (keypress)="soloNumeros($event)"
+                 (paste)="evitarPegadoNegativo($event)"
+                 class="form-input">
         </div>
         <div class="input-group">
           <label>Costo ($):</label>
-          <input type="number" [(ngModel)]="nuevoEnsayoTmp.monto" class="form-input">
+          <input type="number"
+                 min="0"
+                 [(ngModel)]="nuevoEnsayoTmp.monto"
+                 (keypress)="soloNumeros($event)"
+                 (paste)="evitarPegadoNegativo($event)"
+                 class="form-input">
         </div>
       </div>
     </div>
+
     <div class="modal-footer">
       <button class="btn-confirm-dark"
               [disabled]="!nuevoEnsayoTmp.nombre || !nuevoEnsayoTmp.monto"
@@ -180,11 +214,12 @@
   </div>
 </div>
 
+<!-- Modal Abono -->
 <div class="modal-overlay z-top" *ngIf="showAbonoModal">
   <div class="modal-content shadow-box border-gold selection-small">
     <div class="modal-header bg-dark">
-      <h3 style="color: white;">Registrar Abono</h3>
-      <span class="close-btn" style="color: white;" (click)="closeModals()">&times;</span>
+      <h3 style="color: #1F2937;">Registrar Abono</h3>
+      <span class="close-btn" style="color: #1F2937;" (click)="closeModals()">&times;</span>
     </div>
     <div class="modal-body compact" *ngIf="selectedEnsayoForAbono">
       <p><strong>Cliente:</strong> {{ selectedEnsayoForAbono.nombreCompleto }}</p>
@@ -192,9 +227,11 @@
       <div class="input-group full-width mt-10">
         <label>Monto a Abonar ($):</label>
         <input type="number"
+               min="0"
                [(ngModel)]="nuevoAbonoMonto"
                [max]="selectedEnsayoForAbono.saldoPendiente"
                (keypress)="soloNumeros($event)"
+               (paste)="evitarPegadoNegativo($event)"
                class="form-input">
       </div>
     </div>

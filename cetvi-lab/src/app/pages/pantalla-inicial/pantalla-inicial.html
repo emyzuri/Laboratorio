@@ -4,7 +4,7 @@
       <div class="search-box">
         <span class="material-symbols-outlined search-icon">search</span>
         <input type="text"
-               placeholder="Buscar por nombre o cédula..."
+               placeholder="Buscar por nombre"
                class="form-input"
                [(ngModel)]="filtroBusqueda"
                (input)="paginaActual = 1" />
@@ -15,7 +15,7 @@
     </div>
 
     <div class="table-card shadow-box">
-      <table class="table__clientes">
+      <table class="table-custom">
         <thead>
           <tr>
             <th>Nombre Completo (A-Z)</th>
@@ -70,20 +70,20 @@
 
     <div class="modal-body-grid">
       <div class="input-group">
-        <label>Cédula *:</label>
+        <label>Cédula:</label>
         <input type="text" [(ngModel)]="clientForm.cedula" class="form-input"
                [disabled]="isEditing" (keypress)="validarSoloNumeros($event)" maxlength="10">
       </div>
       <div class="input-group">
-        <label>Nombre *:</label>
+        <label>Nombre:</label>
         <input type="text" [(ngModel)]="clientForm.nombre" class="form-input">
       </div>
       <div class="input-group">
-        <label>Apellido *:</label>
+        <label>Apellido:</label>
         <input type="text" [(ngModel)]="clientForm.apellido" class="form-input">
       </div>
       <div class="input-group">
-        <label>Teléfono *:</label>
+        <label>Teléfono:</label>
         <input type="text" [(ngModel)]="clientForm.telefono" class="form-input" maxlength="10" (keypress)="validarSoloNumeros($event)">
       </div>
       <div class="input-group full-width">
