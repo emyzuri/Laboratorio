@@ -4,7 +4,7 @@
       <div class="search-box">
         <span class="material-symbols-outlined search-icon">search</span>
         <input type="text"
-               placeholder="Buscar por nombre"
+               placeholder="Buscar por Nombre o Cédula"
                class="form-input"
                [(ngModel)]="filtroBusqueda"
                (input)="paginaActual = 1" />
@@ -21,14 +21,22 @@
             <th>Nombre Completo (A-Z)</th>
             <th>Cédula</th>
             <th>Título / Profesión</th>
+            <th>Correo Electrónico</th>
             <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let cliente of clientesPaginados">
-            <td>{{ (cliente.cl_nombre || cliente.nombre) }} {{ (cliente.cl_apellido || cliente.apellido) }}</td>
+            <td style="text-transform: uppercase;">
+              {{ (cliente.cl_nombre || cliente.nombre) }} {{ (cliente.cl_apellido || cliente.apellido) }}
+            </td>
             <td>{{ cliente.cl_cedula || cliente.cedula }}</td>
-            <td>{{ cliente.cl_titulo || cliente.titulo }}</td>
+            <td style="text-transform: uppercase;">
+              {{ cliente.cl_titulo || cliente.titulo }}
+            </td>
+            <td style="text-transform: lowercase; color: #64748b;">
+              {{ cliente.correo || cliente.cl_correo || 'N/A' }}
+            </td>
             <td class="table__acciones">
               <div class="icon-actions-container">
                 <button class="action-btn edit" (click)="handleAction('editar', cliente)" title="Editar">
@@ -41,7 +49,7 @@
             </td>
           </tr>
           <tr *ngIf="clientesPaginados.length === 0">
-            <td colspan="4" class="text-center" style="padding: 40px; color: #94a3b8;">
+            <td colspan="5" class="text-center" style="padding: 40px; color: #94a3b8;">
               No se encontraron registros activos.
             </td>
           </tr>
@@ -74,29 +82,54 @@
         <input type="text" [(ngModel)]="clientForm.cedula" class="form-input"
                [disabled]="isEditing" (keypress)="validarSoloNumeros($event)" maxlength="10">
       </div>
+
       <div class="input-group">
         <label>Nombre:</label>
-        <input type="text" [(ngModel)]="clientForm.nombre" class="form-input">
+        <input type="text" [(ngModel)]="clientForm.nombre"
+               (input)="clientForm.nombre = clientForm.nombre.toUpperCase()"
+               class="form-input" style="text-transform: uppercase;">
       </div>
+
       <div class="input-group">
         <label>Apellido:</label>
-        <input type="text" [(ngModel)]="clientForm.apellido" class="form-input">
+        <input type="text" [(ngModel)]="clientForm.apellido"
+               (input)="clientForm.apellido = clientForm.apellido.toUpperCase()"
+               class="form-input" style="text-transform: uppercase;">
       </div>
+
       <div class="input-group">
         <label>Teléfono:</label>
-        <input type="text" [(ngModel)]="clientForm.telefono" class="form-input" maxlength="10" (keypress)="validarSoloNumeros($event)">
+        <input type="text" [(ngModel)]="clientForm.telefono" class="form-input"
+               maxlength="10" (keypress)="validarSoloNumeros($event)">
       </div>
+
       <div class="input-group full-width">
         <label>Dirección:</label>
-        <input type="text" [(ngModel)]="clientForm.direccion" class="form-input">
+        <input type="text" [(ngModel)]="clientForm.direccion"
+               (input)="clientForm.direccion = clientForm.direccion.toUpperCase()"
+               class="form-input" style="text-transform: uppercase;">
       </div>
+
       <div class="input-group">
         <label>Ciudad:</label>
-        <input type="text" [(ngModel)]="clientForm.ciudad" class="form-input">
+        <input type="text" [(ngModel)]="clientForm.ciudad"
+               (input)="clientForm.ciudad = clientForm.ciudad.toUpperCase()"
+               class="form-input" style="text-transform: uppercase;">
       </div>
+
       <div class="input-group">
         <label>Título / Profesión:</label>
-        <input type="text" [(ngModel)]="clientForm.titulo" class="form-input">
+        <input type="text" [(ngModel)]="clientForm.titulo"
+               (input)="clientForm.titulo = clientForm.titulo.toUpperCase()"
+               class="form-input" style="text-transform: uppercase;">
+      </div>
+
+      <div class="input-group">
+        <label>Correo Electrónico:</label>
+        <input type="email" [(ngModel)]="clientForm.correo"
+               (input)="clientForm.correo = clientForm.correo.toLowerCase()"
+               class="form-input" placeholder="ejemplo@correo.com"
+               style="text-transform: lowercase;">
       </div>
     </div>
 

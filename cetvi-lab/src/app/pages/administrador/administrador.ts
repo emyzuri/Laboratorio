@@ -16,8 +16,7 @@ export class AdministradorComponent implements OnInit {
 
   usuarios: any[] = [];
   listaRolesDisponibles: any[] = [];
-
-  filtroNombre: string = '';
+  filtroNombre = '';
   showFormModal = false;
   showRolesModal = false;
   cargando = false;
@@ -25,6 +24,7 @@ export class AdministradorComponent implements OnInit {
   usuarioSeleccionado: any = null;
   rolesSeleccionados: number[] = [];
 
+  // Objeto inicializado vacío
   usuarioForm = {
     nombre: '',
     apellido: '',
@@ -42,22 +42,21 @@ export class AdministradorComponent implements OnInit {
     this.cargarCatalogoRoles();
   }
 
-  // ==============================
-  // CARGAR USUARIOS
-  // ==============================
+  toUpperCase(campo: keyof typeof this.usuarioForm) {
+    if (this.usuarioForm[campo]) {
+      this.usuarioForm[campo] = this.usuarioForm[campo].toUpperCase();
+    }
+  }
+
   async cargarUsuarios() {
     try {
       const respuesta = await this.authService.getUsuarios();
       if (respuesta?.esExitoso && Array.isArray(respuesta.datos)) {
-        this.usuarios = respuesta.datos
-          .map((u: any) => ({
-            ...u,
-            nombreCompleto: `${u?.nombre ?? ''} ${u?.apellido ?? ''}`.trim(),
-            listaRoles: u?.roles
-              ? u.roles.split(',').map((r: string) => r.trim())
-              : []
-          }))
-          .sort((a: any, b: any) => a.nombreCompleto.localeCompare(b.nombreCompleto));
+        this.usuarios = respuesta.datos.map((u: any) => ({
+          ...u,
+          nombreCompleto: `${u?.nombre ?? ''} ${u?.apellido ?? ''}`.trim().toUpperCase(),
+          listaRoles: u?.roles ? u.roles.split(',').map((r: string) => r.trim()) : []
+        }));
       } else {
         this.usuarios = [];
       }
@@ -67,9 +66,6 @@ export class AdministradorComponent implements OnInit {
     }
   }
 
-  // ==============================
-  // CARGAR CATÁLOGO ROLES
-  // ==============================
   async cargarCatalogoRoles() {
     try {
       const respuesta = await this.authService.getRoles();
@@ -84,66 +80,47 @@ export class AdministradorComponent implements OnInit {
     }
   }
 
-  // ==============================
-  // FILTRO USUARIOS
-  // ==============================
   get usuariosFiltrados() {
     let lista = this.usuarios;
     if (this.filtroNombre.trim()) {
       const busqueda = this.filtroNombre.toLowerCase();
       lista = lista.filter(u =>
-        u.nombreCompleto.toLowerCase().includes(busqueda) ||
-        u.cedula?.includes(busqueda)
+        u.nombreCompleto.toLowerCase().includes(busqueda) || u.cedula?.includes(busqueda)
       );
     }
-    return lista.sort((a: any, b: any) => a.nombreCompleto.localeCompare(b.nombreCompleto));
+    return lista.sort((a, b) => a.nombreCompleto.localeCompare(b.nombreCompleto));
   }
 
-  // ==============================
-  // MODAL ROLES
-  // ==============================
+  // --- GESTIÓN DE ROLES MÚLTIPLES ---
   openRolesModal(user: any) {
     this.usuarioSeleccionado = user;
-    this.rolesSeleccionados = [];
-
-    if (user.listaRoles?.length) {
-      this.listaRolesDisponibles.forEach(rolCatalogo => {
-        if (user.listaRoles.includes(rolCatalogo.nombre)) {
-          this.rolesSeleccionados.push(rolCatalogo.id);
-        }
-      });
-    }
-
+    this.rolesSeleccionados = this.listaRolesDisponibles
+      .filter(rol => user.listaRoles.includes(rol.nombre))
+      .map(rol => rol.id);
     this.showRolesModal = true;
   }
 
-  closeRolesModal() {
-    this.showRolesModal = false;
-    this.usuarioSeleccionado = null;
-    this.rolesSeleccionados = [];
+  isRolSelected(rolId: number): boolean {
+    return this.rolesSeleccionados.includes(rolId);
   }
 
-  rolSeleccionado(id: number): boolean {
-    return this.rolesSeleccionados.includes(id);
-  }
-
-  toggleRol(id: number, event: any) {
+  onRolChange(event: any, rolId: number) {
     if (event.target.checked) {
-      if (!this.rolesSeleccionados.includes(id)) this.rolesSeleccionados.push(id);
+      if (!this.rolesSeleccionados.includes(rolId)) this.rolesSeleccionados.push(rolId);
     } else {
-      this.rolesSeleccionados = this.rolesSeleccionados.filter(r => r !== id);
+      this.rolesSeleccionados = this.rolesSeleccionados.filter(id => id !== rolId);
     }
   }
 
-  async guardarRoles() {
-    if (!this.usuarioSeleccionado || this.rolesSeleccionados.length === 0) return;
+  async actualizarRoles() {
+    if (!this.usuarioSeleccionado) return;
     this.cargando = true;
     try {
-      const respuesta = await this.authService.actualizarRolesUsuario(
+      const resp = await this.authService.actualizarRolesUsuario(
         this.usuarioSeleccionado.idUsuario,
         this.rolesSeleccionados
       );
-      if (respuesta?.esExitoso) {
+      if (resp?.esExitoso || resp === true) {
         this.closeRolesModal();
         await this.cargarUsuarios();
       }
@@ -154,10 +131,9 @@ export class AdministradorComponent implements OnInit {
     }
   }
 
-  // ==============================
-  // NUEVO USUARIO
-  // ==============================
+  // --- NUEVO USUARIO (SIN AUTOLLENADO) ---
   openNewUserModal() {
+    // Forzamos el vaciado total para evitar que queden rastros
     this.usuarioForm = {
       nombre: '',
       apellido: '',
@@ -173,27 +149,22 @@ export class AdministradorComponent implements OnInit {
 
   async guardarUsuario() {
     if (!this.formularioValido) return;
-
     this.cargando = true;
-
     const payload = {
-      Nombre: this.usuarioForm.nombre.trim(),
-      Apellido: this.usuarioForm.apellido.trim(),
-      Usuario: this.usuarioForm.login.trim(),
+      Nombre: this.usuarioForm.nombre.trim().toUpperCase(),
+      Apellido: this.usuarioForm.apellido.trim().toUpperCase(),
+      Usuario: this.usuarioForm.login.trim().toUpperCase(),
       Password: this.usuarioForm.password.trim(),
       Telefono: this.usuarioForm.telefono.trim(),
       Cedula: this.usuarioForm.cedula.trim(),
-      Roles: [2] // siempre rol de usuario
+      Roles: [2]
     };
-
     try {
       const respuesta = await this.authService.registrarUsuario(payload);
-
       if (respuesta === true || respuesta?.esExitoso) {
-        this.showFormModal = false;  // cerrar modal
-        await this.cargarUsuarios();  // recargar lista de usuarios
+        this.showFormModal = false;
+        await this.cargarUsuarios();
       }
-
     } catch (error) {
       console.error('Error al registrar usuario:', error);
     } finally {
@@ -201,9 +172,6 @@ export class AdministradorComponent implements OnInit {
     }
   }
 
-  // ==============================
-  // VALIDACIONES
-  // ==============================
   get formularioValido(): boolean {
     return !!(
       this.usuarioForm.nombre?.trim() &&
@@ -225,21 +193,17 @@ export class AdministradorComponent implements OnInit {
 
   validarCedula() {
     const cedula = this.usuarioForm.cedula;
-    if (!/^\d{10}$/.test(cedula)) { this.cedulaValida = false; return; }
-    const provincia = parseInt(cedula.substring(0, 2), 10);
-    if (provincia < 1 || provincia > 24) { this.cedulaValida = false; return; }
-
-    const digitos = cedula.split('').map(Number);
-    const verificador = digitos.pop()!;
-    let suma = 0;
-    digitos.forEach((num, i) => {
-      if (i % 2 === 0) {
-        let mult = num * 2; if (mult > 9) mult -= 9; suma += mult;
-      } else { suma += num; }
-    });
-    const decena = Math.ceil(suma / 10) * 10;
-    this.cedulaValida = ((decena - suma === 10 ? 0 : decena - suma) === verificador);
+    this.cedulaValida = /^\d{10}$/.test(cedula);
   }
 
-  closeModals() { this.showFormModal = false; }
+  closeModals() {
+    this.showFormModal = false;
+    this.showRolesModal = false;
+  }
+
+  closeRolesModal() {
+    this.showRolesModal = false;
+    this.usuarioSeleccionado = null;
+    this.rolesSeleccionados = [];
+  }
 }

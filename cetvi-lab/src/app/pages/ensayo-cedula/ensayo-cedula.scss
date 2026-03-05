@@ -1,0 +1,174 @@
+/* Variables Institucionales CETVI */
+$gold-primary: #F4D77A;
+$gold-soft: #FFF7E0;
+$gold-border: #F1D27A;
+$dark-grey: #1F2937;
+$light-bg: #F4F6F8;
+$white: #FFFFFF;
+$danger-soft-bg: #FDECEC;
+$danger-soft-text: #B42318;
+$success-soft-bg: #ECFDF3;
+$success-soft-text: #027A48;
+
+/* Contenedor Principal */
+.main__container {
+  padding: 30px;
+  background-color: $light-bg;
+  min-height: 100vh;
+  min-height: calc(100vh - 120px);
+  box-shadow: 0 0 16px 6px #ccc;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Cabecera de Acciones y Búsqueda */
+.header-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.search-box-rango {
+        display: flex;
+        gap: 15px;
+        background: white;
+        padding: 6px 15px; // Padding reducido para hacerlo más fino
+        border-radius: 8px; // Bordes un poco más rectos para look profesional
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        //border: 1px solid $border-color;
+        align-items: center;
+
+        .date-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            label {
+                font-weight: 600;
+                //color: $text-dark;
+                font-size: 0.8rem; // Fuente más pequeña
+                text-transform: uppercase;
+            }
+
+            .form-input {
+                border: 1px solid #e2e8f0;
+                border-radius: 4px;
+                padding: 4px 8px; // Input de fecha más pequeño
+                font-size: 0.85rem;
+                outline: none;
+                width: 130px; // Ancho controlado
+
+                &:focus {
+                    border-color: $gold-primary;
+                }
+            }
+        }
+    }
+
+/* Botón Estilo Gold */
+.btn-report-gold {
+  background-color: $gold-primary;
+  color: $dark-grey;
+  border: none;
+  padding: 11px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  transition: transform 0.2s, background 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: darken($gold-primary, 5%);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background-color: #E2E8F0;
+    color: #94A3B8;
+    cursor: not-allowed;
+  }
+
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
+/* Tabla de Resultados */
+.table-card {
+  background: $white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  margin-top: 10px;
+}
+
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+
+  .bg-gold-header {
+    background-color: $gold-soft;
+    th {
+      padding: 18px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #475569;
+      text-align: left;
+      border-bottom: 1px solid $gold-border;
+    }
+  }
+
+  td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #EAECEF;
+    font-size: 0.92rem;
+    color: #334155;
+    vertical-align: middle;
+  }
+
+  tr:hover {
+    background-color: #F9FAFB;
+  }
+}
+
+/* Estilos de Texto y Estados */
+.text-success {
+  color: $success-soft-text;
+  font-weight: 600;
+}
+
+.text-danger {
+  color: $danger-soft-text;
+}
+
+.no-results-row {
+  .no-results-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    .material-symbols-outlined {
+      font-size: 48px;
+      color: #CBD5E1;
+    }
+
+    p {
+      color: #64748B;
+      font-weight: 500;
+    }
+  }
+}
+
+/* Ajuste para los sub-ensayos detallados */
+.ensayo-item {
+  display: block;
+  font-size: 0.85rem;
+  color: #475569;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}

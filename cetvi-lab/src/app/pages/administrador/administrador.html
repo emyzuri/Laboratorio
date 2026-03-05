@@ -1,10 +1,9 @@
 <div class="main__container">
   <div class="container">
-
     <div class="header-actions">
       <div class="search-box">
         <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text" placeholder="Buscar por nombre" class="form-input" [(ngModel)]="filtroNombre" />
+        <input type="text" placeholder="Buscar por Nombre o Cédula" class="form-input" [(ngModel)]="filtroNombre" autocomplete="off" />
       </div>
 
       <button class="new__customer" (click)="openNewUserModal()">
@@ -44,81 +43,75 @@
 </div>
 
 <div class="modal-overlay" *ngIf="showFormModal">
-  <div class="modal-content">
+  <form class="modal-content" autocomplete="off">
     <div class="modal-header">
       <h3>Nuevo Usuario</h3>
       <span class="material-symbols-outlined close-btn" (click)="closeModals()">close</span>
     </div>
+
     <div class="modal-body-grid">
       <div class="input-group">
         <label>Nombre:</label>
-        <input type="text" [(ngModel)]="usuarioForm.nombre">
+        <input type="text" [(ngModel)]="usuarioForm.nombre" (input)="toUpperCase('nombre')" name="no-autocomplete-nombre" autocomplete="off">
       </div>
+
       <div class="input-group">
         <label>Apellido:</label>
-        <input type="text" [(ngModel)]="usuarioForm.apellido">
+        <input type="text" [(ngModel)]="usuarioForm.apellido" (input)="toUpperCase('apellido')" name="no-autocomplete-apellido" autocomplete="off">
       </div>
+
       <div class="input-group">
         <label>Usuario:</label>
-        <input type="text" [(ngModel)]="usuarioForm.login">
+        <input type="text" [(ngModel)]="usuarioForm.login" (input)="toUpperCase('login')" name="user-login-field" autocomplete="one-time-code">
       </div>
+
       <div class="input-group">
         <label>Contraseña:</label>
-        <input type="password" [(ngModel)]="usuarioForm.password">
+        <input type="password" [(ngModel)]="usuarioForm.password" name="user-pass-field" autocomplete="new-password">
       </div>
+
       <div class="input-group">
         <label>Teléfono:</label>
-        <input type="text" maxlength="10" [(ngModel)]="usuarioForm.telefono">
+        <input type="text" maxlength="10" [(ngModel)]="usuarioForm.telefono" (input)="soloNumeros($event); validarTelefono()" name="no-autocomplete-tel" autocomplete="off">
       </div>
+
       <div class="input-group">
         <label>Cédula:</label>
-        <input type="text" maxlength="10" [(ngModel)]="usuarioForm.cedula">
+        <input type="text" maxlength="10" [(ngModel)]="usuarioForm.cedula" (input)="soloNumeros($event); validarCedula()" name="no-autocomplete-ced" autocomplete="off">
       </div>
     </div>
+
     <div class="modal-actions">
-      <button class="primary" [disabled]="!formularioValido || cargando" (click)="guardarUsuario()">
+      <button type="button" class="primary" [disabled]="!formularioValido || cargando" (click)="guardarUsuario()">
         {{ cargando ? 'GUARDANDO...' : 'GUARDAR USUARIO' }}
       </button>
-      <button class="btn-cancel" (click)="closeModals()">CANCELAR</button>
+      <button type="button" class="btn-cancel" (click)="closeModals()">CANCELAR</button>
     </div>
-  </div>
+  </form>
 </div>
-<div class="modal-overlay" *ngIf="showRolesModal">
-  <div class="modal-content role-modal-compact">
 
+<div class="modal-overlay" *ngIf="showRolesModal">
+  <div class="modal-content selection-small">
     <div class="modal-header">
-      <div class="header-title">
-        <span class="material-symbols-outlined header-icon">shield_person</span>
-        <h3>Gestionar Roles</h3>
-      </div>
+      <h3>Gestionar Roles</h3>
       <span class="material-symbols-outlined close-btn" (click)="closeRolesModal()">close</span>
     </div>
 
-    <div class="user-subtitle">
-      {{ usuarioSeleccionado?.nombreCompleto }}
-    </div>
-
-    <div class="modal-body-compact">
-      <div class="checkbox-list">
-        <div class="checkbox-item" *ngFor="let rol of listaRolesDisponibles">
-          <label class="custom-checkbox">
-            <input type="checkbox" [checked]="rolSeleccionado(rol.id)" (change)="toggleRol(rol.id, $event)">
-            <span class="checkmark">
-              <span class="material-symbols-outlined check-icon">check</span>
-            </span>
-            <span class="role-text">{{ rol.nombre }}</span>
-          </label>
-        </div>
+    <div class="modal-body">
+      <p style="margin-bottom: 15px;">Usuario: <strong>{{ usuarioSeleccionado?.nombreCompleto }}</strong></p>
+      <div class="roles-selection-list">
+        <label *ngFor="let rol of listaRolesDisponibles" class="checkbox-group">
+          <input type="checkbox" [checked]="isRolSelected(rol.id)" (change)="onRolChange($event, rol.id)">
+          <span>{{ rol.nombre }}</span>
+        </label>
       </div>
     </div>
 
-    <div class="modal-footer-centered">
-      <button class="primary-btn" (click)="guardarRoles()">
-        <span class="material-symbols-outlined">save</span>
-        GUARDAR ROLES
+    <div class="modal-actions">
+      <button class="primary" (click)="actualizarRoles()" [disabled]="cargando || rolesSeleccionados.length === 0">
+        {{ cargando ? 'GUARDANDO...' : 'ACTUALIZAR ROLES' }}
       </button>
-      <button class="cancel-link" (click)="closeRolesModal()">CANCELAR</button>
+      <button class="btn-cancel" (click)="closeRolesModal()">CANCELAR</button>
     </div>
   </div>
 </div>
-

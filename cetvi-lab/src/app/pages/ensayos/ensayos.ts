@@ -11,22 +11,40 @@ import { AuthService } from '../../auth/services/auth.service';
   styleUrls: ['./ensayos.scss']
 })
 export class EnsayosComponent implements OnInit {
+
   private readonly authService = inject(AuthService);
 
-  ensayosDeudores: any[] = [];
-  clientes: any[] = [];
-  catalogoEnsayos: any[] = [];
+  // =========================
+  // LISTAS PRINCIPALES
+  // =========================
+  ensayosOriginal: any[] = [];
+  ensayosFiltrados: any[] = [];
 
+  clientes: any[] = [];
+  clientesFiltrados: any[] = [];
+
+  catalogoPadres: any[] = [];
+  catalogoHijos: any[] = [];
+
+  idPadreSeleccionado: number = 0;
+
+  // =========================
+  // FILTROS Y UI
+  // =========================
   filtroNombre: string = '';
   filtroClienteBusqueda: string = '';
-  paginaActual: number = 1;
 
-  showFormModal: boolean = false;
-  showSelectionModal: boolean = false;
-  showAbonoModal: boolean = false;
+  showFormModal = false;
+  showSelectionModal = false;
+  showAbonoModal = false;
+  showResults = false;
 
+  // =========================
+  // FORMULARIO
+  // =========================
   minFecha: string = '';
   fechaEntrega: string = '';
+
   listaEnsayosTmp: any[] = [];
   nuevoEnsayoTmp: any = { nombre: '', monto: null, numero: null, idCatalogo: 0 };
 
@@ -37,14 +55,8 @@ export class EnsayosComponent implements OnInit {
 
   selectedEnsayoForAbono: any = null;
   nuevoAbonoMonto: number | null = null;
-  showResults = false;
 
-  seleccionarCliente(cliente: any) {
-    this.filtroClienteBusqueda = `${cliente.cedula} - ${cliente.nombre} ${cliente.apellido}`;
-    this.ensayoForm.ensayo.idCliente = cliente.idCliente;
-    this.showResults = false;
-  }
-
+  // =========================
   ngOnInit() {
     this.cargarDatosIniciales();
     this.establecerFechaMinima();
@@ -53,71 +65,161 @@ export class EnsayosComponent implements OnInit {
   async cargarDatosIniciales() {
     await this.cargarEnsayos();
     await this.cargarClientes();
-    await this.cargarCatalogo();
+    await this.cargarCatalogoPadres();
   }
 
-  get ensayosFiltradosPorBusqueda() {
-    const query = this.filtroNombre.toLowerCase().trim();
-    if (!query) return this.ensayosDeudores;
+  // =========================
+  // CARGAR ENSAYOS
+  // =========================
+  async cargarEnsayos() {
+  try {
+    const resp = await this.authService.getEnsayosDeudores();
 
-    return this.ensayosDeudores.filter(e =>
-      (e.nombreCompleto || '').toLowerCase().includes(query) ||
-      (e.cedula || '').includes(query) ||
-      (e.subensayos || []).some((sub: any) =>
+    if (resp?.esExitoso && Array.isArray(resp.datos)) {
+
+      // FILTRO CRÍTICO: Solo mostramos si el saldo es mayor a 0
+      const soloDeudores = resp.datos.filter((e: any) => Number(e.saldoPendiente ?? 0) > 0);
+
+      this.ensayosOriginal = soloDeudores.map((e: any) => ({
+        cedula: e.cedula || '',
+        nombreCompleto: (e.nombreCompleto || '').toUpperCase(),
+        totalAbonado: Number(e.totalAbonado ?? 0),
+        totalAPagar: Number(e.totalAPagar ?? 0),
+        saldoPendiente: Number(e.saldoPendiente ?? 0),
+        idPrueba: e.idEnsayo ?? 0,
+        expandido: false,
+        subensayos: Array.isArray(e.ensayos)
+          ? e.ensayos.map((s: any) => ({
+              nombreSubEnsayo: (s.nombreCatalogo || 'ENSAYO').toUpperCase(),
+              saldoSub: 0
+            }))
+          : []
+      }));
+
+      this.ensayosFiltrados = [...this.ensayosOriginal];
+    }
+  } catch (error) {
+    console.error('Error al cargar ensayos:', error);
+  }
+}
+
+  // =========================
+  // FILTRO EN TIEMPO REAL
+  // =========================
+  filtrarEnsayos() {
+
+    const query = this.filtroNombre?.toLowerCase().trim();
+
+    if (!query) {
+      this.ensayosFiltrados = [...this.ensayosOriginal];
+      return;
+    }
+
+    this.ensayosFiltrados = this.ensayosOriginal.filter(e => {
+
+      const nombre = (e.nombreCompleto || '').toLowerCase();
+      const cedula = (e.cedula || '').toLowerCase();
+
+      const coincideSub = (e.subensayos || []).some((sub: any) =>
         (sub.nombreSubEnsayo || '').toLowerCase().includes(query)
-      )
+      );
+
+      return (
+        nombre.includes(query) ||
+        cedula.includes(query) ||
+        coincideSub
+      );
+    });
+  }
+
+  // =========================
+  async cargarClientes() {
+    const resp = await this.authService.getClientes();
+    if (resp?.esExitoso) {
+      this.clientes = resp.datos.filter((c: any) => (c.cl_estado ?? c.estado) != 0);
+    }
+  }
+
+  onClienteSearchChange() {
+
+    const bus = this.filtroClienteBusqueda.toLowerCase().trim();
+
+    if (!bus) {
+      this.clientesFiltrados = [];
+      this.showResults = false;
+      this.ensayoForm.ensayo.idCliente = 0;
+      return;
+    }
+
+    this.showResults = true;
+
+    this.clientesFiltrados = this.clientes.filter(c =>
+      (c.cl_cedula || c.cedula || '').includes(bus) ||
+      (c.cl_nombre || c.nombre || '').toLowerCase().includes(bus) ||
+      (c.cl_apellido || c.apellido || '').toLowerCase().includes(bus)
     );
   }
 
-  async cargarEnsayos() {
-    try {
-      const resp = await this.authService.getEnsayosDeudores();
-      if (resp?.esExitoso) {
-        this.ensayosDeudores = resp.datos.map((e: any) => ({
-          cedula: e.cedula || '',
-          nombreCompleto: e.nombreCompleto || 'Sin nombre',
-          totalAbonado: e.totalAbonado ?? 0,
-          totalAPagar: e.totalAPagar ?? 0,
-          saldoPendiente: e.saldoPendiente ?? 0,
-          idPrueba: e.idEnsayo || 0,
-          expandido: false,
-          subensayos: (e.ensayos || []).map((s: any) => ({
-            nombreSubEnsayo: s.nombreCatalogo || 'No especificado',
-            saldoSub: e.saldoPendiente
-          }))
-        }));
-      }
-    } catch (error) {
-      console.error('Error al cargar ensayos:', error);
+  seleccionarCliente(cliente: any) {
+
+    const nombre = cliente.cl_nombre || cliente.nombre;
+    const apellido = cliente.cl_apellido || cliente.apellido;
+    const cedula = cliente.cl_cedula || cliente.cedula;
+
+    this.filtroClienteBusqueda = `${cedula} - ${nombre} ${apellido}`.toUpperCase();
+    this.ensayoForm.ensayo.idCliente = cliente.cl_id || cliente.idCliente;
+    this.showResults = false;
+  }
+
+  // =========================
+  async cargarCatalogoPadres() {
+
+    const resp = await this.authService.getCatalogoEnsayosPorPadre(0);
+
+    console.log('RESP PADRES:', resp);
+
+    if (resp?.esExitoso && resp?.datos?.datos) {
+
+      this.catalogoPadres = resp.datos.datos;
+
+    } else {
+      this.catalogoPadres = [];
     }
   }
 
-  async cargarClientes() {
-    try {
-      const resp = await this.authService.getClientes();
-      if (resp?.esExitoso) {
-        this.clientes = resp.datos.filter(
-          (c: any) => c.cl_estado == 1 || c.estado == 1
-        );
-      }
-    } catch (error) {
-      console.error('Error al cargar clientes:', error);
+  async onPadreChange() {
+
+  this.catalogoHijos = [];
+  this.nuevoEnsayoTmp.idCatalogo = 0;
+
+  if (!this.idPadreSeleccionado) return;
+
+  const resp = await this.authService.getCatalogoEnsayosPorPadre(this.idPadreSeleccionado);
+
+  console.log('RESP HIJOS:', resp);
+
+  if (resp?.esExitoso && resp?.datos?.datos) {
+
+    this.catalogoHijos = resp.datos.datos;
+
+  }
+}
+
+  onEnsayoHijoChange() {
+    const sel = this.catalogoHijos.find(h => (h.id || h.ct_id) == this.nuevoEnsayoTmp.idCatalogo);
+    if (sel) {
+      this.nuevoEnsayoTmp.nombre = (sel.nombre || sel.ct_nombre).toUpperCase();
     }
   }
 
-  async cargarCatalogo() {
-    try {
-      const resp = await this.authService.getCatalogoEnsayos();
-      if (resp?.esExitoso) {
-        this.catalogoEnsayos = resp.datos.map((cat: any) => ({
-          ...cat,
-          nombre: cat.ct_nombre || cat.nombre,
-          idCatalogo: cat.ct_id || cat.idCatalogo
-        }));
-      }
-    } catch (error) {
-      console.error('Error al cargar catálogo:', error);
-    }
+  // =========================
+  toggleEnsayo(ensayo: any) {
+    ensayo.expandido = !ensayo.expandido;
+  }
+
+  openModal() {
+    this.resetForm();
+    this.showFormModal = true;
   }
 
   openAbonoModal(ensayo: any) {
@@ -126,39 +228,44 @@ export class EnsayosComponent implements OnInit {
     this.showAbonoModal = true;
   }
 
-  async guardarNuevoAbono() {
-    if (!this.selectedEnsayoForAbono || !this.nuevoAbonoMonto) return;
+  closeModals() {
+    this.showFormModal = false;
+    this.showSelectionModal = false;
+    this.showAbonoModal = false;
+    this.resetForm();
+  }
 
-    const payload = {
-      idEnsayo: this.selectedEnsayoForAbono.idPrueba,
-      monto: this.nuevoAbonoMonto,
-      usuario: JSON.parse(localStorage.getItem('usuarioLogueado') || '{}').usuario || 'admin'
-    };
+  resetForm() {
+    this.listaEnsayosTmp = [];
+    this.fechaEntrega = '';
+    this.filtroClienteBusqueda = '';
+    this.ensayoForm = { ensayo: { idCliente: 0, descripcion: '' }, abono: null };
+    this.nuevoEnsayoTmp = { nombre: '', monto: null, numero: null, idCatalogo: 0 };
+    this.idPadreSeleccionado = 0;
+    this.catalogoHijos = [];
+  }
 
-    try {
-      const resp = await this.authService.insertarAbono(payload);
-      if (resp?.esExitoso) {
-        this.closeModals();
-        await this.cargarEnsayos();
-      }
-    } catch (error) {
-      console.error('Error al registrar abono:', error);
+  confirmarAgregarEnsayo() {
+
+    if (this.nuevoEnsayoTmp.idCatalogo > 0 && this.nuevoEnsayoTmp.monto > 0) {
+
+      this.listaEnsayosTmp.push({ ...this.nuevoEnsayoTmp });
+
+      this.nuevoEnsayoTmp = { nombre: '', monto: null, numero: null, idCatalogo: 0 };
+      this.idPadreSeleccionado = 0;
+      this.catalogoHijos = [];
+
+      this.showSelectionModal = false;
     }
   }
 
-  onClienteSearchChange() {
-    const encontrado = this.clientes.find(c => {
-      const etiqueta = `${c.cedula || c.cl_cedula} - ${c.nombre || c.cl_nombre} ${c.apellido || c.cl_apellido}`;
-      return etiqueta.trim() === this.filtroClienteBusqueda.trim();
-    });
-
-    this.ensayoForm.ensayo.idCliente = encontrado ? (encontrado.cl_id || encontrado.idCliente) : 0;
-  }
-
   async guardarEnsayo() {
+
+    if (!this.formularioValido()) return;
+
     const payload = {
       idCliente: this.ensayoForm.ensayo.idCliente,
-      descripcion: this.ensayoForm.ensayo.descripcion,
+      descripcion: (this.ensayoForm.ensayo.descripcion || '').toUpperCase(),
       abono: this.ensayoForm.abono || 0,
       fechaEntrega: this.fechaEntrega ? new Date(this.fechaEntrega).toISOString() : null,
       ensayos: this.listaEnsayosTmp.map(e => ({
@@ -168,38 +275,29 @@ export class EnsayosComponent implements OnInit {
       }))
     };
 
-    try {
-      const resp = await this.authService.insertarEnsayo(payload);
-      if (resp?.esExitoso) {
-        this.closeModals();
-        await this.cargarEnsayos();
-      }
-    } catch (error) {
-      console.error('Error al guardar ensayo:', error);
+    const resp = await this.authService.insertarEnsayo(payload);
+    if (resp?.esExitoso) {
+      this.closeModals();
+      await this.cargarEnsayos();
     }
   }
 
-  openModal() { this.resetForm(); this.showFormModal = true; }
-  closeModals() { this.showFormModal = false; this.showSelectionModal = false; this.showAbonoModal = false; }
-  toggleEnsayo(ensayo: any) { ensayo.expandido = !ensayo.expandido; }
+  async guardarNuevoAbono() {
 
-  onEnsayoChange() {
-    const sel = this.catalogoEnsayos.find(c => c.nombre === this.nuevoEnsayoTmp.nombre);
-    if (sel) this.nuevoEnsayoTmp.idCatalogo = sel.idCatalogo;
-  }
+    if (!this.selectedEnsayoForAbono || !this.nuevoAbonoMonto) return;
 
-  confirmarAgregarEnsayo() {
-    if (this.nuevoEnsayoTmp.nombre && this.nuevoEnsayoTmp.monto > 0) {
-      this.listaEnsayosTmp.push({ ...this.nuevoEnsayoTmp });
-      this.showSelectionModal = false;
+    const payload = {
+      idEnsayo: this.selectedEnsayoForAbono.idPrueba,
+      monto: this.nuevoAbonoMonto,
+      usuario: JSON.parse(localStorage.getItem('usuarioLogueado') || '{}').usuario || 'SISTEMA'
+    };
+
+    const resp = await this.authService.insertarAbono(payload);
+
+    if (resp?.esExitoso) {
+      this.closeModals();
+      await this.cargarEnsayos();
     }
-  }
-
-  resetForm() {
-    this.listaEnsayosTmp = [];
-    this.fechaEntrega = '';
-    this.filtroClienteBusqueda = '';
-    this.ensayoForm = { ensayo: { idCliente: 0, descripcion: '' }, abono: null };
   }
 
   establecerFechaMinima() {
@@ -211,12 +309,11 @@ export class EnsayosComponent implements OnInit {
   }
 
   formularioValido() {
-    return this.ensayoForm.ensayo.idCliente > 0 && this.fechaEntrega !== '' && this.listaEnsayosTmp.length > 0;
+    return this.ensayoForm.ensayo.idCliente > 0 &&
+           this.fechaEntrega !== '' &&
+           this.listaEnsayosTmp.length > 0;
   }
 
-  // ==========================================
-  // BLOQUEO DE NUMEROS NEGATIVOS
-  // ==========================================
   soloNumeros(event: KeyboardEvent) {
     const char = String.fromCharCode(event.charCode);
     if (!/[0-9.]/.test(char)) event.preventDefault();
@@ -224,7 +321,6 @@ export class EnsayosComponent implements OnInit {
 
   evitarPegadoNegativo(event: ClipboardEvent) {
     const clipboardData = event.clipboardData?.getData('text');
-    if (!clipboardData) return;
-    if (/[^0-9.]/.test(clipboardData)) event.preventDefault();
+    if (!clipboardData || /[^0-9.]/.test(clipboardData)) event.preventDefault();
   }
 }

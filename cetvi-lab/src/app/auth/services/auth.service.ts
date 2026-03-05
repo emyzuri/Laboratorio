@@ -118,6 +118,9 @@ export class AuthService {
       )
     );
   }
+  getCatalogoEnsayosPorPadre(idPadre: number) {
+    return this.http.get<any>(`${this.URL_BASE}/Ensayo/Catalogo/${idPadre}`).toPromise();
+  }
 
   async getEnsayosDeudores(): Promise<any> {
   return await firstValueFrom(
@@ -165,6 +168,12 @@ export class AuthService {
         `${this.URL_BASE}/Ensayo/Deudores`,
         { headers: this.obtenerHeaders() }
       )
+    );
+  }
+  async getEnsayosPorCedula(cedula: string, fechaInicio: string, fechaFin: string): Promise<any> {
+    const url = `${this.URL_BASE}/Ensayo/ConsultarPorCedula?cedula=${cedula}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+    return await firstValueFrom(
+      this.http.get<any>(url, { headers: this.obtenerHeaders() })
     );
   }
   // ==============================
@@ -236,4 +245,13 @@ export class AuthService {
       )
     );
   }
+  async generarReporteEnsayos(fechaInicio: string, fechaFin: string): Promise<Blob> {
+  const url = `${this.URL_BASE}/Ensayo/ReportePorFecha?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+  return await firstValueFrom(
+    this.http.get(url, {
+      headers: this.obtenerHeaders(),
+      responseType: 'blob' // Es vital para manejar archivos binarios
+    })
+  );
+}
 }
