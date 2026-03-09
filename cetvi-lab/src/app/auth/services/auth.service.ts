@@ -123,11 +123,34 @@ export class AuthService {
   }
 
   async getEnsayosDeudores(): Promise<any> {
+    return await firstValueFrom(
+      this.http.get<any>(
+        `${this.URL_BASE}/Ensayo/Deudores`,
+        { headers: this.obtenerHeaders() }
+      )
+    );
+  }
+  async getEnsayosPorRangoFechas(fechaInicio: string, fechaFin: string): Promise<any> {
+    const url = `${this.URL_BASE}/Ensayo/EnsayoFecha?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+
+    try {
+      return await firstValueFrom(
+        this.http.get<any>(url, { headers: this.obtenerHeaders() })
+      );
+    } catch (error) {
+      console.error('Error al obtener ensayos por rango de fechas:', error);
+      return { esExitoso: false, datos: [] };
+    }
+  }
+  // auth.service.ts
+async generarReportePorCliente(cedula: string, fechaInicio: string, fechaFin: string): Promise<Blob> {
+  const url = `${this.URL_BASE}/Ensayo/ReportePorCliente?cedula=${cedula}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+
   return await firstValueFrom(
-    this.http.get<any>(
-      `${this.URL_BASE}/Ensayo/Deudores`,
-      { headers: this.obtenerHeaders() }
-    )
+    this.http.get(url, {
+      headers: this.obtenerHeaders(), // Aquí ya se incluye el IdSesion obligatoriamente
+      responseType: 'blob'
+    })
   );
 }
 

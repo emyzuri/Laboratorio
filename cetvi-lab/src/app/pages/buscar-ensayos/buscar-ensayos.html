@@ -1,33 +1,34 @@
 <div class="main__container">
-  <div class="container">
+  <div class="container shadow-box">
+
     <div class="header-actions">
       <div class="search-box-rango">
         <div class="date-field">
           <label>Desde:</label>
-          <input type="date" [(ngModel)]="fechaInicio" (change)="buscarEnsayos()" class="form-input">
+          <input type="date" [(ngModel)]="fechaInicio" class="form-input">
         </div>
         <div class="date-field">
           <label>Hasta:</label>
-          <input type="date" [(ngModel)]="fechaFin" (change)="buscarEnsayos()" class="form-input">
+          <input type="date" [(ngModel)]="fechaFin" class="form-input">
         </div>
+
+        <button class="btn-report-gold" (click)="buscar()" [disabled]="!fechaInicio || !fechaFin">
+          BUSCAR <span class="material-symbols-outlined">search</span>
+        </button>
 
         <button class="btn-report-gold" (click)="verReporte()" [disabled]="listaResultadosFiltrados.length === 0">
           Generar Informe <span class="material-symbols-outlined">picture_as_pdf</span>
         </button>
       </div>
 
-      <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text" placeholder="Buscar por Nombre" [(ngModel)]="filtroNombre" class="form-input">
-      </div>
     </div>
 
-    <div class="table-card shadow-box">
+    <div class="table-card">
       <table class="table-custom">
         <thead class="bg-gold-header">
           <tr>
             <th>Cliente / Cédula</th>
-            <th>Ensayos</th>
+            <th>Ensayos Detallados</th>
             <th>Abono Total</th>
             <th>Total General</th>
             <th class="text-center">Saldo</th>
@@ -38,14 +39,20 @@
           <tr *ngFor="let item of listaResultadosFiltrados">
             <td>
               <div class="user-cell">
-                <span class="user-name" style="text-transform: uppercase;">{{ item.nombreCompleto }}</span>
+                <span class="user-name" style="text-transform: uppercase; font-weight: bold;">
+                  {{ item.nombreCompleto }}
+                </span>
                 <span class="user-id">{{ item.cedula }}</span>
               </div>
             </td>
             <td>
-              <div *ngFor="let ensayo of item.ensayos" style="font-size: 0.85rem;">• {{ ensayo.nombreCatalogo }}</div>
+              <div *ngFor="let ensayo of item.ensayos" class="ensayo-item">
+                • {{ ensayo.nombreCatalogo }}
+              </div>
             </td>
-            <td class="text-success" style="font-weight: 600;">$ {{ item.totalAbonado | number:'1.2-2' }}</td>
+            <td class="text-success" style="font-weight: 600;">
+              $ {{ item.totalAbonado | number:'1.2-2' }}
+            </td>
             <td>$ {{ item.totalAPagar | number:'1.2-2' }}</td>
             <td class="text-center">
               <span [class.text-danger]="item.saldoPendiente > 0"
@@ -61,7 +68,7 @@
             <td colspan="6" class="no-results-row">
               <div class="no-results-content">
                 <span class="material-symbols-outlined">event_busy</span>
-                <p>No se encontraron ensayos para los filtros aplicados</p>
+                <p>No se encontraron ensayos para el rango de fechas o nombre indicado.</p>
               </div>
             </td>
           </tr>
@@ -72,8 +79,7 @@
 </div>
 
 <div class="pdf-viewer-overlay" *ngIf="showPdfModal" (click)="cerrarModal()">
-
-  <div class="pdf-viewer-window shadow-box" (click)="$event.stopPropagation()">
+  <div class="pdf-viewer-window" (click)="$event.stopPropagation()">
 
     <button class="pdf-minimal-close" (click)="cerrarModal()" title="Cerrar vista previa">
       <span class="material-symbols-outlined">close</span>

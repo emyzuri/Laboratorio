@@ -68,16 +68,12 @@ export class EnsayosComponent implements OnInit {
     await this.cargarCatalogoPadres();
   }
 
-  // =========================
-  // CARGAR ENSAYOS
-  // =========================
   async cargarEnsayos() {
   try {
     const resp = await this.authService.getEnsayosDeudores();
 
     if (resp?.esExitoso && Array.isArray(resp.datos)) {
 
-      // FILTRO CRÍTICO: Solo mostramos si el saldo es mayor a 0
       const soloDeudores = resp.datos.filter((e: any) => Number(e.saldoPendiente ?? 0) > 0);
 
       this.ensayosOriginal = soloDeudores.map((e: any) => ({

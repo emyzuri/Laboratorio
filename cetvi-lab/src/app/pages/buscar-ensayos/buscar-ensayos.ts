@@ -21,6 +21,7 @@ export class BuscarEnsayosComponent implements OnInit {
   filtroNombre: string = '';
 
   // Datos para la tabla
+  // Cambiamos el nombre o agregamos la referencia para que coincida con tu HTML
   originalResultados: any[] = [];
   busquedaRealizada: boolean = false;
 
@@ -30,12 +31,10 @@ export class BuscarEnsayosComponent implements OnInit {
   pdfBlob: Blob | null = null;
 
   ngOnInit(): void {
-    // Se puede inicializar con la fecha de hoy si se requiere
+    // Inicialización opcional
   }
 
-  /**
-   * Getter para filtrar la lista cargada por nombre o cédula en tiempo real
-   */
+  // Getter para el filtrado en tiempo real por nombre/cédula
   get listaResultadosFiltrados() {
     const bus = this.filtroNombre.toLowerCase().trim();
     if (!bus) return this.originalResultados;
@@ -47,78 +46,64 @@ export class BuscarEnsayosComponent implements OnInit {
   }
 
   /**
-   * Carga los ensayos desde el servicio y aplica el filtro de fechas.
-   * IMPORTANTE: No filtra por saldo para que asomen todos los registros (incluso saldo $0).
+   * Método unificado para buscar.
+   * Usa originalResultados para que el getter 'listaResultadosFiltrados' funcione.
    */
-  async buscarEnsayos() {
-  if (!this.fechaInicio || !this.fechaFin) return;
+  async buscar() {
+    if (!this.fechaInicio || !this.fechaFin) return;
 
-  try {
-    this.busquedaRealizada = true;
-    const resp = await this.authService.getEnsayosDeudores();
+    try {
+      this.busquedaRealizada = true;
+      // Llamada al servicio con el nuevo endpoint por rango
+      const resp = await this.authService.getEnsayosPorRangoFechas(this.fechaInicio, this.fechaFin);
 
-    if (resp?.esExitoso && resp.datos) {
-      // Creamos las fechas de rango y normalizamos a las 00:00:00
-      const start = new Date(this.fechaInicio + 'T00:00:00');
-      const end = new Date(this.fechaFin + 'T23:59:59');
-
-      this.originalResultados = resp.datos.filter((e: any) => {
-        if (!e.fechaRegistro) return false;
-
-        // Convertimos la fecha del backend (que viene con T00:00:00) a objeto Date
-        const fechaReg = new Date(e.fechaRegistro);
-
-        // Comparamos los tiempos para evitar errores de zona horaria
-        return fechaReg.getTime() >= start.getTime() && fechaReg.getTime() <= end.getTime();
-      });
+      if (resp?.esExitoso && Array.isArray(resp.datos)) {
+        // Mapeamos y normalizamos los datos
+        this.originalResultados = resp.datos.map((e: any) => ({
+          ...e,
+          nombreCompleto: (e.nombreCompleto || '').toUpperCase(),
+          totalAbonado: Number(e.totalAbonado ?? 0),
+          totalAPagar: Number(e.totalAPagar ?? 0),
+          saldoPendiente: Number(e.saldoPendiente ?? 0),
+          fechaRegistro: e.fechaRegistro
+        }));
+      } else {
+        this.originalResultados = [];
+      }
+    } catch (error) {
+      console.error('Error en búsqueda:', error);
+      this.originalResultados = [];
     }
-  } catch (error) {
-    console.error('Error al filtrar:', error);
-    this.originalResultados = [];
   }
-}
 
   // --- LÓGICA DEL MODAL DE REPORTE ---
 
-  /**
-   * Solicita el archivo PDF al backend y genera la URL segura para el iframe
-   */
   async verReporte() {
     if (!this.fechaInicio || !this.fechaFin) return;
 
     try {
-      // Obtiene el Blob del reporte diseñado para LABORATORIO CETVI
       this.pdfBlob = await this.authService.generarReporteEnsayos(this.fechaInicio, this.fechaFin);
 
       if (this.pdfBlob) {
         const unsafeUrl = URL.createObjectURL(this.pdfBlob);
         this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(unsafeUrl);
-        this.showPdfModal = true; // Activa el modal overlay
+        this.showPdfModal = true;
       }
     } catch (error) {
       console.error('Error al generar el informe PDF:', error);
     }
   }
 
-  /**
-   * Permite la descarga directa del archivo PDF generado
-   */
-  descargarPdf() {
-    if (!this.pdfBlob) return;
-    const url = window.URL.createObjectURL(this.pdfBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Reporte_Ensayos_CETVI_${this.fechaInicio}_${this.fechaFin}.pdf`;
-    link.click();
-    window.URL.revokeObjectURL(url);
-  }
-
-  /**
-   * Cierra el modal y limpia la URL del PDF para liberar recursos
-   */
   cerrarModal() {
     this.showPdfModal = false;
     this.pdfUrl = null;
-    // Opcionalmente liberar el Blob si no se descargó
+  }
+
+  // Función para validar entrada de solo números (Cédula)
+  soloNumeros(event: KeyboardEvent) {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.preventDefault();
+    }
   }
 }

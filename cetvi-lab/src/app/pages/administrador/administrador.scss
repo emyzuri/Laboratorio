@@ -99,6 +99,8 @@ $light-bg:     #f0f2f5;
 }
 
 /* ===================== 6. BOTONES ===================== */
+/* ... Variables y estilos previos ... */
+
 .new__customer, button.primary {
   @include flex-center;
   gap: 8px;
@@ -111,10 +113,29 @@ $light-bg:     #f0f2f5;
   cursor: pointer;
   @include transition;
 
+  // ESTADO DESHABILITADO
+  &:disabled {
+    background-color: #E2E8F0 !important;
+    border-color: #CBD5E1 !important;
+    color: #94A3B8 !important;
+    cursor: not-allowed !important; // Círculo de prohibido
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba($gold-primary, 0.4);
     background-color: $gold-hover;
+  }
+}
+
+/* Estilo para input inválido */
+input.is-invalid {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2;
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
   }
 }
 
