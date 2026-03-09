@@ -21,6 +21,10 @@
           loadChildren: () => import('./pages/buscar-ensayos/buscar-ensayos-module').then(m => m.BuscarEnsayosModule)
         },
         {
+          path: 'ensayo-cedula', // NUEVA RUTA
+          loadComponent: () => import('./pages/ensayo-cedula/ensayo-cedula').then(m => m.EnsayoCedulaComponent)
+        },
+        {
           path: 'clientes',
           loadChildren: () => import('./pages/pantalla-inicial/pantalla-inicial-module').then(m => m.PantallaInicialRoutingModule)
         },

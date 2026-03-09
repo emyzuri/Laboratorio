@@ -1,0 +1,307 @@
+/* Variables Institucionales CETVI */
+$gold-primary: #F4D77A;
+$gold-soft: #FFF7E0;
+$gold-border: #F1D27A;
+$dark-grey: #1F2937;
+$light-bg: #F4F6F8;
+$white: #FFFFFF;
+$danger-soft-bg: #FDECEC;
+$danger-soft-text: #B42318;
+$success-soft-bg: #ECFDF3;
+$success-soft-text: #027A48;
+
+/* Contenedor Principal */
+.main__container {
+  padding: 30px;
+  background-color: $light-bg;
+  min-height: 100vh;
+  min-height: calc(100vh - 120px);
+  box-shadow: 0 0 16px 6px #ccc;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Cabecera de Acciones y Búsqueda */
+.header-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.search-box-rango {
+        display: flex;
+        gap: 15px;
+        background: white;
+        padding: 6px 15px; // Padding reducido para hacerlo más fino
+        border-radius: 8px; // Bordes un poco más rectos para look profesional
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        //border: 1px solid $border-color;
+        align-items: center;
+        overflow: hidden;
+
+        .date-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            label {
+                font-weight: 600;
+                //color: $text-dark;
+                font-size: 0.8rem; // Fuente más pequeña
+                text-transform: uppercase;
+            }
+
+            .form-input {
+                border: 1px solid #e2e8f0;
+                border-radius: 4px;
+                padding: 4px 8px; // Input de fecha más pequeño
+                font-size: 0.85rem;
+                outline: none;
+                width: 130px; // Ancho controlado
+
+                &:focus {
+                    border-color: $gold-primary;
+                }
+            }
+        }
+    }
+
+/* Botón Estilo Gold */
+.btn-report-gold {
+  background-color: $gold-primary;
+  color: $dark-grey;
+  border: none;
+  padding: 11px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  min-width: none;
+  transition: transform 0.2s, background 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: darken($gold-primary, 5%);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background-color: #E2E8F0;
+    color: #94A3B8;
+    cursor: not-allowed;
+  }
+
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
+/* Tabla de Resultados */
+.table-card {
+  background: $white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  margin-top: 10px;
+}
+
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+
+  .bg-gold-header {
+    background-color: $gold-soft;
+    th {
+      padding: 18px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #475569;
+      text-align: left;
+      border-bottom: 1px solid $gold-border;
+    }
+  }
+
+  td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #EAECEF;
+    font-size: 0.92rem;
+    color: #334155;
+    vertical-align: middle;
+  }
+
+  tr:hover {
+    background-color: #F9FAFB;
+  }
+}
+
+/* Estilos de Texto y Estados */
+.text-success {
+  color: $success-soft-text;
+  font-weight: 600;
+}
+
+.text-danger {
+  color: $danger-soft-text;
+}
+
+.no-results-row {
+  .no-results-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    .material-symbols-outlined {
+      font-size: 48px;
+      color: #CBD5E1;
+    }
+
+    p {
+      color: #64748B;
+      font-weight: 500;
+    }
+  }
+}
+
+/* Ajuste para los sub-ensayos detallados */
+.ensayo-item {
+  display: block;
+  font-size: 0.85rem;
+  color: #475569;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+.btn-report-gold {
+  // Disposición y Alineación
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  // Dimensiones y Espaciado
+  padding: 10px 20px;
+  height: 42px;
+
+  // Colores Institucionales
+  background-color: #F4D77A; // Dorado CETVI
+  color: #1e293b; // Texto oscuro para contraste profesional
+
+  // Bordes y Tipografía
+  border: 1px solid darken(#F4D77A, 5%);
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  // Interactividad
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  // Icono PDF
+  span {
+    font-size: 22px;
+  }
+
+  // Estado Hover (Al pasar el mouse)
+  &:hover:not(:disabled) {
+    background-color: darken(#F4D77A, 8%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  // Estado Active (Al hacer clic)
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  // Estado Deshabilitado (Cuando la tabla está vacía)
+  &:disabled {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+
+    span {
+      color: #94a3b8;
+    }
+  }
+}
+/* --- ESTILOS DEL MODAL PDF CETVI --- */
+.pdf-viewer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(31, 41, 55, 0.85); // Azul grisáceo oscuro con transparencia
+  backdrop-filter: blur(5px); // Efecto desenfoque profesional
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  padding: 20px;
+}
+
+/* Cambia o actualiza estas clases en tu archivo SCSS */
+.pdf-viewer-window {
+  background: white;
+  width: 95%; // Un poco más ancho para mejor visibilidad
+  height: 90%;
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #334155;
+}
+
+.pdf-minimal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: #ffffff; // Fondo blanco según la imagen
+  color: #1e293b;      // Ícono oscuro
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;  // Circular
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2); // Sombra suave para que resalte
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f1f5f9;
+    transform: scale(1.05);
+  }
+
+  span {
+    font-size: 22px;
+    font-weight: 300; // Ícono más fino
+  }
+}
+
+.pdf-frame-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: #525659; // Color de fondo clásico de visores PDF
+
+  iframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+}

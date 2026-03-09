@@ -1,0 +1,72 @@
+<div class="main__container">
+  <div class="container">
+    <div class="header-actions">
+      <div class="search-box-rango">
+        <div class="date-field">
+          <label>Cédula:</label>
+          <input type="text" [(ngModel)]="cedula" placeholder="060..." class="form-input" (keypress)="soloNumeros($event)">
+        </div>
+        <div class="date-field">
+          <label>Desde:</label>
+          <input type="date" [(ngModel)]="fechaInicio" class="form-input">
+        </div>
+        <div class="date-field">
+          <label>Hasta:</label>
+          <input type="date" [(ngModel)]="fechaFin" class="form-input">
+        </div>
+
+        <button class="btn-report-gold" (click)="buscar()" [disabled]="!cedula || !fechaInicio || !fechaFin">
+          BUSCAR <span class="material-symbols-outlined">search</span>
+        </button>
+
+        <button class="btn-report-gold" (click)="verReporte()" [disabled]="resultados.length === 0">
+          Generar Informe <span class="material-symbols-outlined">picture_as_pdf</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-card shadow-box">
+      <table class="table-custom">
+        <thead class="bg-gold-header">
+          <tr>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Ensayo Detallado</th>
+            <th>Total</th>
+            <th>Abono</th>
+            <th>Saldo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of resultados">
+            <td>{{ item.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+            <td style="text-transform: uppercase;"><strong>{{ item.nombreCompleto }}</strong></td>
+            <td>
+              <div *ngFor="let sub of item.ensayos" class="ensayo-item">• {{ sub.nombreCatalogo }}</div>
+            </td>
+            <td>$ {{ item.totalAPagar | number:'1.2-2' }}</td>
+            <td class="text-success">$ {{ item.totalAbonado | number:'1.2-2' }}</td>
+            <td><strong>$ {{ item.saldoPendiente | number:'1.2-2' }}</strong></td>
+          </tr>
+
+          <tr *ngIf="busquedaRealizada && resultados.length === 0">
+            <td colspan="6" class="text-center" style="padding: 40px;">
+              No se encontraron registros para el cliente seleccionado.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="pdf-viewer-overlay" *ngIf="showPdfModal" (click)="cerrarModal()">
+  <div class="pdf-viewer-window" (click)="$event.stopPropagation()">
+    <button class="pdf-minimal-close" (click)="cerrarModal()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="pdf-frame-container">
+      <iframe *ngIf="pdfUrl" [src]="pdfUrl"></iframe>
+    </div>
+  </div>
+</div>

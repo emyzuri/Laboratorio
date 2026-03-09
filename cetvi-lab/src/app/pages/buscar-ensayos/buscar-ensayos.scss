@@ -29,46 +29,107 @@ $success: #28a745;
 
 // SECCIÓN DE FILTROS (RANGO DE FECHAS)
 .header-actions {
-    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; // Cambiado a center para evitar estiramientos innecesarios
+    margin-bottom: 20px;
+    width: 100%;
+    gap: 15px;
 
+    // Bloque de Fechas más fino
     .search-box-rango {
         display: flex;
-        gap: 20px;
+        gap: 15px;
         background: white;
-        padding: 15px 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        padding: 6px 15px; // Padding reducido para hacerlo más fino
+        border-radius: 8px; // Bordes un poco más rectos para look profesional
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         border: 1px solid $border-color;
-        width: fit-content;
+        align-items: center;
 
         .date-field {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
 
             label {
                 font-weight: 600;
                 color: $text-dark;
-                font-size: 0.9rem;
+                font-size: 0.8rem; // Fuente más pequeña
+                text-transform: uppercase;
             }
-        }
 
-        .form-input {
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            padding: 8px 12px;
-            outline: none;
-            transition: all 0.3s ease;
-            font-family: inherit;
+            .form-input {
+                border: 1px solid #e2e8f0;
+                border-radius: 4px;
+                padding: 4px 8px; // Input de fecha más pequeño
+                font-size: 0.85rem;
+                outline: none;
+                width: 130px; // Ancho controlado
 
-            &:focus {
-                border-color: $gold-primary;
-                box-shadow: 0 0 0 3px rgba($gold-primary, 0.1);
+                &:focus {
+                    border-color: $gold-primary;
+                }
             }
         }
     }
-}
 
+    // Bloque del Buscador más pequeño
+    .search-box {
+        background: white;
+        border-radius: 8px;
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        border: 1px solid $border-color;
+        width: 100%;
+        max-width: 260px; // Más angosto para que no domine la pantalla
+        height: 45px;     // Altura fija reducida para que sea fino
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+
+        .search-icon {
+            color: #94a3b8;
+            margin-right: 6px;
+            font-size: 18px; // Icono más pequeño
+        }
+
+        .form-input {
+            border: none;
+            padding: 0;
+            width: 100%;
+            outline: none;
+            background: transparent;
+            font-size: 0.90rem; // Fuente más pequeña
+
+            &::placeholder {
+                color: #cbd5e1;
+            }
+        }
+
+        &:focus-within {
+            border-color: $gold-primary;
+            box-shadow: 0 0 0 2px rgba(241, 210, 122, 0.15);
+        }
+
+            &:disabled {
+              background-color: #e2e8f0;
+              border-color: #cbd5e1;
+              color: #94a3b8;
+              cursor: not-allowed;
+              box-shadow: none;
+              transform: none;
+
+              span {
+                color: #94a3b8;
+              }
+            }
+
+
+
+
+    }
+}
 // TARJETA DE TABLA
 .table-card {
     background: white;
@@ -168,3 +229,227 @@ $success: #28a745;
 .text-danger { color: $danger !important; }
 .text-success { color: $success !important; }
 .text-center { text-align: center !important; }
+
+.search-box {
+    // Eliminamos flex: 1 para que no intente ocupar todo el espacio
+    width: 100%;
+    max-width: 350px;
+    background: white;
+    border-radius: 8px;
+    padding: 2px 15px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease; // Suaviza los cambios de borde y sombra
+
+    .search-icon {
+        color: #94a3b8;
+        margin-right: 8px;
+        font-size: 20px;
+    }
+
+    .form-input {
+        border: none;
+        padding: 10px;
+        width: 100%;
+        outline: none;
+        font-size: 0.95rem;
+        background: transparent;
+    }
+
+    /* Hover sutil */
+    &:hover {
+        border-color: #D1D5DB;
+    }
+
+    /* Focus con el color dorado del proyecto */
+    &:focus-within {
+        border-color: $gold-primary;
+        box-shadow: 0 0 0 3px rgba(241, 210, 122, 0.25);
+    }
+}
+.modal-overlay-pdf {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8); // Fondo más oscuro para resaltar el blanco
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.modal-content-pdf {
+  background: white;
+  width: 95%;
+  height: 95vh;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.floating-pdf-actions {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  display: flex;
+  gap: 10px;
+  z-index: 10; // Asegura que estén por encima del iframe
+}
+
+.btn-action-pdf {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  &.download {
+    color: #1e293b;
+    &:hover { background: #f8fafc; }
+  }
+
+  &.close {
+    padding: 8px; // Solo icono para cerrar
+    color: #ef4444;
+    &:hover { background: #fee2e2; border-color: #fecaca; }
+  }
+
+  span { font-size: 20px; }
+}
+
+.pdf-viewer-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(15, 23, 42, 0.9); // Fondo oscuro institucional
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.pdf-viewer-window {
+  background: white;
+  width: 90%;
+  height: 92vh;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-minimal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  // Estilo exacto del botón circular del modal
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151; // Gris oscuro profesional
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+
+  &:hover {
+    background: #f3f4f6;
+    color: #ef4444; // Rojo sutil para cerrar
+    transform: scale(1.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  span {
+    font-size: 20px; // Tamaño de icono balanceado
+    font-weight: 500;
+  }
+}
+
+.pdf-frame-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+.btn-report-gold {
+  // Disposición y Alineación
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  // Dimensiones y Espaciado
+  padding: 10px 20px;
+  min-width: 180px;
+  height: 42px;
+
+  // Colores Institucionales
+  background-color: #F4D77A; // Dorado CETVI
+  color: #1e293b; // Texto oscuro para contraste profesional
+
+  // Bordes y Tipografía
+  border: 1px solid darken(#F4D77A, 5%);
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  // Interactividad
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  // Icono PDF
+  span {
+    font-size: 22px;
+  }
+
+  // Estado Hover (Al pasar el mouse)
+  &:hover:not(:disabled) {
+    background-color: darken(#F4D77A, 8%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  // Estado Active (Al hacer clic)
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  // Estado Deshabilitado (Cuando la tabla está vacía)
+  &:disabled {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+
+    span {
+      color: #94a3b8;
+    }
+  }
+}

@@ -2,23 +2,18 @@
 $gold-primary: #F4D77A;
 $gold-hover:   #e6c86a;
 $gold-soft:    #FFF7E0;
-$gold-border:  #F1D27A; // Color Piel
+$gold-border:  #F1D27A; // Color Piel institucional
 $dark-grey:    #1F2937;
 $white:        #FFFFFF;
 $black:        #000000;
 $text-muted:   #64748b;
-$light-bg:     #f0f2f5; // Gris claro para que el blanco resalte
+$light-bg:     #f0f2f5;
 
 /* ===================== 2. MIXINS ===================== */
 @mixin transition { transition: all 0.3s ease; }
+@mixin flex-center { display: flex; align-items: center; justify-content: center; }
 
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ===================== 3. ESTRUCTURA Y ELEVACIÓN ===================== */
+/* ===================== 3. ESTRUCTURA ===================== */
 .main__container {
   padding: 30px;
   background-color: #f4f7f6;
@@ -26,7 +21,6 @@ $light-bg:     #f0f2f5; // Gris claro para que el blanco resalte
   box-shadow: 0 0 16px 6px #ccc;
   .container { max-width: 1200px; margin: 0 auto; }
 }
-
 
 /* ===================== 4. CABECERA ===================== */
 .header-actions {
@@ -61,6 +55,7 @@ $light-bg:     #f0f2f5; // Gris claro para que el blanco resalte
   border: 1px solid #f0f0f0;
   border-radius: 10px;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 
   .table__clientes {
     width: 100%;
@@ -88,37 +83,45 @@ $light-bg:     #f0f2f5; // Gris claro para que el blanco resalte
     }
 
     tbody tr:hover { background-color: #f9fafb; }
-    tbody tr:last-child td { border-bottom: none; }
   }
 }
 
-/* ROLES EN TABLA: FONDO BLANCO Y LETRAS NEGRAS */
 .roles-container { display: flex; gap: 8px; flex-wrap: wrap; }
 .role-badge {
-  background-color: $white !important;
-  color: $black !important;
+  background-color: $white;
+  color: $black;
   border: 1.5px solid $gold-border;
   padding: 4px 16px;
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   display: inline-block;
 }
 
 /* ===================== 6. BOTONES ===================== */
+/* ... Variables y estilos previos ... */
 
-/* Nuevo Usuario (Amarillo) y Botón Primario de Modales */
 .new__customer, button.primary {
   @include flex-center;
   gap: 8px;
   background: $gold-primary;
-  border: 2px solid $gold-border;
+  border: 1px solid darken($gold-border, 10%);
   color: $dark-grey;
   padding: 10px 24px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
   @include transition;
+
+  // ESTADO DESHABILITADO
+  &:disabled {
+    background-color: #E2E8F0 !important;
+    border-color: #CBD5E1 !important;
+    color: #94A3B8 !important;
+    cursor: not-allowed !important; // Círculo de prohibido
+    transform: none !important;
+    box-shadow: none !important;
+  }
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -127,35 +130,34 @@ $light-bg:     #f0f2f5; // Gris claro para que el blanco resalte
   }
 }
 
-/* Acciones Circulares en Tabla */
+/* Estilo para input inválido */
+input.is-invalid {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2;
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+  }
+}
+
 .btn-icon-only {
   @include flex-center;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background-color: $white !important;
+  background-color: $white;
   border: 1.5px solid $gold-border;
-  color: $black !important;
+  color: $dark-grey;
   cursor: pointer;
   @include transition;
 
   &:hover {
-    background-color: $gold-soft !important;
+    background-color: $gold-soft;
     transform: scale(1.1);
+    color: $black;
   }
-  .material-symbols-outlined { font-size: 22px; }
-}
-
-button:disabled {
-  background: #eee !important;
-  color: #aaa !important;
-  cursor: not-allowed !important;
-  border-color: #ddd !important;
 }
 
 /* ===================== 7. MODALES ===================== */
-
-/* Overlay Global */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -165,15 +167,15 @@ button:disabled {
   backdrop-filter: blur(4px);
 }
 
-/* Modal Estándar (Nuevo Usuario) */
 .modal-content {
   background: $white;
   border-radius: 16px;
   width: 95%;
-  max-width: 650px;
+  max-width: 600px;
   border: 1.5px solid $gold-border;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  animation: modalIn 0.3s ease-out;
 
   .modal-header {
     background: $gold-soft;
@@ -186,8 +188,7 @@ button:disabled {
     h3 { margin: 0; font-size: 1.1rem; color: $dark-grey; font-weight: 700; }
     .close-btn {
       cursor: pointer;
-      color: $text-muted;
-      &:hover { color: #e74c3c; transform: scale(1.1); }
+      &:hover { color: #e74c3c; transform: rotate(90deg); @include transition; }
     }
   }
 
@@ -204,17 +205,16 @@ button:disabled {
     gap: 6px;
     label { font-size: 0.75rem; font-weight: 700; color: $text-muted; text-transform: uppercase; }
     input {
-      padding: 12px;
+      padding: 11px;
       border: 1px solid #d1d5db;
       border-radius: 8px;
       @include transition;
       &:focus { border-color: $gold-primary; outline: none; box-shadow: 0 0 0 3px rgba($gold-primary, 0.1); }
     }
-    small { color: #e74c3c; font-size: 0.7rem; margin-top: 4px; }
   }
 
   .modal-actions {
-    padding: 20px 24px;
+    padding: 15px 24px;
     background: #f8fafc;
     display: flex;
     justify-content: flex-end;
@@ -223,121 +223,69 @@ button:disabled {
   }
 }
 
+/* ===================== 8. MODAL COMPACTO (ROLES) ===================== */
+.selection-small {
+  max-width: 400px; // Tamaño ideal para gestión de roles
+
+  .modal-body {
+    padding: 20px 24px;
+    .user-info-text {
+      margin-bottom: 15px;
+      color: $text-muted;
+      strong { color: $dark-grey; }
+    }
+  }
+}
+
+.roles-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    background: #fdfdfd;
+    border: 1px solid #f1f1f1;
+    border-radius: 10px;
+    cursor: pointer;
+    @include transition;
+
+    &:hover {
+      background: $gold-soft;
+      border-color: $gold-primary;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: $gold-primary;
+      cursor: pointer;
+    }
+
+    span {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: $dark-grey;
+    }
+  }
+}
+
 .btn-cancel {
-  background: #e2e8f0;
+  background: #f1f5f9;
   color: $text-muted;
-  border: 1px solid #cbd5e1;
+  border: none;
   padding: 10px 22px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
   @include transition;
-  &:hover { background: #cbd5e1; color: $dark-grey; }
+  &:hover { background: #e2e8f0; color: $dark-grey; }
 }
 
-/* ===================== 8. MODAL COMPACTO (ROLES) ===================== */
-.role-modal-compact {
-  background: $white;
-  width: 90%;
-  max-width: 380px;
-  border-radius: 20px;
-  border: 1px solid $gold-border;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: modalIn 0.3s ease-out;
-
-  .modal-header {
-    width: 100%;
-    background: $gold-soft;
-    padding: 16px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .header-title {
-      display: flex; align-items: center; gap: 8px; color: $dark-grey;
-      .header-icon { font-size: 20px; color: darken($gold-border, 20%); }
-      h3 { margin: 0; font-size: 1rem; font-weight: 700; }
-    }
-    .close-btn {
-      cursor: pointer;
-      &:hover { color: #e74c3c; transform: rotate(90deg); }
-    }
-  }
-
-  .user-subtitle {
-    padding: 15px 0 5px 0;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: $text-muted;
-    text-align: center;
-  }
-
-  .modal-body-compact {
-    width: 100%;
-    padding: 20px 40px;
-    .checkbox-list { display: flex; flex-direction: column; gap: 12px; }
-    .checkbox-item {
-      background: #fdfdfd;
-      border: 1px solid #f1f1f1;
-      padding: 10px 15px;
-      border-radius: 12px;
-      @include transition;
-      &:hover { border-color: $gold-primary; background: $gold-soft; }
-    }
-  }
-
-  .modal-footer-centered {
-    width: 100%;
-    padding: 10px 40px 30px 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-
-    .primary-btn {
-      width: 100%;
-      background: $gold-primary;
-      border: none;
-      padding: 12px;
-      border-radius: 12px;
-      font-weight: 700;
-      color: $dark-grey;
-      @include flex-center;
-      gap: 8px;
-      cursor: pointer;
-      @include transition;
-      &:hover { background: darken($gold-primary, 5%); transform: translateY(-2px); }
-    }
-
-    .cancel-link {
-      background: transparent; border: none; color: $text-muted; font-weight: 600; cursor: pointer;
-      &:hover { color: $dark-grey; text-decoration: underline; }
-    }
-  }
-}
-
-/* ESTILO DEL CHECKBOX */
-.custom-checkbox {
-  display: flex; align-items: center; gap: 12px; cursor: pointer; width: 100%;
-  input { display: none; }
-  .checkmark {
-    width: 22px; height: 22px; border: 2px solid $gold-border; border-radius: 6px;
-    background: white; @include flex-center; @include transition;
-    .check-icon { font-size: 16px; color: white; display: none; font-weight: bold; }
-  }
-  input:checked + .checkmark {
-    background: $gold-primary; border-color: $gold-primary;
-    .check-icon { display: block; }
-  }
-  .role-text { font-size: 0.95rem; font-weight: 500; color: $dark-grey; }
-}
-
-/* ANIMACIONES */
 @keyframes modalIn {
-  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  from { opacity: 0; transform: translateY(15px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
