@@ -2,13 +2,18 @@
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class EliminarClienteCom : IRequest<Unit>
+    /// <summary>
+    /// Clase transaccional para eliminar un cliente.
+    /// </summary>
+    /// <remarks>
+    /// Contructor que inicializa el identificador del cliente a eliminar.
+    /// </remarks>
+    /// <param name="idCliente">Identificador del cliente</param>
+    public class EliminarClienteCom(int idCliente) : IRequest<Unit>
     {
-        public int IdCliente { get; set; }
-
-        public EliminarClienteCom(int idCliente)
-        {
-            IdCliente = idCliente;
-        }
+        /// <summary>
+        /// Identificador del cliente a eliminar.
+        /// </summary>
+        public int IdCliente { get; set; } = idCliente;
     }
 }

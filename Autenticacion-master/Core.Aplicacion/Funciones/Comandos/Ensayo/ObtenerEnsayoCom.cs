@@ -4,7 +4,7 @@ using Core.Dominio.Model;
 
 namespace Core.Aplicacion.Funciones.Comandos.Ensayo
 {
-    public class ObtenerEnsayoCom :  IRequest<object>
+    public class ObtenerEnsayoCom : IRequest<IEnumerable<EnsayoDetalladoModel>>
     {
         public int IdPrueba { get; set; }
 

@@ -5,24 +5,42 @@ using Core.Dominio.Model;
 using Core.Util;
 using MediatR;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Core.Aplicacion.Funciones.Comandos.Cliente
 {
-    public class CrearClienteHandler : IRequestHandler<CrearClienteCom, CrearClienteModel>
+    /// <summary>
+    /// Logica de creacion de cliente
+    /// </summary>
+    public class CrearClienteHandler(ICliente clienteServicio, ICacheServicio iCacheServicio) : IRequestHandler<CrearClienteCom, ClienteModel>
     {
-        private readonly ICliente _clienteServicio;
-        private readonly ICacheServicio _cacheServicio;
+        /// <summary>
+        /// Servicio de cliente
+        /// </summary>
+        private readonly ICliente _clienteServicio = clienteServicio;
 
-        public CrearClienteHandler(ICliente clienteServicio, ICacheServicio cacheServicio)
-        {
-            _clienteServicio = clienteServicio;
-            _cacheServicio = cacheServicio;
-        }
+        /// <summary>
+        /// Servicio de cache
+        /// </summary>
+        private readonly ICacheServicio iCacheServicio = iCacheServicio;
 
-        public async Task<CrearClienteModel> Handle(CrearClienteCom request, CancellationToken cancellationToken)
+        /// <summary>
+        /// Logica de creacion de cliente
+        /// </summary>
+        /// <param name="request">Objeto transaccional</param>
+        /// <param name="cancellationToken">Token de cancelacion</param>
+        /// <returns>Cliente</returns>
+        /// <exception cref="ManejoExcepciones">manejo de excepciones</exception>
+        public async Task<ClienteModel> Handle(CrearClienteCom request, CancellationToken cancellationToken)
         {
+            IEnumerable<ClienteModel> clientes = await iCacheServicio.Obtener<IEnumerable<ClienteModel>>("Clientes_");
+            if (clientes != null && clientes.Any(c => c.Cedula == request.Cedula))
+            {
+                throw new ManejoExcepciones("Ya existe un cliente con la cédula proporcionada.");
+            }
+
             ClienteModel nuevoCliente = new()
             {
                 Cedula = request.Cedula,
@@ -31,24 +49,15 @@ namespace Core.Aplicacion.Funciones.Comandos.Cliente
                 Telefono = request.Telefono,
                 Direccion = request.Direccion,
                 Ciudad = request.Ciudad,
-                Titulo = request.Titulo
+                Titulo = request.Titulo,
+                Correo = request.Correo,
             };
 
-            var clienteBd = await _clienteServicio.ConsultarCliente(new ConsultarClienteModel { Cedula = request.Cedula });
-            if (clienteBd != null)
-            {
-                if (clienteBd.Estado)
-                {
-                    throw new ManejoExcepciones("Ya existe un cliente con la cédula proporcionada.");
-                }
-                nuevoCliente.IdCliente = clienteBd.IdCliente;
-                await _clienteServicio.ActualizarCliente(nuevoCliente);
-                await _clienteServicio.ActivarCliente(clienteBd.Cedula);
-                return clienteBd;
-            }
-            return await _clienteServicio.InsertarCliente(nuevoCliente);
+            ClienteModel cliente =  await _clienteServicio.InsertarCliente(nuevoCliente);
+            clientes = clientes.Append(cliente);
+            await iCacheServicio.Agregar($"Clientes_", clientes, TimeSpan.FromMinutes(480));
+            return cliente;
 
-            //await _cacheServicio.Agregar("UltimoClienteId", idGenerado.ToString(), new TimeSpan(0, 5, 0));
         }
     }
 }

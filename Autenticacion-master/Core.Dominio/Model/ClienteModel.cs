@@ -13,6 +13,7 @@ namespace Core.Dominio.Model
         public string Ciudad { get; set; }
         public string Titulo { get; set; }
         public string Estado { get; set; }
+        public string Correo { get; set; }
         public Guid IdSesion { get; set; }
 
         public ClienteModel()

@@ -8,6 +8,7 @@ using Core.DataAccess.Clientes.Servicio;
 using Core.DataAccess.Clientes.Interfaz;
 using Core.DataAccess.Menu.Servicio;
 using Core.DataAccess.Menu.Interfaz;
+using Core.DataAccess.Ubicacion.Servicio;
 
 namespace Core.Aplicacion
 {
@@ -28,6 +29,7 @@ namespace Core.Aplicacion
             servicios.AddScoped<IRegistrarLog, RegistrarLogServicio>();
             servicios.AddScoped<IPermiso, PermisoServicio>();
             servicios.AddSingleton<ICacheServicio, CacheServicio>();
+            servicios.AddSingleton<IUbicacion, UbicacionServicio>();
             servicios.AddTransient<MiddlewareExtension>();
             servicios.AddAutoMapper(Assembly.GetExecutingAssembly());
             servicios.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

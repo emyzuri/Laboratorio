@@ -24,10 +24,16 @@ namespace Core.Aplicacion.Funciones.Comandos.Menu
 
         public async Task<IEnumerable<MenuModel>> Handle(ValidarMenuCom request, CancellationToken cancellationToken)
         {
-            UsuarioModel usuario = await cacheServicio.Obtener<UsuarioModel>(httpContextAccessor.HttpContext.Request.Headers["IdSesion"]);
+            var idSesion = httpContextAccessor.HttpContext.Request.Headers["IdSesion"].ToString();
+            UsuarioModel usuario = await cacheServicio.Obtener<UsuarioModel>(idSesion);
+            if (usuario == null)
+            {
+                return new List<MenuModel>();
+            }
             IEnumerable<MenuModel> menu = await iMenu.ObtenerMenu();
             IEnumerable<MenuModel> rolMenu = await iMenu.ObtenerMenusPorRol(usuario.IdUsuario);
-            IEnumerable<MenuModel> menusPermitidos = menu.Where(a => rolMenu.Any(b => b.IdMenu == a.IdMenu));
+            var menusPermitidos = menu.Where(a => rolMenu.Any(b => b.IdMenu == a.IdMenu)).ToList();
+
             foreach (var item in menusPermitidos)
             {
                 var hijos = menusPermitidos.Where(x => x.IdPadre == item.IdMenu).ToList();
@@ -37,7 +43,6 @@ namespace Core.Aplicacion.Funciones.Comandos.Menu
                 }
             }
             return menusPermitidos.Where(x => x.IdPadre == 0).ToList();
-
         }
     }
 }

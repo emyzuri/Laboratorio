@@ -16,7 +16,9 @@ namespace Core.Dominio.Model
         public DateTime FechaRegistro { get; set; }
         public DateTime FechaEntrega { get; set; }
         public string NombreCliente { get; set; }
+        public string Correo { get; set; }
         public IEnumerable<EnsayoDetalladoModel> Ensayos { get; set; }
+        public IEnumerable<ClienteDeudorModel> EnsayosPrueba { get; set; }
 
     }
 }

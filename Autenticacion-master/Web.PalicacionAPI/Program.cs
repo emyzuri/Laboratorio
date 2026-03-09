@@ -61,5 +61,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/HealthCheck");
 app.UseMiddleware<MiddlewareExtension>();
+app.UseStaticFiles();
 
 app.Run();
