@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
@@ -13,16 +14,15 @@ import { AuthService } from '../../auth/services/auth.service';
 export class EnsayosComponent implements OnInit {
 
   private readonly authService = inject(AuthService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   // =========================
   // LISTAS PRINCIPALES
   // =========================
   ensayosOriginal: any[] = [];
   ensayosFiltrados: any[] = [];
-
   clientes: any[] = [];
   clientesFiltrados: any[] = [];
-
   catalogoPadres: any[] = [];
   catalogoHijos: any[] = [];
 
@@ -37,13 +37,16 @@ export class EnsayosComponent implements OnInit {
   showFormModal = false;
   showSelectionModal = false;
   showAbonoModal = false;
+  showPdfModal = false; // Control del nuevo modal de PDF
   showResults = false;
+  cargando = false;
 
   // =========================
-  // FORMULARIO
+  // FORMULARIO Y PDF
   // =========================
   minFecha: string = '';
   fechaEntrega: string = '';
+  pdfUrl: SafeResourceUrl | null = null; // URL segura para el iframe
 
   listaEnsayosTmp: any[] = [];
   nuevoEnsayoTmp: any = { nombre: '', monto: null, numero: null, idCatalogo: 0 };
@@ -69,65 +72,91 @@ export class EnsayosComponent implements OnInit {
   }
 
   async cargarEnsayos() {
-  try {
-    const resp = await this.authService.getEnsayosDeudores();
+    try {
+      const resp = await this.authService.getEnsayosDeudores();
+      if (resp?.esExitoso && Array.isArray(resp.datos)) {
+        const soloDeudores = resp.datos.filter((e: any) => Number(e.saldoPendiente ?? 0) > 0);
 
-    if (resp?.esExitoso && Array.isArray(resp.datos)) {
-
-      const soloDeudores = resp.datos.filter((e: any) => Number(e.saldoPendiente ?? 0) > 0);
-
-      this.ensayosOriginal = soloDeudores.map((e: any) => ({
-        cedula: e.cedula || '',
-        nombreCompleto: (e.nombreCompleto || '').toUpperCase(),
-        totalAbonado: Number(e.totalAbonado ?? 0),
-        totalAPagar: Number(e.totalAPagar ?? 0),
-        saldoPendiente: Number(e.saldoPendiente ?? 0),
-        idPrueba: e.idEnsayo ?? 0,
-        expandido: false,
-        subensayos: Array.isArray(e.ensayos)
-          ? e.ensayos.map((s: any) => ({
-              nombreSubEnsayo: (s.nombreCatalogo || 'ENSAYO').toUpperCase(),
-              saldoSub: 0
-            }))
-          : []
-      }));
-
-      this.ensayosFiltrados = [...this.ensayosOriginal];
+        this.ensayosOriginal = soloDeudores.map((e: any) => ({
+          cedula: e.cedula || '',
+          nombreCompleto: (e.nombreCompleto || '').toUpperCase(),
+          totalAbonado: Number(e.totalAbonado ?? 0),
+          totalAPagar: Number(e.totalAPagar ?? 0),
+          saldoPendiente: Math.max(0, Number(e.saldoPendiente ?? 0)),
+          idPrueba: e.idEnsayo ?? 0,
+          expandido: false,
+          subensayos: Array.isArray(e.ensayos)
+            ? e.ensayos.map((s: any) => ({
+                nombreSubEnsayo: (s.nombreCatalogo || 'ENSAYO').toUpperCase(),
+                saldoSub: 0
+              }))
+            : []
+        }));
+        this.ensayosFiltrados = [...this.ensayosOriginal];
+      }
+    } catch (error) {
+      console.error('Error al cargar ensayos:', error);
     }
-  } catch (error) {
-    console.error('Error al cargar ensayos:', error);
   }
-}
+
+  // =========================
+  // REPORTE PDF EN MODAL
+  // =========================
+  async imprimirReporteIndividual(ensayo: any) {
+    this.cargando = true;
+    try {
+      const hoy = new Date().toISOString().split('T')[0];
+
+      const blob = await this.authService.generarReportePorCliente(
+        ensayo.cedula,
+        '2000-01-01', // Rango amplio de historial
+        hoy
+      );
+
+      if (blob && blob.size > 0) {
+        // Creación de URL segura para el visor interno
+        const url = window.URL.createObjectURL(blob);
+        this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        this.showPdfModal = true;
+      } else {
+        alert('No se encontraron ensayos registrados para generar este reporte.');
+      }
+    } catch (error) {
+      console.error('Error al generar PDF:', error);
+      alert('Error al conectar con el servidor de reportes.');
+    } finally {
+      this.cargando = false;
+    }
+  }
+
+  closePdfModal() {
+    this.showPdfModal = false;
+    this.pdfUrl = null;
+    // Es importante liberar la memoria del objeto URL creado
+  }
 
   // =========================
   // FILTRO EN TIEMPO REAL
   // =========================
   filtrarEnsayos() {
-
     const query = this.filtroNombre?.toLowerCase().trim();
-
     if (!query) {
       this.ensayosFiltrados = [...this.ensayosOriginal];
       return;
     }
 
     this.ensayosFiltrados = this.ensayosOriginal.filter(e => {
-
       const nombre = (e.nombreCompleto || '').toLowerCase();
       const cedula = (e.cedula || '').toLowerCase();
-
       const coincideSub = (e.subensayos || []).some((sub: any) =>
         (sub.nombreSubEnsayo || '').toLowerCase().includes(query)
       );
-
-      return (
-        nombre.includes(query) ||
-        cedula.includes(query) ||
-        coincideSub
-      );
+      return (nombre.includes(query) || cedula.includes(query) || coincideSub);
     });
   }
 
+  // =========================
+  // GESTIÓN DE CLIENTES
   // =========================
   async cargarClientes() {
     const resp = await this.authService.getClientes();
@@ -137,18 +166,14 @@ export class EnsayosComponent implements OnInit {
   }
 
   onClienteSearchChange() {
-
     const bus = this.filtroClienteBusqueda.toLowerCase().trim();
-
     if (!bus) {
       this.clientesFiltrados = [];
       this.showResults = false;
       this.ensayoForm.ensayo.idCliente = 0;
       return;
     }
-
     this.showResults = true;
-
     this.clientesFiltrados = this.clientes.filter(c =>
       (c.cl_cedula || c.cedula || '').includes(bus) ||
       (c.cl_nombre || c.nombre || '').toLowerCase().includes(bus) ||
@@ -157,7 +182,6 @@ export class EnsayosComponent implements OnInit {
   }
 
   seleccionarCliente(cliente: any) {
-
     const nombre = cliente.cl_nombre || cliente.nombre;
     const apellido = cliente.cl_apellido || cliente.apellido;
     const cedula = cliente.cl_cedula || cliente.cedula;
@@ -168,38 +192,26 @@ export class EnsayosComponent implements OnInit {
   }
 
   // =========================
+  // CATÁLOGOS
+  // =========================
   async cargarCatalogoPadres() {
-
     const resp = await this.authService.getCatalogoEnsayosPorPadre(0);
-
-    console.log('RESP PADRES:', resp);
-
     if (resp?.esExitoso && resp?.datos?.datos) {
-
       this.catalogoPadres = resp.datos.datos;
-
     } else {
       this.catalogoPadres = [];
     }
   }
 
   async onPadreChange() {
-
-  this.catalogoHijos = [];
-  this.nuevoEnsayoTmp.idCatalogo = 0;
-
-  if (!this.idPadreSeleccionado) return;
-
-  const resp = await this.authService.getCatalogoEnsayosPorPadre(this.idPadreSeleccionado);
-
-  console.log('RESP HIJOS:', resp);
-
-  if (resp?.esExitoso && resp?.datos?.datos) {
-
-    this.catalogoHijos = resp.datos.datos;
-
+    this.catalogoHijos = [];
+    this.nuevoEnsayoTmp.idCatalogo = 0;
+    if (!this.idPadreSeleccionado) return;
+    const resp = await this.authService.getCatalogoEnsayosPorPadre(this.idPadreSeleccionado);
+    if (resp?.esExitoso && resp?.datos?.datos) {
+      this.catalogoHijos = resp.datos.datos;
+    }
   }
-}
 
   onEnsayoHijoChange() {
     const sel = this.catalogoHijos.find(h => (h.id || h.ct_id) == this.nuevoEnsayoTmp.idCatalogo);
@@ -208,6 +220,8 @@ export class EnsayosComponent implements OnInit {
     }
   }
 
+  // =========================
+  // CONTROL DE MODALES
   // =========================
   toggleEnsayo(ensayo: any) {
     ensayo.expandido = !ensayo.expandido;
@@ -228,6 +242,7 @@ export class EnsayosComponent implements OnInit {
     this.showFormModal = false;
     this.showSelectionModal = false;
     this.showAbonoModal = false;
+    this.showPdfModal = false;
     this.resetForm();
   }
 
@@ -239,26 +254,25 @@ export class EnsayosComponent implements OnInit {
     this.nuevoEnsayoTmp = { nombre: '', monto: null, numero: null, idCatalogo: 0 };
     this.idPadreSeleccionado = 0;
     this.catalogoHijos = [];
+    this.pdfUrl = null;
   }
 
   confirmarAgregarEnsayo() {
-
     if (this.nuevoEnsayoTmp.idCatalogo > 0 && this.nuevoEnsayoTmp.monto > 0) {
-
       this.listaEnsayosTmp.push({ ...this.nuevoEnsayoTmp });
-
       this.nuevoEnsayoTmp = { nombre: '', monto: null, numero: null, idCatalogo: 0 };
       this.idPadreSeleccionado = 0;
       this.catalogoHijos = [];
-
       this.showSelectionModal = false;
     }
   }
 
+  // =========================
+  // GUARDADO DE DATOS
+  // =========================
   async guardarEnsayo() {
-
     if (!this.formularioValido()) return;
-
+    this.cargando = true;
     const payload = {
       idCliente: this.ensayoForm.ensayo.idCliente,
       descripcion: (this.ensayoForm.ensayo.descripcion || '').toUpperCase(),
@@ -271,31 +285,40 @@ export class EnsayosComponent implements OnInit {
       }))
     };
 
-    const resp = await this.authService.insertarEnsayo(payload);
-    if (resp?.esExitoso) {
-      this.closeModals();
-      await this.cargarEnsayos();
+    try {
+      const resp = await this.authService.insertarEnsayo(payload);
+      if (resp?.esExitoso) {
+        this.closeModals();
+        await this.cargarEnsayos();
+      }
+    } finally {
+      this.cargando = false;
     }
   }
 
   async guardarNuevoAbono() {
-
     if (!this.selectedEnsayoForAbono || !this.nuevoAbonoMonto) return;
-
+    this.cargando = true;
     const payload = {
       idEnsayo: this.selectedEnsayoForAbono.idPrueba,
       monto: this.nuevoAbonoMonto,
       usuario: JSON.parse(localStorage.getItem('usuarioLogueado') || '{}').usuario || 'SISTEMA'
     };
 
-    const resp = await this.authService.insertarAbono(payload);
-
-    if (resp?.esExitoso) {
-      this.closeModals();
-      await this.cargarEnsayos();
+    try {
+      const resp = await this.authService.insertarAbono(payload);
+      if (resp?.esExitoso) {
+        this.closeModals();
+        await this.cargarEnsayos();
+      }
+    } finally {
+      this.cargando = false;
     }
   }
 
+  // =========================
+  // UTILITARIOS
+  // =========================
   establecerFechaMinima() {
     this.minFecha = new Date().toISOString().split('T')[0];
   }

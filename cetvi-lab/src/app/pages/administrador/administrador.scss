@@ -289,3 +289,64 @@ input.is-invalid {
   from { opacity: 0; transform: translateY(15px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* Estilos específicos para el modal de eliminación */
+.border-danger { border: 1.5px solid #feb2b2 !important; }
+
+.bg-danger-light {
+  background-color: #fff5f5 !important;
+  border-bottom: 1px solid #fed7d7 !important;
+}
+
+.text-danger { color: #c53030 !important; }
+
+.alert-icon-container {
+  margin-bottom: 15px;
+  span { font-size: 48px; color: #f56565; }
+}
+
+.confirm-text {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 5px;
+  strong { color: #1a202c; text-transform: uppercase; }
+}
+
+.sub-text { font-size: 0.85rem; color: #718096; margin-bottom: 20px; }
+
+.modal-actions-center {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  background: #f8fafc;
+}
+
+.btn-confirm-delete {
+  background-color: #e53e3e; // Rojo profesional
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+
+  &:hover { background-color: #c53030; transform: translateY(-1px); }
+  &:disabled { background-color: #feb2b2; cursor: not-allowed; }
+}
+
+.btn-cancel-light {
+  background-color: #edf2f7;
+  color: #4a5568;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+
+  &:hover { background-color: #e2e8f0; }
+}
