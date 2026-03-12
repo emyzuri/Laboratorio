@@ -44,12 +44,20 @@
                 <strong>$ {{ ens.saldoPendiente | number:'1.2-2' }}</strong>
               </td>
               <td class="text-center">
-                <button class="btn-abono-action"
-                        [disabled]="ens.saldoPendiente <= 0"
-                        (click)="openAbonoModal(ens)">
-                  <span class="material-symbols-outlined">payments</span>
-                  Abonar
-                </button>
+                <div class="action-buttons-container">
+                  <button class="btn-abono-action"
+                          [disabled]="ens.saldoPendiente <= 0"
+                          (click)="openAbonoModal(ens)">
+                    <span class="material-symbols-outlined">payments</span>
+                    Abonar
+                  </button>
+
+                  <button class="btn-pdf-action"
+                          (click)="imprimirReporteIndividual(ens)"
+                          title="Ver Reporte Individual">
+                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                  </button>
+                </div>
               </td>
             </tr>
 
@@ -253,6 +261,24 @@
       <button class="btn-confirm-gold"
               [disabled]="!nuevoAbonoMonto || nuevoAbonoMonto <= 0 || nuevoAbonoMonto > selectedEnsayoForAbono?.saldoPendiente"
               (click)="guardarNuevoAbono()">CONFIRMAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="pdf-viewer-overlay" *ngIf="showPdfModal" (click)="closeModals()">
+  <div class="pdf-viewer-window" (click)="$event.stopPropagation()">
+
+    <button class="pdf-minimal-close" (click)="closeModals()" title="Cerrar vista previa">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <div class="pdf-frame-container">
+      <iframe *ngIf="pdfUrl"
+              [src]="pdfUrl"
+              width="100%"
+              height="100%"
+              frameborder="0">
+      </iframe>
     </div>
   </div>
 </div>

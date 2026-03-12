@@ -142,13 +142,14 @@ export class AuthService {
       return { esExitoso: false, datos: [] };
     }
   }
-  // auth.service.ts
+ // auth.service.ts
 async generarReportePorCliente(cedula: string, fechaInicio: string, fechaFin: string): Promise<Blob> {
-  const url = `${this.URL_BASE}/Ensayo/ReportePorCliente?cedula=${cedula}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+  // CAMBIO: Se actualiza la ruta a 'ReportePorClienteIngresado'
+  const url = `${this.URL_BASE}/Ensayo/ReportePorClienteIngresado?cedula=${cedula}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
 
   return await firstValueFrom(
     this.http.get(url, {
-      headers: this.obtenerHeaders(), // Aquí ya se incluye el IdSesion obligatoriamente
+      headers: this.obtenerHeaders(),
       responseType: 'blob'
     })
   );
@@ -248,7 +249,39 @@ async generarReportePorCliente(cedula: string, fechaInicio: string, fechaFin: st
     )
   );
 }
+// En auth.service.ts
+async eliminarUsuario(idUsuario: number): Promise<any> {
+  // Pasamos el ID por header como solicita el controlador
+  const headers = this.obtenerHeaders().set('idUsuario', idUsuario.toString());
 
+  try {
+    return await firstValueFrom(
+      this.http.delete<any>(`${this.URL_BASE}/Usuario/Eliminar`, { headers })
+    );
+  } catch (error) {
+    console.error('Error al eliminar usuario:', error);
+    return { esExitoso: false, mensaje: 'Error de conexión con el servidor.' };
+  }
+}
+/**
+   * Actualiza la información básica de un usuario (Nombre, Apellido, Usuario, etc.)
+   * @param usuario Objeto con los datos del usuario a modificar
+   */
+  async actualizarUsuario(usuario: any): Promise<any> {
+    const url = `${this.URL_BASE}/Usuario/Actualizar`;
+
+    try {
+      return await firstValueFrom(
+        this.http.put<any>(url, usuario, { headers: this.obtenerHeaders() })
+      );
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
+      return {
+        esExitoso: false,
+        mensaje: 'No se pudo conectar con el servidor para actualizar el usuario.'
+      };
+    }
+  }
 
   async actualizarRolesUsuario(
     idUsuario: number,

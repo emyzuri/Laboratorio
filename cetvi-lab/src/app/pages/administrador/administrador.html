@@ -1,132 +1,3 @@
-<!-- <div class="main__container">
-  <div class="container">
-    <div class="header-actions">
-      <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text" placeholder="Buscar por Nombre o Cédula" class="form-input" [(ngModel)]="filtroNombre" autocomplete="off" />
-      </div>
-
-      <button class="new__customer" (click)="openNewUserModal()">
-        Nuevo Usuario
-        <span class="material-symbols-outlined">person_add</span>
-      </button>
-    </div>
-
-    <div class="table-card">
-      <table class="table__clientes">
-        <thead>
-          <tr>
-            <th>NOMBRE COMPLETO</th>
-            <th>ROLES ASIGNADOS</th>
-            <th>ACCIONES</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let user of usuariosFiltrados">
-            <td>{{ user.nombreCompleto }}</td>
-            <td>
-              <div class="roles-container">
-                <span class="role-badge" *ngFor="let rol of user.listaRoles">{{ rol }}</span>
-                <span *ngIf="user.listaRoles.length === 0" class="text-muted">Sin roles</span>
-              </div>
-            </td>
-            <td>
-              <button class="btn-icon-only" (click)="openRolesModal(user)" title="Gestionar Roles">
-                <span class="material-symbols-outlined">settings_accessibility</span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" *ngIf="showFormModal">
-  <form class="modal-content" autocomplete="off">
-    <div class="modal-header">
-      <h3>Nuevo Usuario</h3>
-      <span class="material-symbols-outlined close-btn" (click)="closeModals()">close</span>
-    </div>
-
-    <div class="modal-body-grid">
-      <div class="input-group">
-        <label>Nombre:</label>
-        <input type="text" [(ngModel)]="usuarioForm.nombre" (input)="toUpperCase('nombre')" name="no-autocomplete-nombre" autocomplete="off">
-      </div>
-
-      <div class="input-group">
-        <label>Apellido:</label>
-        <input type="text" [(ngModel)]="usuarioForm.apellido" (input)="toUpperCase('apellido')" name="no-autocomplete-apellido" autocomplete="off">
-      </div>
-
-      <div class="input-group">
-        <label>Usuario:</label>
-        <input type="text" [(ngModel)]="usuarioForm.login" (input)="toUpperCase('login')" name="user-login-field" autocomplete="one-time-code">
-      </div>
-
-      <div class="input-group">
-        <label>Contraseña:</label>
-        <input type="password" [(ngModel)]="usuarioForm.password" name="user-pass-field" autocomplete="new-password">
-      </div>
-
-      <div class="input-group">
-        <label>Teléfono:</label>
-        <input type="text" maxlength="10" [(ngModel)]="usuarioForm.telefono" (input)="soloNumeros($event); validarTelefono()" name="no-autocomplete-tel" autocomplete="off">
-      </div>
-
-      <div class="input-group">
-        <label>Cédula:</label>
-        <input
-          type="text"
-          maxlength="10"
-          [(ngModel)]="usuarioForm.cedula"
-          (input)="soloNumeros($event); validarCedula()"
-          [class.is-invalid]="usuarioForm.cedula.length === 10 && !cedulaValida"
-          name="no-autocomplete-ced"
-          autocomplete="off">
-
-        <small *ngIf="usuarioForm.cedula.length === 10 && !cedulaValida" style="color: red;">
-          Cédula ecuatoriana inválida
-        </small>
-      </div>
-    </div>
-
-    <div class="modal-actions">
-      <button type="button" class="primary" [disabled]="!formularioValido || cargando" (click)="guardarUsuario()">
-        {{ cargando ? 'GUARDANDO...' : 'GUARDAR USUARIO' }}
-      </button>
-      <button type="button" class="btn-cancel" (click)="closeModals()">CANCELAR</button>
-    </div>
-  </form>
-</div>
-
-<div class="modal-overlay" *ngIf="showRolesModal">
-  <div class="modal-content selection-small">
-    <div class="modal-header">
-      <h3>Gestionar Roles</h3>
-      <span class="material-symbols-outlined close-btn" (click)="closeRolesModal()">close</span>
-    </div>
-
-    <div class="modal-body">
-      <p style="margin-bottom: 15px;">Usuario: <strong>{{ usuarioSeleccionado?.nombreCompleto }}</strong></p>
-      <div class="roles-selection-list">
-        <label *ngFor="let rol of listaRolesDisponibles" class="checkbox-group">
-          <input type="checkbox" [checked]="isRolSelected(rol.id)" (change)="onRolChange($event, rol.id)">
-          <span>{{ rol.nombre }}</span>
-        </label>
-      </div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="primary" (click)="actualizarRoles()" [disabled]="cargando || rolesSeleccionados.length === 0">
-        {{ cargando ? 'GUARDANDO...' : 'ACTUALIZAR ROLES' }}
-      </button>
-      <button class="btn-cancel" (click)="closeRolesModal()">CANCELAR</button>
-    </div>
-  </div>
-</div> -->
-
 <div class="main__container">
   <div class="container">
     <div class="header-actions">
@@ -164,9 +35,22 @@
               </div>
             </td>
             <td>
-              <button class="btn-icon-only" (click)="openRolesModal(user)" title="Gestionar Roles">
-                <span class="material-symbols-outlined">settings_accessibility</span>
-              </button>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-icon-only" (click)="editarUsuario(user)" title="Editar Usuario">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+
+                <button class="btn-icon-only" (click)="openRolesModal(user)" title="Gestionar Roles">
+                  <span class="material-symbols-outlined">settings_accessibility</span>
+                </button>
+
+                <button class="btn-icon-only btn-delete"
+                        (click)="borrarUsuario(user)"
+                        title="Eliminar Usuario"
+                        [disabled]="cargando">
+                  <span class="material-symbols-outlined">delete_forever</span>
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -178,29 +62,29 @@
 <div class="modal-overlay" *ngIf="showFormModal">
   <form class="modal-content" autocomplete="off">
     <div class="modal-header">
-      <h3>Nuevo Usuario</h3>
+      <h3>{{ isEditMode ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
       <span class="material-symbols-outlined close-btn" (click)="closeModals()">close</span>
     </div>
 
     <div class="modal-body-grid">
       <div class="input-group">
         <label>Nombre:</label>
-        <input type="text" [(ngModel)]="usuarioForm.nombre" (input)="toUpperCase('nombre')" name="no-autocomplete-nombre" autocomplete="off">
+        <input type="text" [(ngModel)]="usuarioForm.nombre" (input)="toUpperCase('nombre')" name="no-autocomplete-nombre">
       </div>
 
       <div class="input-group">
         <label>Apellido:</label>
-        <input type="text" [(ngModel)]="usuarioForm.apellido" (input)="toUpperCase('apellido')" name="no-autocomplete-apellido" autocomplete="off">
+        <input type="text" [(ngModel)]="usuarioForm.apellido" (input)="toUpperCase('apellido')" name="no-autocomplete-apellido">
       </div>
 
       <div class="input-group">
         <label>Usuario:</label>
-        <input type="text" [(ngModel)]="usuarioForm.login" (input)="toUpperCase('login')" name="user-login-field" autocomplete="one-time-code">
+        <input type="text" [(ngModel)]="usuarioForm.login" (input)="toUpperCase('login')" name="user-login-field">
       </div>
 
       <div class="input-group">
         <label>Contraseña:</label>
-        <input type="password" [(ngModel)]="usuarioForm.password" name="user-pass-field" autocomplete="new-password">
+        <input type="password" [(ngModel)]="usuarioForm.password" name="user-pass-field" autocomplete="new-password" [placeholder]="isEditMode ? '********' : ''">
       </div>
 
       <div class="input-group">
@@ -211,7 +95,6 @@
                (input)="soloNumeros($event); validarTelefono()"
                [class.is-invalid]="usuarioForm.telefono.length > 0 && !telefonoValido"
                name="no-autocomplete-tel"
-               autocomplete="off"
                placeholder="Ej: 0987654321">
         <small *ngIf="usuarioForm.telefono.length > 0 && !telefonoValido" style="color: #ef4444; font-size: 0.7rem;">
           Debe empezar con 09 y tener 10 dígitos
@@ -226,11 +109,9 @@
                (input)="soloNumeros($event); validarCedula()"
                [class.is-invalid]="usuarioForm.cedula.length === 10 && !cedulaValida"
                name="no-autocomplete-ced"
-               autocomplete="off"
                placeholder="10 dígitos">
-
         <small *ngIf="usuarioForm.cedula.length === 10 && !cedulaValida" style="color: #ef4444; font-size: 0.7rem;">
-          Cédula ecuatoriana inválida (Módulo 10)
+          Cédula ecuatoriana inválida
         </small>
       </div>
     </div>
@@ -240,7 +121,7 @@
               class="primary"
               [disabled]="!formularioValido || cargando"
               (click)="guardarUsuario()">
-        {{ cargando ? 'PROCESANDO...' : 'GUARDAR USUARIO' }}
+        {{ cargando ? 'PROCESANDO...' : (isEditMode ? 'ACTUALIZAR DATOS' : 'GUARDAR USUARIO') }}
       </button>
       <button type="button" class="btn-cancel" (click)="closeModals()">CANCELAR</button>
     </div>
@@ -271,6 +152,34 @@
         {{ cargando ? 'ACTUALIZANDO...' : 'ACTUALIZAR ROLES' }}
       </button>
       <button class="btn-cancel" (click)="closeRolesModal()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showConfirmDelete">
+  <div class="modal-content selection-small border-danger">
+    <div class="modal-header bg-danger-light">
+      <h3 class="text-danger">¿Eliminar Usuario?</h3>
+      <span class="material-symbols-outlined close-btn" (click)="cancelarEliminacion()">close</span>
+    </div>
+
+    <div class="modal-body text-center" style="padding: 30px 20px;">
+      <div style="margin-bottom: 15px;">
+        <span class="material-symbols-outlined" style="font-size: 48px; color: #f56565;">warning</span>
+      </div>
+      <p style="font-size: 1.1rem; color: #2d3748; margin-bottom: 5px;">
+        ¿Seguro de eliminar a <strong>{{ usuarioABorrar?.nombreCompleto }}</strong>?
+      </p>
+      <p style="font-size: 0.85rem; color: #718096;">El registro dejará de ser visible en el sistema.</p>
+    </div>
+
+    <div class="modal-actions-center" style="padding: 20px; display: flex; justify-content: center; gap: 15px; background: #f8fafc;">
+      <button class="btn-confirm-delete" (click)="confirmarEliminacion()" [disabled]="cargando">
+        {{ cargando ? 'ELIMINANDO...' : 'ELIMINAR' }}
+      </button>
+      <button class="btn-cancel-light" (click)="cancelarEliminacion()">
+        CANCELAR
+      </button>
     </div>
   </div>
 </div>
