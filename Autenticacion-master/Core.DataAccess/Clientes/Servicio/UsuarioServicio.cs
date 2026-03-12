@@ -175,5 +175,48 @@ namespace Core.DataAccess.Clientes.Servicio
             var resultado = await dbConnection.QueryAsync<RolModel>(sql);
             return resultado.ToList();
         }
+        /// <summary>
+        /// Elimina de forma lógica o física un usuario de la base de datos
+        /// </summary>
+        /// <param name="idUsuario">Identificador único del usuario</param>
+        /// <returns>True si la eliminación fue exitosa</returns>
+        public async Task<bool> EliminarUsuario(int idUsuario)
+        {
+            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
+            try
+            {
+                DynamicParameters parametros = new();
+                parametros.Add("@i_id_usuario", idUsuario, dbType: DbType.Int32);
+                parametros.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+                await dbConnection.ExecuteAsync("spd_eliminar_usuario", parametros, commandType: CommandType.StoredProcedure);
+
+                int respuesta = parametros.Get<int>("@ReturnValue");
+                return respuesta == 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        public async Task<bool> ActualizarUsuario(UsuarioModel usuario)
+        {
+            using IDbConnection dbConnection = sqlConfiguracion.CrearConexion();
+            try
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@i_id_usuario", usuario.IdUsuario); 
+                parametros.Add("@i_nombre", usuario.Nombre);
+                parametros.Add("@i_apellido", usuario.Apellido);
+                parametros.Add("@i_usuario", usuario.Usuario);
+                parametros.Add("@i_telefono", usuario.Telefono);
+                parametros.Add("@i_cedula", usuario.Cedula);
+                parametros.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+                await dbConnection.ExecuteAsync("spu_actualizar_usuario", parametros, commandType: CommandType.StoredProcedure);
+                return parametros.Get<int>("@ReturnValue") == 0;
+            }
+            catch { return false; }
+        }
     }
 }

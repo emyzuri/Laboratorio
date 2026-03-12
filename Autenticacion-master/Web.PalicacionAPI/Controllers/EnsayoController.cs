@@ -155,5 +155,22 @@ namespace Web.PalicacionAPI.Controllers
                 $"ReporteEnsayosCliente_{DateTime.Now:g}.pdf"
             );
         }
+        [HttpGet("ReportePorClienteIngresado")]
+        public async Task<IActionResult> ReportePorClienteIngresado([FromQuery] string cedula, [FromQuery] DateTime fechaInicio, [FromQuery] DateTime fechaFin)
+        {
+            var comando = new ReporteEnsayoClienteIngresadoCom(cedula, fechaInicio, fechaFin);
+            byte[] pdfBytes = await _mediador.Send(comando);
+
+            if (pdfBytes == null || pdfBytes.Length <= 3) 
+            {
+                return NotFound("No se encontraron registros para generar el reporte en esas fechas.");
+            }
+
+            return File(
+                pdfBytes,
+                "application/pdf",
+                $"Reporte_{cedula}_{DateTime.Now:yyyyMMdd_HHmm}.pdf"
+            );
+        }
     }
 }

@@ -16,6 +16,12 @@ namespace Core.DataAccess.Clientes.Interfaz
         Task<bool> RegistrarUsuario(UsuarioModel usuario, List<int> roles);
         Task<bool> ActualizarRolesUsuario(int idUsuario, List<int> roles);
         Task<List<RolModel>> ObtenerRoles();
+        /// <summary>
+        /// Realiza la desactivación (eliminación lógica) de un usuario
+        /// </summary>
+        /// <param name="idUsuario">ID del usuario a desactivar</param>
+        Task<bool> EliminarUsuario(int idUsuario);
+        Task<bool> ActualizarUsuario(UsuarioModel usuario);
 
     }
 }

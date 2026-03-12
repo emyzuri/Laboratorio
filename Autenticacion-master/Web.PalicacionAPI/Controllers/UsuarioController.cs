@@ -82,6 +82,28 @@ namespace Web.PalicacionAPI.Controllers
             );
             return Ok(respuesta);
         }
+        [HttpDelete("Eliminar")]
+        public async Task<IActionResult> EliminarUsuario()
+        {
+            if (!Request.Headers.TryGetValue("idUsuario", out var idUsuarioStr) ||
+                !int.TryParse(idUsuarioStr, out int idUsuario))
+            {
+                return BadRequest(new { esExitoso = false, mensaje = "ID de usuario no válido en la petición." });
+            }
+
+            respuesta = await RespestaServicio.CrearRespuestaExito(logger, async () =>
+                await mediador.Send(new EliminarUsuarioCom(idUsuario))
+            );
+
+            return Ok(respuesta);
+        }
+        [HttpPut("Actualizar")]
+        public async Task<IActionResult> ActualizarUsuario([FromBody] ActualizarUsuarioCom comando)
+        {
+            var resultado = await mediador.Send(comando);
+            if (resultado) return Ok(new { esExitoso = true, mensaje = "Usuario actualizado." });
+            return BadRequest(new { esExitoso = false, mensaje = "Error al actualizar." });
+        }
 
     }
 }

@@ -173,7 +173,7 @@ namespace Core.Aplicacion.Funciones.Comandos.Ensayo
             document.Add(new Paragraph("________________________________________")
                 .SetTextAlignment(TextAlignment.CENTER)
                 .SetFontColor(negro));
-            document.Add(new Paragraph("Responsable del Reporte")
+            document.Add(new Paragraph("VÍCTOR ALFONSO SANTILLÁN RIVERA")
                 .SetFont(boldFont)
                 .SetFontSize(10)
                 .SetTextAlignment(TextAlignment.CENTER));
